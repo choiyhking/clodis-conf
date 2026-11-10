@@ -74,7 +74,7 @@ export function Clock() {
   return (
     <div className="clock" title="A deadline of 23:59 AoE is 20:59 KST on the following day">
       {ZONES.map((z) => (
-        <span key={z.label} className={z.label === 'AoE' ? 'aoe' : ''} title={z.hint}><i>{z.label}</i> {at(z.zone)}</span>
+        <span key={z.label} title={z.hint}><i>{z.label}</i> {at(z.zone)}</span>
       ))}
       <small className="muted">23:59 AoE = 20:59 KST next day</small>
     </div>

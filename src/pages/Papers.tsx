@@ -83,7 +83,7 @@ export default function Papers() {
           <h2>People</h2>
           <div className="card">
             <table className="plain">
-              <thead><tr><th>Member</th><th>Writing</th><th>In review</th><th>Accepted</th><th>Rejected</th><th>Next deadline</th></tr></thead>
+              <thead><tr><th>Member</th><th>In progress</th><th>In review</th><th>Accepted</th><th>Rejected</th><th>Next deadline</th></tr></thead>
               <tbody>
                 {people.map(({ m, writing, review, acc, rej, next }) => (
                   <tr key={m.id}>

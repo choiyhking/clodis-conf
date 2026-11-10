@@ -144,7 +144,7 @@ export default function Timeline() {
         </div>
         <span className="grow" />
         <span className="legend">
-          <i className="lg ps-writing" /> Writing <i className="lg rev" /> Under review <i className="lg ps-accepted" /> Accepted <i className="lg ps-rejected" /> Rejected
+          <i className="lg ps-writing" /> In progress <i className="lg rev" /> Under review <i className="lg ps-accepted" /> Accepted <i className="lg ps-rejected" /> Rejected
         </span>
       </div>
 
