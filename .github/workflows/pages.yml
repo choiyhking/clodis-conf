@@ -31,17 +31,25 @@ jobs:
           cache: npm
       - run: npm ci
 
+      # Dates are collected on the daily schedule and on manual runs only. Code pushes just build and
+      # deploy, so a data commit never races with the next push.
       - name: Collect conference dates
+        if: github.event_name != 'push'
         run: npm run update-data
         continue-on-error: true
 
       - name: Commit collected data
+        if: github.event_name != 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data/auto.json
-          git diff --cached --quiet || git commit -m "data: collect conference dates $(date -u +%F)"
-          git push
+          git diff --cached --quiet && exit 0
+          git commit -m "data: collect conference dates $(date -u +%F)"
+          # Someone may have pushed while this ran: replay our commit on top, and never fail the
+          # deploy over it — tomorrow's run will commit the data again.
+          git pull --rebase origin main || git rebase --abort || true
+          git push || echo "::warning::Could not push collected data; will retry on the next run"
 
       - name: Build
         run: npm run build
