@@ -74,7 +74,8 @@ export interface AutoData {
   crawl: Record<string, CrawlEdition[]>
 }
 
-export type PaperStatus = 'writing' | 'submitted' | 'accepted' | 'rejected'
+// research: being worked on, no venue chosen yet → writing: aimed at a deadline → submitted → accepted / rejected
+export type PaperStatus = 'research' | 'writing' | 'submitted' | 'accepted' | 'rejected'
 
 export interface PaperTarget {
   confId: string
@@ -111,10 +112,19 @@ export interface Member {
   role: Role
 }
 
+/** One line of the activity log: who changed what, and when. */
+export interface LogEntry {
+  id: string
+  at: string // ISO timestamp
+  by: string
+  text: string
+}
+
 export interface Data {
   conferences: Conf[]
   deadlines: Deadline[]
   papers: Paper[]
   members: Member[]
+  log: LogEntry[]
 }
 export type Coll = keyof Data

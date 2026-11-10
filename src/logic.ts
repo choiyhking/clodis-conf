@@ -1,4 +1,4 @@
-import { ROLES, type AutoData, type Conf, type Deadline, type Member, type PaperStatus, type Round, type Row } from './types'
+import { ROLES, type AutoData, type Coll, type Conf, type Data, type Deadline, type Member, type Paper, type PaperStatus, type Round, type Row } from './types'
 
 export const APP_NAME = 'Camera Ready'
 
@@ -55,12 +55,67 @@ export const roundTag = (round: string) => (round ? `R${round}` : '')
 export const rowLabel = (r: { conf: Conf; round: string }) => r.conf.acronym + (r.round ? ` R${r.round}` : '')
 export const STATUS_LABEL: Record<Row['status'], string> = { verified: 'Verified', auto: 'Auto', estimated: 'Estimated' }
 export const PAPER_STATUS: { key: PaperStatus; label: string }[] = [
+  { key: 'research', label: 'Researching' },
   { key: 'writing', label: 'In progress' },
   { key: 'submitted', label: 'Under review' },
   { key: 'accepted', label: 'Accepted' },
   { key: 'rejected', label: 'Rejected' },
 ]
 export const paperStatusLabel = (s: PaperStatus) => PAPER_STATUS.find((x) => x.key === s)!.label
+/** A paper is "researching" until it has a venue, and "in progress" once it does. Later stages are set by hand. */
+export function settleStatus(p: Paper): Paper {
+  if (p.status === 'research' && p.target) return { ...p, status: 'writing' }
+  if (p.status === 'writing' && !p.target) return { ...p, status: 'research' }
+  return p
+}
+
+// ---------- activity log ----------
+const changed = <T extends object>(a: T, b: T, keys: (keyof T)[]) => keys.filter((k) => JSON.stringify(a[k]) !== JSON.stringify(b[k]))
+const arrow = (a: unknown, b: unknown) => `${a || '–'} → ${b || '–'}`
+
+/** One human-readable line for a save or delete, or '' when nothing worth recording changed. */
+export function describeChange(coll: Coll, prev: unknown, next: unknown, data: Data): string {
+  const acr = (confId: string) => data.conferences.find((c) => c.id === confId)?.acronym ?? confId
+  if (coll === 'deadlines') {
+    const a = prev as Deadline | undefined, b = next as Deadline | undefined
+    const d = (b ?? a)!
+    const label = `${acr(d.confId)}${d.round ? ` R${d.round}` : ''} ${d.year}`
+    if (!b) return `Deleted ${label} deadline (${a!.deadline})`
+    if (!a) return `${b.status === 'verified' ? 'Verified' : 'Added'} ${label}: deadline ${b.deadline}`
+    const keys = changed(a, b, ['abstract', 'deadline', 'noti', 'event', 'location', 'url', 'round', 'year', 'note'])
+    const parts = keys.map((k) => `${k === 'noti' ? 'notification' : k} ${arrow(a[k], b[k])}`)
+    if (parts.length) return `Changed ${label}: ${parts.join(', ')}`
+    return b.checkedAt !== a.checkedAt || b.status !== a.status ? `Verified ${label} (deadline ${b.deadline})` : ''
+  }
+  if (coll === 'papers') {
+    const a = prev as Paper | undefined, b = next as Paper | undefined
+    const title = (b ?? a)!.title
+    if (!b) return `Deleted paper "${title}"`
+    if (!a) return `Added paper "${title}"${b.target ? ` targeting ${b.target.label}` : ''}`
+    const parts: string[] = []
+    if (a.status !== b.status) parts.push(`status ${arrow(paperStatusLabel(a.status), paperStatusLabel(b.status))}`)
+    if (a.target?.label !== b.target?.label || a.target?.deadline !== b.target?.deadline) parts.push(`target ${arrow(a.target?.label, b.target?.label)}`)
+    const other = changed(a, b, ['title', 'group', 'members', 'start', 'note', 'link']).map((k) => (k === 'group' ? 'topic' : k === 'members' ? 'people' : k))
+    if (other.length) parts.push(`edited ${other.join(', ')}`)
+    return parts.length ? `"${title}": ${parts.join('; ')}` : ''
+  }
+  if (coll === 'conferences') {
+    const a = prev as Conf | undefined, b = next as Conf | undefined
+    if (!b) return `Stopped tracking ${a!.acronym}`
+    if (!a) return `Started tracking ${b.acronym}`
+    const keys = changed(a, b, ['acronym', 'name', 'area', 'kiise', 'bk', 'blind', 'owner', 'ccfddl'])
+    return keys.length ? `Changed ${b.acronym}: ${keys.map((k) => `${k} ${arrow(a[k], b[k])}`).join(', ')}` : ''
+  }
+  if (coll === 'members') {
+    const a = prev as Member | undefined, b = next as Member | undefined
+    if (!b) return `Removed member ${a!.name}`
+    if (!a) return `Added member ${b.name}${b.role ? ` (${b.role})` : ''}`
+    const keys = changed(a, b, ['name', 'role', 'email'])
+    return keys.length ? `Changed member ${a.name}: ${keys.map((k) => `${k} ${arrow(a[k], b[k])}`).join(', ')}` : ''
+  }
+  return ''
+}
+
 export const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4)
 
 // ---------- people ----------

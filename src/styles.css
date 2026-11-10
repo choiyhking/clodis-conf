@@ -373,3 +373,15 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
 }
 .me-name { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
 .me-name .link { font-size: 11px; font-weight: 400; color: var(--muted); text-decoration: underline; }
+
+/* research stage, pickers, activity log */
+.sdot.ps-research, .lg.ps-research { background: var(--idea); }
+.bar.ps-research { background: linear-gradient(90deg, var(--idea), color-mix(in srgb, var(--idea) 15%, transparent)); box-shadow: none; }
+.combo { display: flex; gap: 6px; } .combo input { flex: 1; }
+.pick-list { display: flex; flex-direction: column; margin-top: 4px; }
+.activity { max-height: 420px; overflow: auto; }
+.activity ul { list-style: none; margin: 0; padding: 0; }
+.activity li { display: grid; grid-template-columns: 124px 110px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 8px 16px; border-top: 1px solid var(--line); }
+.activity li:first-child { border-top: none; }
+.activity time { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.activity .who { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, hue, initials, isDate, isStale, rowLabel,
-  sortMembers, toKST, uid,
+  settleStatus, sortMembers, toKST, uid,
 } from './logic'
 import { useStore } from './store'
 import type { Conf, Deadline, Paper, PaperStatus, Row } from './types'
@@ -310,7 +310,7 @@ export const newPaper = (me: string, today: string, row?: Row): Paper => ({
   group: '',
   members: me ? [me] : [],
   start: today,
-  status: 'writing',
+  status: row ? 'writing' : 'research',
   target: row ? { confId: row.confId, label: rowLabel(row), deadline: row.deadline, noti: row.noti } : null,
   history: [],
   note: '',
@@ -321,7 +321,10 @@ const RESULT_LABEL = { accepted: 'Accepted', rejected: 'Rejected', withdrawn: 'W
 export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: boolean; onClose: () => void }) {
   const { save, remove, data, rows, today } = useStore()
   const [p, setP] = useState<Paper>(paper)
-  const set = <K extends keyof Paper>(k: K, v: Paper[K]) => setP((x) => ({ ...x, [k]: v }))
+  // Choosing or clearing a target moves the paper between Researching and In progress by itself.
+  const set = <K extends keyof Paper>(k: K, v: Paper[K]) => setP((x) => (k === 'target' ? settleStatus({ ...x, [k]: v }) : { ...x, [k]: v }))
+  const topics = useMemo(() => [...new Set(data.papers.map((x) => x.group).filter(Boolean))].sort(), [data.papers])
+  const [newTopic, setNewTopic] = useState(() => !!paper.group && !data.papers.some((x) => x.id !== paper.id && x.group === paper.group) && !data.papers.some((x) => x.group === paper.group))
   const upcoming = useMemo(() => rows.filter((r) => r.deadline >= today), [rows, today])
   const keyOf = (r: { confId: string; deadline: string }) => `${r.confId}|${r.deadline}`
   const targetKey = p.target ? keyOf(p.target) : ''
@@ -339,7 +342,7 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
     if ((p.status === 'accepted' || p.status === 'rejected') && p.target && !sameAttempt(p)) {
       history = [...history, { label: p.target.label, deadline: p.target.deadline, result: p.status, date: today }]
     }
-    await save('papers', { ...p, history })
+    await save('papers', settleStatus({ ...p, history }))
     onClose()
   }
   const retarget = (r: Row) =>
@@ -358,8 +361,18 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
           <input value={p.title} onChange={(e) => set('title', e.target.value)} autoFocus={isNew} placeholder="e.g. LLM-seccomp" />
         </Field>
         <Field label="Research topic">
-          <input value={p.group} onChange={(e) => set('group', e.target.value)} list="groups" placeholder="e.g. Container security" />
-          <datalist id="groups">{[...new Set(data.papers.map((x) => x.group))].filter(Boolean).map((g) => <option key={g} value={g} />)}</datalist>
+          {newTopic || topics.length === 0 ? (
+            <span className="combo">
+              <input value={p.group} onChange={(e) => set('group', e.target.value)} placeholder="New topic, e.g. Container security" autoFocus={newTopic && !isNew} />
+              {topics.length > 0 && <button className="ghost" onClick={() => { setNewTopic(false); set('group', '') }} title="Pick an existing topic instead">Pick</button>}
+            </span>
+          ) : (
+            <select value={p.group} onChange={(e) => (e.target.value === '+' ? (setNewTopic(true), set('group', '')) : set('group', e.target.value))}>
+              <option value="">No topic</option>
+              {topics.map((g) => <option key={g}>{g}</option>)}
+              <option value="+">＋ New topic…</option>
+            </select>
+          )}
         </Field>
         <Field label="Status">
           <select value={p.status} onChange={(e) => set('status', e.target.value as PaperStatus)}>
@@ -426,18 +439,59 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
 }
 export { RESULT_LABEL }
 
+// ---------- pick which paper targets a deadline ----------
+/** From a deadline: choose one of our papers to aim at it, or start a new one. */
+export function TargetModal({ row, onClose }: { row: Row; onClose: () => void }) {
+  const { data, save, me, today } = useStore()
+  const [fresh, setFresh] = useState<Paper | null>(null)
+  const target = { confId: row.confId, label: rowLabel(row), deadline: row.deadline, noti: row.noti }
+  // Anything not currently under review or accepted can be pointed at this deadline.
+  const candidates = data.papers.filter((p) => p.status === 'research' || p.status === 'writing' || p.status === 'rejected')
+  const assign = async (p: Paper) => {
+    const failed = p.status === 'rejected' && p.target && !p.history.some((h) => h.label === p.target!.label && h.deadline === p.target!.deadline)
+    await save('papers', {
+      ...p,
+      history: failed ? [...p.history, { label: p.target!.label, deadline: p.target!.deadline, result: 'rejected', date: today }] : p.history,
+      status: 'writing',
+      target,
+    })
+    onClose()
+  }
+  if (fresh) return <PaperModal paper={fresh} isNew onClose={onClose} />
+  return (
+    <Modal title={`Target ${target.label}`} onClose={onClose}>
+      <p className="muted">Deadline {fmt(row.deadline)} · {countdown(row.deadline, today)}. Which paper is going here?</p>
+      <div className="pick-list">
+        {candidates.map((p) => (
+          <button key={p.id} className="mini" onClick={() => assign(p)} disabled={p.target?.confId === row.confId && p.target.deadline === row.deadline}>
+            <i className={`sdot ps-${p.status}`} /> <b>{p.title}</b> <Avatars names={p.members} />
+            <span className="muted">{p.target ? (p.status === 'rejected' ? `rejected at ${p.target.label}` : `now ${p.target.label}`) : 'no target yet'}</span>
+          </button>
+        ))}
+        {candidates.length === 0 && <p className="muted">No papers yet. Add ongoing work on the Papers page, or start one here.</p>}
+      </div>
+      <footer>
+        <button onClick={() => setFresh(newPaper(me, today, row))}><Icon name="plus" size={14} /> New paper</button>
+        <span className="grow" />
+        <button onClick={onClose}>Cancel</button>
+      </footer>
+    </Modal>
+  )
+}
+
 // ---------- conference detail drawer ----------
 export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) {
-  const { rows, data, today, me } = useStore()
+  const { rows, data, today } = useStore()
   const verify = useVerify()
   const [edit, setEdit] = useState(false)
   const [editConf, setEditConf] = useState(false)
   const [paper, setPaper] = useState<Paper | null>(null)
+  const [pick, setPick] = useState(false)
   useEffect(() => {
-    const h = (e: KeyboardEvent) => e.key === 'Escape' && !edit && !editConf && !paper && onClose()
+    const h = (e: KeyboardEvent) => e.key === 'Escape' && !edit && !editConf && !paper && !pick && onClose()
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [onClose, edit, editConf, paper])
+  }, [onClose, edit, editConf, paper, pick])
 
   // Re-read the row from the store so the drawer reflects edits made from inside it.
   const live = rows.find((r) => r.confId === row.confId && r.deadline === row.deadline) ?? rows.find((r) => r.id === row.id) ?? row
@@ -529,7 +583,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
               <span className="muted">{p.target?.confId === conf.id ? p.target.label : 'Earlier attempt'}</span>
             </button>
           ))}
-          {live.deadline >= today && <button onClick={() => setPaper(newPaper(me, today, live))}><Icon name="plus" size={14} /> Target this deadline</button>}
+          {live.deadline >= today && <button onClick={() => setPick(true)}><Icon name="plus" size={14} /> Target this deadline</button>}
         </section>
 
         {others.length > 0 && (
@@ -551,6 +605,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
       {edit && <DeadlineModal row={live} onClose={() => setEdit(false)} />}
       {editConf && <ConfModal conf={conf} onClose={() => setEditConf(false)} />}
       {paper && <PaperModal paper={paper} isNew={!data.papers.some((p) => p.id === paper.id)} onClose={() => setPaper(null)} />}
+      {pick && <TargetModal row={live} onClose={() => setPick(false)} />}
     </div>
   )
 }

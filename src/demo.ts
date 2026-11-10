@@ -42,7 +42,7 @@ export function demoPapers(rows: Row[], members: Member[], today: string): Paper
       note: 'Third attempt. Reviewers asked for a larger corpus both times.',
     },
     { title: 'eBPF database tracing', group: 'Systems performance', members: [...who(2), ...who(0)].filter((v, i, a) => a.indexOf(v) === i), start: addDays(today, -30), status: 'writing', target: far ? target(far) : null, history: [] },
-    { title: 'LogNER', group: 'Systems performance', members: who(2), start: addDays(today, -20), status: 'writing', target: null, history: [], note: 'Need to decide between a systems venue and an NLP one.' },
+    { title: 'LogNER', group: 'Systems performance', members: who(2), start: addDays(today, -20), status: 'research', target: null, history: [], note: 'Need to decide between a systems venue and an NLP one.' },
     { title: 'MicroVM for IoT gateways', group: 'IoT', members: who(1, true), start: addDays(today, -210), status: 'submitted', target: review1 ? target(review1) : null, history: [] },
     { title: 'Web crawling at the edge', group: 'IoT', members: who(0), start: addDays(today, -160), status: 'submitted', target: review2 ? target(review2) : null, history: [] },
     { title: 'Sandbox policy synthesis', group: 'Container security', members: who(2, true), start: addDays(today, -260), status: 'accepted', target: won ? target(won) : null, history: won ? [past(won, 'accepted')] : [] },

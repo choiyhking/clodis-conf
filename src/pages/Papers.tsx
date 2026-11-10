@@ -18,6 +18,7 @@ export default function Papers() {
         const hist = mine.flatMap((p) => p.history)
         return {
           m,
+          research: mine.filter((p) => p.status === 'research').length,
           writing: mine.filter((p) => p.status === 'writing').length,
           review: mine.filter((p) => p.status === 'submitted').length,
           acc: hist.filter((h) => h.result === 'accepted').length,
@@ -36,7 +37,7 @@ export default function Papers() {
       <header className="page-head">
         <div>
           <h1>Papers</h1>
-          <p className="muted">Who is writing what, where it's going, and how past submissions went</p>
+          <p className="muted">Ongoing research, where each paper is headed, and how past submissions went</p>
         </div>
         <button className="primary" onClick={() => setPaper(newPaper(me, today))}><Icon name="plus" size={14} /> New paper</button>
       </header>
@@ -83,11 +84,12 @@ export default function Papers() {
           <h2>People</h2>
           <div className="card">
             <table className="plain">
-              <thead><tr><th>Member</th><th>In progress</th><th>In review</th><th>Accepted</th><th>Rejected</th><th>Next deadline</th></tr></thead>
+              <thead><tr><th>Member</th><th>Researching</th><th>In progress</th><th>In review</th><th>Accepted</th><th>Rejected</th><th>Next deadline</th></tr></thead>
               <tbody>
-                {people.map(({ m, writing, review, acc, rej, next }) => (
+                {people.map(({ m, research, writing, review, acc, rej, next }) => (
                   <tr key={m.id}>
                     <td><span className="person"><Avatar name={m.name} /> {m.name} {m.role && <span className="tag">{m.role}</span>}</span></td>
+                    <td>{research || <span className="muted">–</span>}</td>
                     <td>{writing || <span className="muted">–</span>}</td>
                     <td>{review || <span className="muted">–</span>}</td>
                     <td>{acc || <span className="muted">–</span>}</td>
