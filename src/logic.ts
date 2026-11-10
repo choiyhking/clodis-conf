@@ -1,0 +1,310 @@
+import { ROLES, type AutoData, type Conf, type Deadline, type Member, type PaperStatus, type Round, type Row } from './types'
+
+export const APP_NAME = 'Camera Ready'
+
+// ---------- dates ----------
+const DAY = 86400000
+export const toMs = (d: string) => Date.parse(d + 'T00:00:00Z')
+export const fromMs = (ms: number) => new Date(ms).toISOString().slice(0, 10)
+export const addDays = (d: string, n: number) => fromMs(toMs(d) + n * DAY)
+export const diffDays = (a: string, b: string) => Math.round((toMs(a) - toMs(b)) / DAY)
+export function todayStr() {
+  const n = new Date()
+  const p = (x: number) => String(x).padStart(2, '0')
+  return `${n.getFullYear()}-${p(n.getMonth() + 1)}-${p(n.getDate())}`
+}
+export const isDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s)
+export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+/** Every date in the UI is shown as ISO 2026-11-17; this only blanks out missing values. */
+export const fmt = (d: string) => (isDate(d) ? d : '')
+export const fmtShort = fmt
+export const monthTitle = (ym: string) => `${MONTHS_LONG[Number(ym.slice(5, 7)) - 1]} ${ym.slice(0, 4)}`
+export function countdown(deadline: string, today: string) {
+  const n = diffDays(deadline, today)
+  return n === 0 ? 'Today' : n > 0 ? `${n}d` : 'Closed'
+}
+
+// ---------- timezones ----------
+/** Hours from UTC for the zone names deadline sources use: "AoE", "UTC-12", "UTC+8", "UTC". null if unknown. */
+export function tzOffset(tz: string): number | null {
+  const t = tz.trim().toUpperCase()
+  if (t === 'AOE') return -12
+  const m = t.match(/^(?:UTC|GMT)\s*([+-]\d{1,2})?$/)
+  return m ? Number(m[1] ?? 0) : null
+}
+/** A deadline given as date + time in some zone, expressed in Korean time: "2026-11-18 20:59". */
+export function toKST(date: string, time: string, tz: string): string {
+  const off = tzOffset(tz)
+  if (off === null || !isDate(date) || !/^\d{2}:\d{2}$/.test(time)) return ''
+  const ms = Date.parse(`${date}T${time}:00Z`) - off * 3600000 + 9 * 3600000
+  return new Date(ms).toISOString().slice(0, 16).replace('T', ' ')
+}
+
+/** First day of a conference from free text such as "June 13-19, 2027" or "May 31 and June 2-4, 2026". */
+export function eventStart(text: string): string {
+  const m = text.match(/([A-Za-z]{3,9})\.?\s+(\d{1,2})/)
+  const y = text.match(/20\d\d/)
+  const month = m ? MONTHS.findIndex((x) => x.toLowerCase() === m[1].slice(0, 3).toLowerCase()) : -1
+  if (!m || !y || month < 0) return ''
+  return `${y[0]}-${String(month + 1).padStart(2, '0')}-${m[2].padStart(2, '0')}`
+}
+
+// ---------- labels ----------
+export const roundTag = (round: string) => (round ? `R${round}` : '')
+export const rowLabel = (r: { conf: Conf; round: string }) => r.conf.acronym + (r.round ? ` R${r.round}` : '')
+export const STATUS_LABEL: Record<Row['status'], string> = { verified: 'Verified', auto: 'Auto', estimated: 'Estimated' }
+export const PAPER_STATUS: { key: PaperStatus; label: string }[] = [
+  { key: 'writing', label: 'Writing' },
+  { key: 'submitted', label: 'Under review' },
+  { key: 'accepted', label: 'Accepted' },
+  { key: 'rejected', label: 'Rejected' },
+]
+export const paperStatusLabel = (s: PaperStatus) => PAPER_STATUS.find((x) => x.key === s)!.label
+export const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4)
+
+// ---------- people ----------
+export const roleRank = (role: string) => {
+  const i = ROLES.indexOf(role as (typeof ROLES)[number])
+  return i < 0 ? ROLES.length : i
+}
+export const sortMembers = (ms: Member[]) => [...ms].sort((a, b) => roleRank(a.role) - roleRank(b.role) || a.name.localeCompare(b.name))
+/** Stable hue per name so a person keeps the same avatar colour everywhere. */
+export function hue(name: string) {
+  let h = 0
+  for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) % 360
+  return h
+}
+/** Korean names read better as the given name (last two syllables); Latin names as initials. */
+export function initials(name: string) {
+  const n = name.trim()
+  if (/[가-힣]/.test(n)) return n.length > 2 ? n.slice(-2) : n
+  return n.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+}
+
+// ---------- places ----------
+const COUNTRY: Record<string, string> = {
+  usa: 'US', us: 'US', 'united states': 'US', uk: 'GB', 'united kingdom': 'GB', england: 'GB', scotland: 'GB', wales: 'GB',
+  italy: 'IT', netherlands: 'NL', 'south korea': 'KR', korea: 'KR', france: 'FR', germany: 'DE', australia: 'AU', au: 'AU',
+  singapore: 'SG', greece: 'GR', czechia: 'CZ', 'czech republic': 'CZ', belgium: 'BE', canada: 'CA', japan: 'JP', hungary: 'HU',
+  china: 'CN', denmark: 'DK', ireland: 'IE', india: 'IN', poland: 'PL', morocco: 'MA', vietnam: 'VN', macau: 'MO', macao: 'MO',
+  'new zealand': 'NZ', sweden: 'SE', 'hong kong': 'HK', spain: 'ES', portugal: 'PT', austria: 'AT', switzerland: 'CH',
+  brazil: 'BR', mexico: 'MX', taiwan: 'TW', thailand: 'TH', uae: 'AE', 'united arab emirates': 'AE', turkey: 'TR', 'türkiye': 'TR',
+  norway: 'NO', finland: 'FI', israel: 'IL', chile: 'CL', argentina: 'AR', malaysia: 'MY', indonesia: 'ID', 'south africa': 'ZA',
+  egypt: 'EG', croatia: 'HR', cyprus: 'CY', malta: 'MT', luxembourg: 'LU', romania: 'RO', estonia: 'EE', slovenia: 'SI',
+  'saudi arabia': 'SA', qatar: 'QA', philippines: 'PH', colombia: 'CO', peru: 'PE', iceland: 'IS', bulgaria: 'BG', serbia: 'RS',
+}
+const US_STATES =
+  'AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY DC'.split(' ')
+const US_STATE_NAMES = /\b(california|texas|georgia|massachusetts|colorado|washington|florida|hawaii|utah|virginia|new york|illinois|ohio|oregon|arizona|nevada|pennsylvania|michigan|minnesota|maryland|louisiana|tennessee|north carolina)\b/i
+
+/** Flag emoji for a free-text location, or '' when the country can't be told. */
+export function flagOf(location: string): string {
+  if (!location) return ''
+  if (/virtual|online/i.test(location)) return '🌐'
+  const parts = location.split(',').map((p) => p.trim()).filter(Boolean)
+  let code = ''
+  for (let i = parts.length - 1; i >= 0 && !code; i--) {
+    const p = parts[i]
+    code = COUNTRY[p.toLowerCase().replace(/\s+sar$/, '')] ?? (US_STATES.includes(p) ? 'US' : '')
+  }
+  if (!code) {
+    const lower = location.toLowerCase()
+    code = Object.entries(COUNTRY).find(([name]) => name.length > 3 && lower.includes(name))?.[1] ?? (US_STATE_NAMES.test(location) ? 'US' : '')
+  }
+  return code ? String.fromCodePoint(...[...code].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)) : ''
+}
+
+// ---------- merging collected data into rows ----------
+export const autoSig = (a: Round) => [a.abstract, a.deadline, a.noti].join('|')
+const MATCH_WINDOW = 21 // days: a collected round and a stored row this close are the same round
+const STALE_DAYS = 45
+const MAX_SITE_ROUNDS = 2 // a page yielding more "rounds" than this was almost certainly misread
+
+interface Collected {
+  year: number
+  link: string
+  place: string
+  date: string
+  rounds: (Round & { sources: string[]; evidence: string[]; tz: string })[]
+}
+
+/**
+ * One list of editions per conference from both collectors.
+ * ccfddl (hand-curated, ~90% exact against our verified dates) is the primary source; the site crawler
+ * fills editions ccfddl doesn't have yet and acts as a second opinion on the ones it does.
+ */
+export function collected(conf: Conf, auto: AutoData): Collected[] {
+  const ccf = (conf.ccfddl && auto.ccfddl[conf.ccfddl]?.editions) || []
+  const crawl = auto.crawl?.[conf.id] ?? []
+  const years = [...new Set([...ccf.map((e) => e.year), ...crawl.map((e) => e.year)])].sort()
+  const out: Collected[] = []
+  for (const year of years) {
+    const c = ccf.find((e) => e.year === year)
+    const s = crawl.find((e) => e.year === year)
+    const cRounds = (c?.rounds ?? []).filter((r) => isDate(r.deadline))
+    const sRounds = (s?.rounds ?? []).filter((r) => isDate(r.deadline))
+    if (cRounds.length) {
+      out.push({
+        year,
+        link: c!.link || s?.url || '',
+        place: c!.place,
+        date: c!.date,
+        rounds: cRounds.map((r) => {
+          const same = sRounds.find((x) => x.deadline === r.deadline)
+          return { ...r, noti: r.noti || same?.noti || '', sources: same ? ['ccfddl', 'site'] : ['ccfddl'], evidence: same ? s!.evidence : [], tz: c!.timezone ?? '' }
+        }),
+      })
+    } else if (sRounds.length && sRounds.length <= MAX_SITE_ROUNDS) {
+      out.push({ year, link: s!.url, place: '', date: '', rounds: sRounds.map((r) => ({ ...r, sources: ['site'], evidence: s!.evidence, tz: '' })) })
+    }
+  }
+  return out
+}
+
+/** Stored deadlines + collected data + last-year estimates → rows for display. */
+export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData | null, today: string): Row[] {
+  const confById = new Map(confs.map((c) => [c.id, c]))
+  const rows: Row[] = []
+  for (const d of deadlines) {
+    const conf = confById.get(d.confId)
+    if (conf) rows.push({ ...d, conf, virtual: false })
+  }
+
+  // 1) collected values
+  if (auto) {
+    for (const conf of confs) {
+      const mine = rows.filter((r) => r.confId === conf.id)
+      for (const ed of collected(conf, auto)) {
+        ed.rounds.forEach((a, i) => {
+          const round = ed.rounds.length > 1 ? `${i + 1}/${ed.rounds.length}` : ''
+          const source = a.sources[0]
+          let best: Row | undefined
+          for (const r of mine) {
+            const gap = Math.abs(diffDays(r.deadline, a.deadline))
+            if (gap <= MATCH_WINDOW && (!best || gap < Math.abs(diffDays(best.deadline, a.deadline)))) best = r
+          }
+          if (best && best.status === 'verified') {
+            // Past deadlines aren't worth an alert. Notification dates aren't compared: sources differ on
+            // whether they mean the first-round or the final decision.
+            const upcoming = best.deadline >= today || a.deadline >= today
+            const differs = best.deadline !== a.deadline || (!!a.abstract && best.abstract !== a.abstract)
+            if (upcoming && differs && best.autoSig !== autoSig(a)) best.autoDiff = { ...a, link: ed.link, source }
+            best.sources = a.sources
+            best.evidence = a.evidence
+            if (best.deadline === a.deadline) Object.assign(best, { time: a.time, tz: a.tz })
+          } else if (best) {
+            // An estimate from the sheet, and the real dates are now out: show the collected values.
+            Object.assign(best, {
+              abstract: a.abstract,
+              deadline: a.deadline,
+              noti: a.noti || best.noti,
+              notiEstimated: !a.noti && !!best.noti,
+              status: 'auto',
+              year: ed.year,
+              round: best.round || round,
+              url: ed.link || best.url,
+              location: ed.place || best.location,
+              event: eventStart(ed.date) || best.event,
+              source,
+              checkedAt: auto.generatedAt.slice(0, 10),
+              checkedBy: '',
+              sources: a.sources,
+              evidence: a.evidence,
+              time: a.time,
+              tz: a.tz,
+            })
+          } else if (diffDays(a.deadline, today) > -400) {
+            const row: Row = {
+              id: `${conf.id}-${a.deadline}`,
+              confId: conf.id,
+              conf,
+              year: ed.year,
+              round,
+              abstract: a.abstract,
+              deadline: a.deadline,
+              noti: a.noti,
+              event: eventStart(ed.date),
+              location: ed.place,
+              url: ed.link,
+              status: 'auto',
+              checkedAt: auto.generatedAt.slice(0, 10),
+              checkedBy: '',
+              source,
+              note: [ed.date, a.comment].filter(Boolean).join(' · '),
+              virtual: true,
+              sources: a.sources,
+              evidence: a.evidence,
+              time: a.time,
+              tz: a.tz,
+            }
+            rows.push(row)
+            mine.push(row)
+          }
+        })
+      }
+    }
+  }
+
+  // 2) no dates for the next edition yet → project last year's dates forward 364 days (same weekday)
+  const byConf = new Map<string, Row[]>()
+  for (const r of rows) byConf.set(r.confId, [...(byConf.get(r.confId) ?? []), r])
+  for (const list of byConf.values()) {
+    for (const r of [...list]) {
+      if (r.deadline >= today || r.status === 'estimated') continue
+      const hasNext = list.some((o) => {
+        const gap = diffDays(o.deadline, r.deadline)
+        return gap > 300 && gap < 430
+      })
+      if (hasNext) continue
+      // Usually one year ahead; if a conference has gone more than a year with no news, keep projecting
+      // (up to three years) rather than letting it drop off the list.
+      let years = 1
+      while (years < 3 && addDays(r.deadline, 364 * years) < today) years++
+      const shift = (d: string) => (d ? addDays(d, 364 * years) : '')
+      const dl = shift(r.deadline)
+      if (dl < today) continue
+      if (list.some((o) => Math.abs(diffDays(o.deadline, dl)) < 60)) continue // something real or projected is already there
+      const est: Row = {
+        ...r,
+        id: `${r.confId}-${dl}`,
+        year: r.year + years,
+        abstract: shift(r.abstract),
+        deadline: dl,
+        noti: shift(r.noti),
+        event: shift(r.event),
+        location: '',
+        status: 'estimated',
+        notiEstimated: false,
+        checkedAt: '',
+        checkedBy: '',
+        source: 'estimate',
+        note: '',
+        virtual: true,
+        derivedFrom: r.deadline,
+        autoDiff: undefined,
+        autoSig: undefined,
+        sources: undefined,
+        evidence: undefined,
+        time: undefined,
+        tz: undefined,
+      }
+      rows.push(est)
+      list.push(est)
+    }
+  }
+  return rows.sort((a, b) => a.deadline.localeCompare(b.deadline) || a.conf.acronym.localeCompare(b.conf.acronym))
+}
+
+export const isStale = (r: Row, today: string) =>
+  r.status === 'verified' && r.deadline >= today && (!r.checkedAt || diffDays(today, r.checkedAt) > STALE_DAYS)
+
+/** Next year's site exists but we have no dates for that edition yet. */
+export function newSites(confs: Conf[], deadlines: Deadline[], auto: AutoData | null) {
+  if (!auto?.crawl) return []
+  const maxYear = new Map<string, number>()
+  for (const d of deadlines) maxYear.set(d.confId, Math.max(maxYear.get(d.confId) ?? 0, d.year))
+  return confs.flatMap((conf) =>
+    (auto.crawl[conf.id] ?? []).filter((e) => e.firstSeen && e.year > (maxYear.get(conf.id) ?? 0)).map((site) => ({ conf, site })),
+  )
+}

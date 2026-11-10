@@ -1,0 +1,1123 @@
+{
+ "aaai": {
+  "acronym": "AAAI",
+  "kiise": "S",
+  "bk": 4
+ },
+ "acl": {
+  "acronym": "ACL",
+  "kiise": "S",
+  "bk": 4
+ },
+ "ase": {
+  "acronym": "ASE",
+  "kiise": "S",
+  "bk": 3
+ },
+ "asplos": {
+  "acronym": "ASPLOS",
+  "kiise": "S",
+  "bk": 4
+ },
+ "cav": {
+  "acronym": "CAV",
+  "kiise": "S",
+  "bk": 4
+ },
+ "ccs": {
+  "acronym": "CCS",
+  "kiise": "S",
+  "bk": 4
+ },
+ "chi": {
+  "acronym": "CHI",
+  "kiise": "S",
+  "bk": 4
+ },
+ "cikm": {
+  "acronym": "CIKM",
+  "kiise": "S",
+  "bk": 3
+ },
+ "conext": {
+  "acronym": "CONEXT",
+  "kiise": "S",
+  "bk": 3
+ },
+ "crypto": {
+  "acronym": "CRYPTO",
+  "kiise": "S",
+  "bk": 4
+ },
+ "cvpr": {
+  "acronym": "CVPR",
+  "kiise": "S",
+  "bk": 4
+ },
+ "dac": {
+  "acronym": "DAC",
+  "kiise": "S",
+  "bk": 3
+ },
+ "eccv": {
+  "acronym": "ECCV",
+  "kiise": "S",
+  "bk": 2
+ },
+ "emnlp": {
+  "acronym": "EMNLP",
+  "kiise": "S",
+  "bk": 3
+ },
+ "eurocrypt": {
+  "acronym": "EUROCRYPT",
+  "kiise": "S",
+  "bk": 4
+ },
+ "eurosys": {
+  "acronym": "EuroSys",
+  "kiise": "S",
+  "bk": 2
+ },
+ "focs": {
+  "acronym": "FOCS",
+  "kiise": "S",
+  "bk": 4
+ },
+ "fse": {
+  "acronym": "FSE",
+  "kiise": "A",
+  "bk": 4
+ },
+ "hpca": {
+  "acronym": "HPCA",
+  "kiise": "S",
+  "bk": 4
+ },
+ "iccv": {
+  "acronym": "ICCV",
+  "kiise": "S",
+  "bk": 4
+ },
+ "icde": {
+  "acronym": "ICDE",
+  "kiise": "S",
+  "bk": 3
+ },
+ "icdm": {
+  "acronym": "ICDM",
+  "kiise": "S",
+  "bk": 3
+ },
+ "icfp": {
+  "acronym": "ICFP",
+  "kiise": "S",
+  "bk": 2
+ },
+ "iclr": {
+  "acronym": "ICLR",
+  "kiise": "S"
+ },
+ "icml": {
+  "acronym": "ICML",
+  "kiise": "S",
+  "bk": 4
+ },
+ "icse": {
+  "acronym": "ICSE",
+  "kiise": "S",
+  "bk": 4
+ },
+ "infocom": {
+  "acronym": "INFOCOM",
+  "kiise": "S",
+  "bk": 4
+ },
+ "isca": {
+  "acronym": "ISCA",
+  "kiise": "S",
+  "bk": 4
+ },
+ "ismar": {
+  "acronym": "ISMAR",
+  "kiise": "S",
+  "bk": 1
+ },
+ "ismb": {
+  "acronym": "ISMB",
+  "kiise": "S",
+  "bk": 1
+ },
+ "issta": {
+  "acronym": "ISSTA",
+  "kiise": "S",
+  "bk": 2
+ },
+ "kdd": {
+  "acronym": "KDD",
+  "kiise": "S",
+  "bk": 4
+ },
+ "lics": {
+  "acronym": "LICS",
+  "kiise": "S",
+  "bk": 3
+ },
+ "miccai": {
+  "acronym": "MICCAI",
+  "kiise": "S",
+  "bk": 1
+ },
+ "micro": {
+  "acronym": "MICRO",
+  "kiise": "S",
+  "bk": 4
+ },
+ "mobicom": {
+  "acronym": "MobiCom",
+  "kiise": "S",
+  "bk": 4
+ },
+ "mobisys": {
+  "acronym": "MobiSys",
+  "kiise": "S",
+  "bk": 3
+ },
+ "naacl": {
+  "acronym": "NAACL",
+  "kiise": "S"
+ },
+ "ndss": {
+  "acronym": "NDSS",
+  "kiise": "S",
+  "bk": 2
+ },
+ "neurips": {
+  "acronym": "NeurIPS",
+  "kiise": "S"
+ },
+ "oopsla": {
+  "acronym": "OOPSLA",
+  "kiise": "S",
+  "bk": 4
+ },
+ "pact": {
+  "acronym": "PACT",
+  "kiise": "S",
+  "bk": 3
+ },
+ "pldi": {
+  "acronym": "PLDI",
+  "kiise": "S",
+  "bk": 4
+ },
+ "podc": {
+  "acronym": "PODC",
+  "kiise": "S",
+  "bk": 3
+ },
+ "pods": {
+  "acronym": "PODS",
+  "kiise": "S",
+  "bk": 3
+ },
+ "popl": {
+  "acronym": "POPL",
+  "kiise": "S",
+  "bk": 4
+ },
+ "ppopp": {
+  "acronym": "PPoPP",
+  "kiise": "S",
+  "bk": 3
+ },
+ "rtas": {
+  "acronym": "RTAS",
+  "kiise": "S",
+  "bk": 2
+ },
+ "rtss": {
+  "acronym": "RTSS",
+  "kiise": "S",
+  "bk": 4
+ },
+ "snp": {
+  "acronym": "S&P",
+  "kiise": "S",
+  "bk": 4
+ },
+ "sc": {
+  "acronym": "SC",
+  "kiise": "S",
+  "bk": 3
+ },
+ "sigcomm": {
+  "acronym": "SIGCOMM",
+  "kiise": "S",
+  "bk": 4
+ },
+ "siggraph": {
+  "acronym": "SIGGRAPH",
+  "kiise": "S",
+  "bk": 4
+ },
+ "siggraph-asia": {
+  "acronym": "SIGGRAPH ASIA",
+  "kiise": "S"
+ },
+ "sigir": {
+  "acronym": "SIGIR",
+  "kiise": "S",
+  "bk": 4
+ },
+ "sigmetrics": {
+  "acronym": "SIGMETRICS",
+  "kiise": "S",
+  "bk": 3
+ },
+ "sigmod": {
+  "acronym": "SIGMOD",
+  "kiise": "S",
+  "bk": 4
+ },
+ "socg": {
+  "acronym": "SOCG",
+  "kiise": "S",
+  "bk": 2
+ },
+ "soda": {
+  "acronym": "SODA",
+  "kiise": "S",
+  "bk": 3
+ },
+ "sosp": {
+  "acronym": "SOSP",
+  "kiise": "S",
+  "bk": 4
+ },
+ "stoc": {
+  "acronym": "STOC",
+  "kiise": "S",
+  "bk": 4
+ },
+ "ubicomp": {
+  "acronym": "UBICOMP",
+  "kiise": "S",
+  "bk": 3
+ },
+ "uist": {
+  "acronym": "UIST",
+  "kiise": "S",
+  "bk": 2
+ },
+ "usenix-atc": {
+  "acronym": "USENIX ATC",
+  "kiise": "S"
+ },
+ "usenix-fast": {
+  "acronym": "USENIX FAST",
+  "kiise": "S"
+ },
+ "usenix-nsdi": {
+  "acronym": "USENIX NSDI",
+  "kiise": "S"
+ },
+ "usenix-osdi": {
+  "acronym": "USENIX OSDI",
+  "kiise": "S"
+ },
+ "vis": {
+  "acronym": "VIS",
+  "kiise": "S",
+  "bk": 4
+ },
+ "vldb": {
+  "acronym": "VLDB",
+  "kiise": "S"
+ },
+ "vr": {
+  "acronym": "VR",
+  "kiise": "S",
+  "bk": 2
+ },
+ "wsdm": {
+  "acronym": "WSDM",
+  "kiise": "S",
+  "bk": 3
+ },
+ "www": {
+  "acronym": "WWW",
+  "kiise": "S",
+  "bk": 4
+ },
+ "aamas": {
+  "acronym": "AAMAS",
+  "kiise": "A",
+  "bk": 2
+ },
+ "accv": {
+  "acronym": "ACCV",
+  "kiise": "A",
+  "bk": 1
+ },
+ "acl-findings": {
+  "acronym": "ACL Findings",
+  "kiise": "A"
+ },
+ "acns": {
+  "acronym": "ACNS",
+  "kiise": "A"
+ },
+ "acsac": {
+  "acronym": "ACSAC",
+  "kiise": "A",
+  "bk": 2
+ },
+ "aistats": {
+  "acronym": "AISTATS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "ancs": {
+  "acronym": "ANCS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "asiaccs": {
+  "acronym": "ASIACCS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "asiacrypt": {
+  "acronym": "ASIACRYPT",
+  "kiise": "A",
+  "bk": 2
+ },
+ "asonam": {
+  "acronym": "ASONAM",
+  "kiise": "A"
+ },
+ "bcb": {
+  "acronym": "BCB",
+  "kiise": "A"
+ },
+ "bibm": {
+  "acronym": "BIBM",
+  "kiise": "A",
+  "bk": 1
+ },
+ "bigdata": {
+  "acronym": "BIGDATA",
+  "kiise": "A"
+ },
+ "bmvc": {
+  "acronym": "BMVC",
+  "kiise": "A"
+ },
+ "cases": {
+  "acronym": "CASES",
+  "kiise": "A",
+  "bk": 2
+ },
+ "cc": {
+  "acronym": "CC",
+  "kiise": "A",
+  "bk": 2
+ },
+ "ccc": {
+  "acronym": "CCC",
+  "kiise": "A",
+  "bk": 2
+ },
+ "ccgrid": {
+  "acronym": "CCGRID",
+  "kiise": "A",
+  "bk": 1
+ },
+ "cgo": {
+  "acronym": "CGO",
+  "kiise": "A",
+  "bk": 2
+ },
+ "ches": {
+  "acronym": "CHES",
+  "kiise": "A"
+ },
+ "cidr": {
+  "acronym": "CIDR",
+  "kiise": "A"
+ },
+ "cloud": {
+  "acronym": "CLOUD",
+  "kiise": "A",
+  "bk": 1
+ },
+ "cluster": {
+  "acronym": "CLUSTER",
+  "kiise": "A",
+  "bk": 1
+ },
+ "codaspy": {
+  "acronym": "CODASPY",
+  "kiise": "A"
+ },
+ "codes-isss": {
+  "acronym": "CODES+ISSS",
+  "kiise": "A"
+ },
+ "coling": {
+  "acronym": "COLING",
+  "kiise": "A",
+  "bk": 2
+ },
+ "colt": {
+  "acronym": "COLT",
+  "kiise": "A",
+  "bk": 3
+ },
+ "concur": {
+  "acronym": "CONCUR",
+  "kiise": "A",
+  "bk": 1
+ },
+ "conll": {
+  "acronym": "CoNLL",
+  "kiise": "A"
+ },
+ "corl": {
+  "acronym": "CoRL",
+  "kiise": "A"
+ },
+ "cpm": {
+  "acronym": "CPM",
+  "kiise": "A"
+ },
+ "cscw": {
+  "acronym": "CSCW",
+  "kiise": "A",
+  "bk": 3
+ },
+ "csf": {
+  "acronym": "CSF",
+  "kiise": "A",
+  "bk": 1
+ },
+ "dasfaa": {
+  "acronym": "DASFAA",
+  "kiise": "A",
+  "bk": 1
+ },
+ "date": {
+  "acronym": "DATE",
+  "kiise": "A",
+  "bk": 2
+ },
+ "disc": {
+  "acronym": "DISC",
+  "kiise": "A",
+  "bk": 2
+ },
+ "dlt": {
+  "acronym": "DLT",
+  "kiise": "A"
+ },
+ "dsn": {
+  "acronym": "DSN",
+  "kiise": "A",
+  "bk": 2
+ },
+ "eacl": {
+  "acronym": "EACL",
+  "kiise": "A",
+  "bk": 2
+ },
+ "eccb": {
+  "acronym": "ECCB",
+  "kiise": "A"
+ },
+ "ecoop": {
+  "acronym": "ECOOP",
+  "kiise": "A",
+  "bk": 2
+ },
+ "ecrts": {
+  "acronym": "ECRTS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "edbt": {
+  "acronym": "EDBT",
+  "kiise": "A",
+  "bk": 2
+ },
+ "emsoft": {
+  "acronym": "EMSOFT",
+  "kiise": "A",
+  "bk": 2
+ },
+ "esa": {
+  "acronym": "ESA",
+  "kiise": "A",
+  "bk": 2
+ },
+ "esop": {
+  "acronym": "ESOP",
+  "kiise": "A",
+  "bk": 2
+ },
+ "esorics": {
+  "acronym": "ESORICS",
+  "kiise": "A",
+  "bk": 2
+ },
+ "eg": {
+  "acronym": "EG",
+  "kiise": "A"
+ },
+ "euro-par": {
+  "acronym": "EURO-PAR",
+  "kiise": "A"
+ },
+ "eurosnp": {
+  "acronym": "EuroS&P",
+  "kiise": "A"
+ },
+ "eurovis": {
+  "acronym": "EuroVis",
+  "kiise": "A"
+ },
+ "fase": {
+  "acronym": "FASE",
+  "kiise": "A",
+  "bk": 1
+ },
+ "fc": {
+  "acronym": "FC",
+  "kiise": "A",
+  "bk": 1
+ },
+ "fccm": {
+  "acronym": "FCCM",
+  "kiise": "A"
+ },
+ "fm": {
+  "acronym": "FM",
+  "kiise": "A"
+ },
+ "fpga": {
+  "acronym": "FPGA",
+  "kiise": "A"
+ },
+ "fpl": {
+  "acronym": "FPL",
+  "kiise": "A"
+ },
+ "hpdc": {
+  "acronym": "HPDC",
+  "kiise": "A",
+  "bk": 2
+ },
+ "i3d": {
+  "acronym": "i3D",
+  "kiise": "A"
+ },
+ "icalp": {
+  "acronym": "ICALP",
+  "kiise": "A",
+  "bk": 2
+ },
+ "icassp": {
+  "acronym": "ICASSP",
+  "kiise": "A"
+ },
+ "iccad": {
+  "acronym": "ICCAD",
+  "kiise": "A",
+  "bk": 3
+ },
+ "iccd": {
+  "acronym": "ICCD",
+  "kiise": "A",
+  "bk": 1
+ },
+ "iccps": {
+  "acronym": "ICCPS",
+  "kiise": "A"
+ },
+ "icdcs": {
+  "acronym": "ICDCS",
+  "kiise": "A",
+  "bk": 3
+ },
+ "icn": {
+  "acronym": "ICN",
+  "kiise": "A"
+ },
+ "icnp": {
+  "acronym": "ICNP",
+  "kiise": "A",
+  "bk": 2
+ },
+ "icpp": {
+  "acronym": "ICPP",
+  "kiise": "A",
+  "bk": 2
+ },
+ "icra": {
+  "acronym": "ICRA",
+  "kiise": "A",
+  "bk": 1
+ },
+ "ics": {
+  "acronym": "ICS",
+  "kiise": "A",
+  "bk": 2
+ },
+ "fseicsme": {
+  "acronym": "FSEICSME",
+  "kiise": "A"
+ },
+ "icsoc": {
+  "acronym": "ICSOC",
+  "kiise": "A",
+  "bk": 1
+ },
+ "icst": {
+  "acronym": "ICST",
+  "kiise": "A",
+  "bk": 1
+ },
+ "icws": {
+  "acronym": "ICWS",
+  "kiise": "A",
+  "bk": 2
+ },
+ "icwsm": {
+  "acronym": "ICWSM",
+  "kiise": "A"
+ },
+ "iiswc": {
+  "acronym": "IISWC",
+  "kiise": "A",
+  "bk": 1
+ },
+ "ijcai": {
+  "acronym": "IJCAI",
+  "kiise": "A",
+  "bk": 4
+ },
+ "ijcnlp": {
+  "acronym": "IJCNLP",
+  "kiise": "A"
+ },
+ "imc": {
+  "acronym": "IMC",
+  "kiise": "A",
+  "bk": 2
+ },
+ "interspeech": {
+  "acronym": "InterSpeech",
+  "kiise": "A"
+ },
+ "ipdps": {
+  "acronym": "IPDPS",
+  "kiise": "A",
+  "bk": 2
+ },
+ "ipmi": {
+  "acronym": "IPMI",
+  "kiise": "A"
+ },
+ "ipsn": {
+  "acronym": "IPSN",
+  "kiise": "A",
+  "bk": 3
+ },
+ "iros": {
+  "acronym": "IROS",
+  "kiise": "A"
+ },
+ "isaac": {
+  "acronym": "ISAAC",
+  "kiise": "A",
+  "bk": 1
+ },
+ "islped": {
+  "acronym": "ISLPED",
+  "kiise": "A",
+  "bk": 1
+ },
+ "ispass": {
+  "acronym": "ISPASS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "issre": {
+  "acronym": "ISSRE",
+  "kiise": "A",
+  "bk": 1
+ },
+ "iswc": {
+  "acronym": "ISWC",
+  "kiise": "A",
+  "bk": 2
+ },
+ "iui": {
+  "acronym": "IUI",
+  "kiise": "A",
+  "bk": 2
+ },
+ "lctes": {
+  "acronym": "LCTES",
+  "kiise": "A",
+  "bk": 2
+ },
+ "mascots": {
+  "acronym": "MASCOTS",
+  "kiise": "A",
+  "bk": 2
+ },
+ "mass": {
+  "acronym": "MASS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "mfcs": {
+  "acronym": "MFCS",
+  "kiise": "A"
+ },
+ "middleware": {
+  "acronym": "MIDDLEWARE",
+  "kiise": "A"
+ },
+ "mlsys": {
+  "acronym": "MLSys",
+  "kiise": "A"
+ },
+ "mm": {
+  "acronym": "MM",
+  "kiise": "A",
+  "bk": 4
+ },
+ "mmsys": {
+  "acronym": "MMsys",
+  "kiise": "A"
+ },
+ "mobihoc": {
+  "acronym": "MobiHoc",
+  "kiise": "A",
+  "bk": 3
+ },
+ "models": {
+  "acronym": "MODELS",
+  "kiise": "A",
+  "bk": 2
+ },
+ "msr": {
+  "acronym": "MSR",
+  "kiise": "A"
+ },
+ "msst": {
+  "acronym": "MSST",
+  "kiise": "A",
+  "bk": 1
+ },
+ "naacl-findings": {
+  "acronym": "NAACL Findings",
+  "kiise": "A"
+ },
+ "noms": {
+  "acronym": "NOMS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "pakdd": {
+  "acronym": "PAKDD",
+  "kiise": "A",
+  "bk": 1
+ },
+ "pam": {
+  "acronym": "PAM",
+  "kiise": "A"
+ },
+ "percom": {
+  "acronym": "PERCOM",
+  "kiise": "A",
+  "bk": 3
+ },
+ "pets": {
+  "acronym": "PETS",
+  "kiise": "A"
+ },
+ "pg": {
+  "acronym": "PG",
+  "kiise": "A",
+  "bk": 2
+ },
+ "pkc": {
+  "acronym": "PKC",
+  "kiise": "A"
+ },
+ "pkdd": {
+  "acronym": "PKDD",
+  "kiise": "A"
+ },
+ "psb": {
+  "acronym": "PSB",
+  "kiise": "A"
+ },
+ "raid": {
+  "acronym": "RAID",
+  "kiise": "A",
+  "bk": 2
+ },
+ "re": {
+  "acronym": "RE",
+  "kiise": "A",
+  "bk": 2
+ },
+ "recomb": {
+  "acronym": "RECOMB",
+  "kiise": "A",
+  "bk": 1
+ },
+ "recsys": {
+  "acronym": "RecSys",
+  "kiise": "A",
+  "bk": 1
+ },
+ "rss": {
+  "acronym": "RSS",
+  "kiise": "A",
+  "bk": 2
+ },
+ "saner": {
+  "acronym": "SANER",
+  "kiise": "A"
+ },
+ "sas": {
+  "acronym": "SAS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "sca": {
+  "acronym": "SCA",
+  "kiise": "A"
+ },
+ "sdm": {
+  "acronym": "SDM",
+  "kiise": "A",
+  "bk": 2
+ },
+ "secon": {
+  "acronym": "SECON",
+  "kiise": "A",
+  "bk": 1
+ },
+ "sensys": {
+  "acronym": "SenSys",
+  "kiise": "A",
+  "bk": 3
+ },
+ "sgp": {
+  "acronym": "SGP",
+  "kiise": "A",
+  "bk": 1
+ },
+ "socc": {
+  "acronym": "SOCC",
+  "kiise": "A",
+  "bk": 1
+ },
+ "soups": {
+  "acronym": "SOUPS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "spaa": {
+  "acronym": "SPAA",
+  "kiise": "A",
+  "bk": 3
+ },
+ "srds": {
+  "acronym": "SRDS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "stacs": {
+  "acronym": "STACS",
+  "kiise": "A",
+  "bk": 1
+ },
+ "swat": {
+  "acronym": "SWAT",
+  "kiise": "A"
+ },
+ "systor": {
+  "acronym": "SYSTOR",
+  "kiise": "A"
+ },
+ "tacas": {
+  "acronym": "TACAS",
+  "kiise": "A",
+  "bk": 2
+ },
+ "uai": {
+  "acronym": "UAI",
+  "kiise": "A",
+  "bk": 3
+ },
+ "vmcai": {
+  "acronym": "VMCAI",
+  "kiise": "A"
+ },
+ "vrst": {
+  "acronym": "VRST",
+  "kiise": "A",
+  "bk": 1
+ },
+ "wacv": {
+  "acronym": "WACV",
+  "kiise": "A"
+ },
+ "wads": {
+  "acronym": "WADS",
+  "kiise": "A"
+ },
+ "whc": {
+  "acronym": "WHC",
+  "kiise": "A"
+ },
+ "wiopt": {
+  "acronym": "WiOpt",
+  "kiise": "A"
+ },
+ "wisec": {
+  "acronym": "WiSec",
+  "kiise": "A"
+ },
+ "wowmom": {
+  "acronym": "WoWMoM",
+  "kiise": "A"
+ },
+ "nips": {
+  "acronym": "NIPS",
+  "bk": 4
+ },
+ "vldb-pvldb": {
+  "acronym": "VLDB/PVLDB",
+  "bk": 4
+ },
+ "nsdi": {
+  "acronym": "NSDI",
+  "bk": 4
+ },
+ "osdi": {
+  "acronym": "OSDI",
+  "bk": 4
+ },
+ "kr": {
+  "acronym": "KR",
+  "bk": 3
+ },
+ "atc": {
+  "acronym": "ATC",
+  "bk": 3
+ },
+ "fast": {
+  "acronym": "FAST",
+  "bk": 3
+ },
+ "security": {
+  "acronym": "Security",
+  "bk": 3
+ },
+ "cogsci": {
+  "acronym": "CogSci",
+  "bk": 2
+ },
+ "naacl-hlt": {
+  "acronym": "NAACL/HLT",
+  "bk": 2
+ },
+ "codes": {
+  "acronym": "CODES",
+  "bk": 2
+ },
+ "icmr": {
+  "acronym": "ICMR",
+  "bk": 1
+ },
+ "nossdav": {
+  "acronym": "NOSSDAV",
+  "bk": 1
+ },
+ "sac": {
+  "acronym": "SAC",
+  "bk": 1
+ },
+ "i3dg": {
+  "acronym": "i3DG",
+  "bk": 1
+ },
+ "vee": {
+  "acronym": "VEE",
+  "bk": 1
+ },
+ "cseet": {
+  "acronym": "CSEET",
+  "bk": 1
+ },
+ "ecai": {
+  "acronym": "ECAI",
+  "bk": 1
+ },
+ "gecco": {
+  "acronym": "GECCO",
+  "bk": 1
+ },
+ "infovis": {
+  "acronym": "InfoVis",
+  "bk": 1
+ },
+ "avss": {
+  "acronym": "AVSS",
+  "bk": 1
+ },
+ "hipc": {
+  "acronym": "HiPC",
+  "bk": 1
+ },
+ "icpr": {
+  "acronym": "ICPR",
+  "bk": 1
+ },
+ "icaps": {
+  "acronym": "ICAPS",
+  "bk": 1
+ },
+ "hipeac": {
+  "acronym": "HiPEAC",
+  "bk": 1
+ },
+ "its": {
+  "acronym": "ITS",
+  "bk": 1
+ },
+ "iclp": {
+  "acronym": "ICLP",
+  "bk": 1
+ },
+ "europar": {
+  "acronym": "Europar",
+  "bk": 1
+ },
+ "ijcar": {
+  "acronym": "IJCAR",
+  "bk": 1
+ },
+ "tcc": {
+  "acronym": "TCC",
+  "bk": 1
+ }
+}
