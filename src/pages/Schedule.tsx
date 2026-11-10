@@ -159,7 +159,8 @@ export default function Schedule() {
                     <td className={'date c' + est}>{fmt(r.abstract) || <span className="faint">–</span>}</td>
                     <td className={'date strong c' + est}>{fmt(r.deadline)}</td>
                     <td className="c"><Countdown deadline={r.deadline} today={today} /></td>
-                    <td className={'date c emph' + (est || r.notiEstimated ? ' est' : '')}>{fmt(r.noti) || <span className="faint">TBD</span>}</td>
+                    <td className={'date c emph' + (est || r.notiEstimated ? ' est' : '')}
+                      title={r.noti && (est || r.notiEstimated) ? 'Estimated: the notification date has not been announced, so this is projected from the previous edition' : undefined}>{fmt(r.noti) || <span className="faint">TBD</span>}</td>
                     <td className="date c emph days">{r.noti ? `${diffDays(r.noti, r.deadline)}d` : <span className="faint">–</span>}</td>
                     <td className="two-line">
                       <Place location={r.location} />

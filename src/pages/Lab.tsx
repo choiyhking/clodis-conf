@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { DEMO_PREFIX, demoPapers } from '../demo'
-import { roleRank, sortMembers, uid } from '../logic'
+import { ICON_CHOICES, ROLE_ICON, roleRank, sortMembers, uid } from '../logic'
 import { MODE, loadSeed, supabase, useStore } from '../store'
 import { ROLES, type Data, type Member, type Role } from '../types'
 import { Avatar, Icon } from '../ui'
@@ -90,6 +90,12 @@ export default function Lab() {
                     <td className="m-name">
                       <Avatar name={m.name} size={26} />
                       <input defaultValue={m.name} key={m.name} aria-label="Name" onBlur={(e) => rename(m, e.target.value)} onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()} />
+                    </td>
+                    <td className="m-icon">
+                      <select value={m.icon ?? ''} onChange={(e) => save('members', { ...m, icon: e.target.value })} aria-label="Icon" title="Icon shown for this person">
+                        <option value="">{ROLE_ICON[m.role] ? `${ROLE_ICON[m.role]} default` : 'Initials'}</option>
+                        {ICON_CHOICES.map((i) => <option key={i} value={i}>{i}</option>)}
+                      </select>
                     </td>
                     <td>
                       <select value={m.role} onChange={(e) => save('members', { ...m, role: e.target.value as Role })} aria-label="Role">

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
-  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, hue, initials, isDate, isStale, rowLabel,
+  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, hue, initials, isDate, isStale, memberIcon, paperLinks, rowLabel,
   settleStatus, sortMembers, toKST, uid,
 } from './logic'
 import { useStore } from './store'
@@ -29,12 +29,20 @@ export function Icon({ name, size = 16 }: { name: keyof typeof ICONS | string; s
   )
 }
 
+/** A person shown as their icon (their own pick, else the one for their role) on a per-person tint. */
 export function Avatar({ name, size = 22 }: { name: string; size?: number }) {
+  const { data } = useStore()
   if (!name) return null
+  const m = data.members.find((x) => x.name === name)
+  const icon = m ? memberIcon(m) : ''
   const unknown = name === '?'
   return (
-    <span className="avatar" title={unknown ? 'Not selected' : name} style={{ width: size, height: size, fontSize: size * 0.42, background: unknown ? 'var(--faint)' : `hsl(${hue(name)} 55% 42%)` }}>
-      {unknown ? '?' : initials(name)}
+    <span
+      className={'avatar' + (icon ? ' emoji' : '')}
+      title={unknown ? 'Not selected' : m?.role ? `${name} · ${m.role}` : name}
+      style={{ width: size, height: size, fontSize: size * (icon ? 0.58 : 0.42), background: unknown ? 'var(--faint)' : icon ? `hsl(${hue(name)} 60% 88%)` : `hsl(${hue(name)} 55% 42%)` }}
+    >
+      {unknown ? '?' : icon || initials(name)}
     </span>
   )
 }
@@ -330,10 +338,12 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
   const targetKey = p.target ? keyOf(p.target) : ''
   const toTarget = (r: Row) => ({ confId: r.confId, label: rowLabel(r), deadline: r.deadline, noti: r.noti })
   const sameAttempt = (x: Paper) => x.history.some((h) => h.label === x.target!.label && h.deadline === x.target!.deadline)
-  // Where could this go next once the current target's result is out?
-  const after = p.target?.noti || p.target?.deadline || today
+  const links = paperLinks(p)
+  const setLinks = (v: string[]) => setP((x) => ({ ...x, links: v, link: '' }))
+  // Where could this go next? After the decision if we're still waiting for it, from today if it's already rejected.
+  const after = p.status === 'rejected' ? today : p.target?.noti || p.target?.deadline || today
   const nextOptions = useMemo(
-    () => upcoming.filter((r) => r.deadline > after && r.confId !== p.target?.confId).slice(0, 8),
+    () => upcoming.filter((r) => r.deadline > after && r.confId !== p.target?.confId).slice(0, 5),
     [upcoming, after, p.target],
   )
   const submit = async () => {
@@ -342,7 +352,7 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
     if ((p.status === 'accepted' || p.status === 'rejected') && p.target && !sameAttempt(p)) {
       history = [...history, { label: p.target.label, deadline: p.target.deadline, result: p.status, date: today }]
     }
-    await save('papers', settleStatus({ ...p, history }))
+    await save('papers', settleStatus({ ...p, history, links: links.map((l) => l.trim()).filter(Boolean), link: '' }))
     onClose()
   }
   const retarget = (r: Row) =>
@@ -396,23 +406,46 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
             {p.target && !upcoming.some((r) => keyOf(r) === targetKey) && <option value={targetKey}>{p.target.label} — {fmt(p.target.deadline)}</option>}
             {upcoming.map((r) => (
               <option key={r.id} value={keyOf(r)}>
-                {fmt(r.deadline)} · {rowLabel(r)} · {countdown(r.deadline, today)}{r.status !== 'verified' ? ` · ${STATUS_LABEL[r.status].toLowerCase()}` : ''}
+                {rowLabel(r)} — due {fmt(r.deadline)} ({diffDays(r.deadline, today)} days left){r.status === 'estimated' ? ', date not announced yet' : ''}
               </option>
             ))}
           </select>
         </Field>
         <Field label="Started"><input type="date" value={p.start} onChange={(e) => set('start', e.target.value)} /></Field>
-        <Field label="Link (Overleaf, repo…)"><input value={p.link} onChange={(e) => set('link', e.target.value)} /></Field>
-        <Field label="Notes" span><textarea rows={2} value={p.note} onChange={(e) => set('note', e.target.value)} /></Field>
-      </div>
-      {p.target && nextOptions.length > 0 && (
-        <div className="next">
-          <span className="muted">If it doesn't get in — deadlines after the {p.target.label} result ({fmt(p.target.noti) || 'date TBD'}). Click to retarget.</span>
-          <div className="chips">
-            {nextOptions.map((r) => (
-              <button key={r.id} className="chip" onClick={() => retarget(r)}>{rowLabel(r)} <small>{fmtShort(r.deadline)}</small></button>
+        <Field label="Notes"><textarea rows={1} value={p.note} onChange={(e) => set('note', e.target.value)} /></Field>
+        <Field label="Links (Overleaf, repo, slides…)" span>
+          <div className="links">
+            {links.map((l, i) => (
+              <span className="combo" key={i}>
+                <input value={l} placeholder="https://…" onChange={(e) => setLinks(links.map((x, j) => (j === i ? e.target.value : x)))} />
+                {/^https?:\/\//.test(l) && <a className="btn" href={l} target="_blank" rel="noreferrer" title="Open"><Icon name="link" size={14} /></a>}
+                <button className="ghost" onClick={() => setLinks(links.filter((_, j) => j !== i))} aria-label="Remove link"><Icon name="close" size={14} /></button>
+              </span>
             ))}
+            <button className="ghost add-link" onClick={() => setLinks([...links, ''])}><Icon name="plus" size={14} /> Add link</button>
           </div>
+        </Field>
+      </div>
+      {p.target && p.status !== 'accepted' && nextOptions.length > 0 && (
+        <div className="next fallback">
+          <b>{p.status === 'rejected' ? `Rejected at ${p.target.label} — where next?` : `Backup plan if ${p.target.label} rejects it`}</b>
+          <span className="muted">
+            {p.status === 'rejected'
+              ? 'The nearest deadlines still open:'
+              : p.target.noti
+                ? `The decision comes on ${fmt(p.target.noti)}. These are the first deadlines after that:`
+                : 'No decision date yet, so these are simply the next deadlines after this one:'}
+          </span>
+          <ul>
+            {nextOptions.map((r) => (
+              <li key={r.id}>
+                <b>{rowLabel(r)}</b>
+                <span>{fmt(r.deadline)}</span>
+                <span className="muted">{diffDays(r.deadline, after)} days {p.status === 'rejected' ? 'from now' : p.target?.noti ? 'after the decision' : 'after this deadline'}</span>
+                <button onClick={() => retarget(r)}>Make this the target</button>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
       {p.history.length > 0 && (
