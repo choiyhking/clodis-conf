@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:local": "vite --mode demo --port 5174",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "update-data": "node scripts/update.mjs"

@@ -55,7 +55,7 @@ export const roundTag = (round: string) => (round ? `R${round}` : '')
 export const rowLabel = (r: { conf: Conf; round: string }) => r.conf.acronym + (r.round ? ` R${r.round}` : '')
 export const STATUS_LABEL: Record<Row['status'], string> = { verified: 'Verified', auto: 'Auto', estimated: 'Estimated' }
 export const PAPER_STATUS: { key: PaperStatus; label: string }[] = [
-  { key: 'writing', label: 'Writing' },
+  { key: 'writing', label: 'In progress' },
   { key: 'submitted', label: 'Under review' },
   { key: 'accepted', label: 'Accepted' },
   { key: 'rejected', label: 'Rejected' },

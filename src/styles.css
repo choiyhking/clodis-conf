@@ -166,6 +166,9 @@ th { position: sticky; top: 0; z-index: 2; background: var(--surface); font-size
 .sched tbody tr.reviewing:hover td { background: color-mix(in srgb, var(--row-review) 80%, var(--text) 6%); }
 .sched td.date { font-variant-numeric: tabular-nums; }
 .sched td.strong { font-weight: 600; }
+/* Notification and review time decide where a rejected paper can go next, so they read as strongly as the deadline. */
+.sched td.key { font-weight: 600; }
+.sched td.key.days { color: var(--accent-ink); }
 .faint { color: var(--faint); }
 .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-left: 8px; border: 1px solid var(--line-strong); }
 .sw.targeted { background: var(--row-target); } .sw.reviewing { background: var(--row-review); }
@@ -182,8 +185,6 @@ td.conf { max-width: 208px; }
 .clock { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-bottom: 14px; font-variant-numeric: tabular-nums; }
 .clock span { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-weight: 600; }
 .clock i { font-style: normal; font-weight: 500; color: var(--muted); font-size: 11.5px; }
-.clock .aoe { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); }
-.clock .aoe i { color: var(--accent-ink); }
 .clock small { margin-left: 4px; }
 .steps .when { width: 100%; }
 .steps .when b { font-size: 12px; color: var(--text); }
@@ -262,7 +263,7 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
 
 /* timeline */
 .tl { overflow-x: auto; --left: 232px; }
-.tl-inner { min-width: 1080px; position: relative; }
+.tl-inner { min-width: 1080px; position: relative; padding-bottom: 22px; }
 .tl-row { display: grid; grid-template-columns: var(--left) minmax(0, 1fr); }
 .tl-left { padding: 8px 14px; border-right: 1px solid var(--line); display: flex; flex-direction: column; justify-content: center; min-width: 0; position: sticky; left: 0; background: var(--surface); z-index: 3; }
 .tl-track { position: relative; min-width: 0; }
@@ -313,7 +314,7 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
 .attempt { position: absolute; top: 2px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; display: grid; place-items: center; font-size: 8.5px; font-style: normal; font-weight: 700; z-index: 1; }
 .tl-today { position: absolute; top: 0; bottom: 0; left: var(--left); right: 0; pointer-events: none; z-index: 2; }
 .tl-today div { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1.5px solid var(--hot); }
-.tl-today span { position: absolute; top: 34px; left: -22px; width: 44px; text-align: center; font-size: 10.5px; font-weight: 700; color: #fff; background: var(--hot); border-radius: 8px; line-height: 16px; }
+.tl-today span { position: absolute; bottom: 3px; left: -22px; width: 44px; text-align: center; font-size: 10.5px; font-weight: 700; color: #fff; background: var(--hot); border-radius: 8px; line-height: 16px; }
 .legend { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
 .lg { display: inline-block; width: 16px; height: 8px; border-radius: 3px; margin-left: 8px; }
 .range { margin: 0 6px; font-variant-numeric: tabular-nums; }
