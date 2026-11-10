@@ -58,7 +58,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [auto, setAuto] = useState<AutoData | null>(null)
   const [ready, setReady] = useState(false)
   const [error, setError] = useState('')
-  const [me, setMeState] = useState(() => localStorage.getItem(LS_ME) ?? '')
+  const [localMe, setLocalMe] = useState(() => localStorage.getItem(LS_ME) ?? '')
   const [session, setSession] = useState<string | null>(null)
   const today = todayStr()
 
@@ -102,16 +102,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [reload])
 
-  // If the signed-in email belongs to a member, select that member as "me".
-  useEffect(() => {
-    const m = session && data.members.find((x) => x.email && x.email.toLowerCase() === session.toLowerCase())
-    if (m && m.name !== me) setMe(m.name)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, data.members])
+  // Who "me" is.
+  //  - shared mode: whoever's member entry carries the signed-in email. It is not a free choice, so
+  //    nobody ends up acting as someone else by accident; picking a name once links the account to it.
+  //  - local mode: a plain per-browser choice.
+  const sameEmail = (a: string) => !!session && a.trim().toLowerCase() === session.toLowerCase()
+  const me = supabase ? (data.members.find((m) => sameEmail(m.email))?.name ?? '') : localMe
 
   const setMe = (name: string) => {
-    localStorage.setItem(LS_ME, name)
-    setMeState(name)
+    if (!supabase) {
+      localStorage.setItem(LS_ME, name)
+      return setLocalMe(name)
+    }
+    if (!session) return
+    for (const m of data.members) {
+      if (m.name === name && !sameEmail(m.email)) void save('members', { ...m, email: session })
+      else if (m.name !== name && sameEmail(m.email)) void save('members', { ...m, email: '' })
+    }
   }
 
   const save: Ctx['save'] = async (coll, doc) => {
