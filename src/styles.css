@@ -49,7 +49,9 @@ small { font-size: 12px; }
 .icon { flex: none; vertical-align: -3px; }
 .loading { padding: 40px; color: var(--muted); }
 .error { background: var(--hot-soft); color: var(--hot); padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; }
-.est { color: var(--est); font-style: italic; }
+/* Estimated dates look like any other date, with a small ? after them. Zero width keeps columns aligned. */
+.est { color: inherit; font-style: normal; }
+.est:not(:has(.faint))::after { content: '?'; display: inline-block; width: 0; overflow: visible; font-size: 0.72em; font-weight: 700; color: var(--est); vertical-align: super; line-height: 0; padding-left: 1px; }
 
 /* controls */
 button, input, select, textarea { font: inherit; color: inherit; }
