@@ -609,14 +609,14 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
 
         <section>
           <h3>Papers</h3>
-          {papers.length === 0 && <p className="muted">Nobody is targeting {conf.acronym} yet.</p>}
+          {papers.length === 0 && <p className="nobody">Nobody is targeting <b>{rowLabel(live)}</b> yet.</p>}
           {papers.map((p) => (
             <button key={p.id} className="mini" onClick={() => setPaper(p)}>
               <i className={`sdot ps-${p.status}`} /> <b>{p.title}</b> <Avatars names={p.members} />
               <span className="muted">{p.target?.confId === conf.id ? p.target.label : 'Earlier attempt'}</span>
             </button>
           ))}
-          {live.deadline >= today && <button onClick={() => setPick(true)}><Icon name="plus" size={14} /> Target this deadline</button>}
+          {live.deadline >= today && <button onClick={() => setPick(true)}><Icon name="plus" size={14} /> Target {rowLabel(live)}</button>}
         </section>
 
         {others.length > 0 && (
