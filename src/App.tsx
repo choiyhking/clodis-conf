@@ -82,12 +82,28 @@ export default function App() {
         <div className="side-foot">
           <label className="me">
             <Avatar name={me || '?'} size={28} />
-            <span>
-              <select value={me} onChange={(e) => setMe(e.target.value)} aria-label="Who are you?">
-                <option value="">Who are you?</option>
-                {sortMembers(data.members).map((m) => <option key={m.id}>{m.name}</option>)}
-              </select>
-              <small className="muted">{meRole || (me ? 'Role not set' : 'Pick your name')}</small>
+            <span title={session ? `Signed in as ${session}` : undefined}>
+              {MODE === 'supabase' && me ? (
+                // Shared mode: identity follows the login. To change it, move the email in Lab → Members.
+                <b className="me-name">
+                  {me}
+                  <button className="link" onClick={() => confirm(`Unlink ${session} from ${me}?`) && setMe('')}>Not you?</button>
+                </b>
+              ) : (
+                <select
+                  value={me}
+                  aria-label="Who are you?"
+                  onChange={(e) => {
+                    const name = e.target.value
+                    if (MODE === 'supabase' && name && !confirm(`Link ${session} to ${name}? You will act as ${name} from now on.`)) return
+                    setMe(name)
+                  }}
+                >
+                  <option value="">Who are you?</option>
+                  {sortMembers(data.members).map((m) => <option key={m.id}>{m.name}</option>)}
+                </select>
+              )}
+              <small className="muted">{meRole || (me ? 'Role not set' : MODE === 'supabase' ? 'Pick your name once' : 'Pick your name')}</small>
             </span>
           </label>
           <p className="sync muted">
