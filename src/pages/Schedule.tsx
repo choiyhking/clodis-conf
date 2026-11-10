@@ -158,8 +158,8 @@ export default function Schedule() {
                     <td className={'date c' + est}>{fmt(r.abstract) || <span className="faint">–</span>}</td>
                     <td className={'date strong c' + est}>{fmt(r.deadline)}</td>
                     <td className="c"><Countdown deadline={r.deadline} today={today} /></td>
-                    <td className={'date c key' + (est || r.notiEstimated ? ' est' : '')}>{fmt(r.noti) || <span className="faint">TBD</span>}</td>
-                    <td className="date c key days">{r.noti ? `${diffDays(r.noti, r.deadline)}d` : <span className="faint">–</span>}</td>
+                    <td className={'date c emph' + (est || r.notiEstimated ? ' est' : '')}>{fmt(r.noti) || <span className="faint">TBD</span>}</td>
+                    <td className="date c emph days">{r.noti ? `${diffDays(r.noti, r.deadline)}d` : <span className="faint">–</span>}</td>
                     <td className="two-line">
                       <Place location={r.location} />
                       <small>Starts {fmt(r.event) || 'TBD'}</small>

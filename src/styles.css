@@ -167,8 +167,8 @@ th { position: sticky; top: 0; z-index: 2; background: var(--surface); font-size
 .sched td.date { font-variant-numeric: tabular-nums; }
 .sched td.strong { font-weight: 600; }
 /* Notification and review time decide where a rejected paper can go next, so they read as strongly as the deadline. */
-.sched td.key { font-weight: 600; }
-.sched td.key.days { color: var(--accent-ink); }
+.sched td.emph { font-weight: 600; }
+.sched td.emph.days { color: var(--accent-ink); }
 .faint { color: var(--faint); }
 .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-left: 8px; border: 1px solid var(--line-strong); }
 .sw.targeted { background: var(--row-target); } .sw.reviewing { background: var(--row-review); }
