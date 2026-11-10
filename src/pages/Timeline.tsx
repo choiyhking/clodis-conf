@@ -59,7 +59,7 @@ export default function Timeline() {
 
   const visible = (p: Paper) => {
     const last = p.target?.noti || p.target?.deadline || today
-    return p.status === 'writing' || p.status === 'submitted' || last >= start
+    return p.status === 'research' || p.status === 'writing' || p.status === 'submitted' || last >= start
   }
   const groups: { key: string; head: ReactNode; papers: Paper[] }[] =
     by === 'person'
@@ -78,7 +78,7 @@ export default function Timeline() {
 
   const sub = (p: Paper) => {
     const t = p.target
-    if (!t) return 'No target yet'
+    if (!t) return 'Researching · no target yet'
     if (p.status === 'submitted') return `${t.label} · result ${t.noti ? fmtShort(t.noti) : 'TBD'}`
     if (p.status === 'accepted') return `Accepted at ${t.label}`
     if (p.status === 'rejected') return `Rejected at ${t.label}`
@@ -87,7 +87,7 @@ export default function Timeline() {
 
   const bar = (p: Paper) => {
     const t = p.target
-    const working = p.status === 'writing'
+    const working = p.status === 'research' || p.status === 'writing'
     const from = p.start && p.start > start ? p.start : start
     const to = t?.deadline ?? today
     const show = to > start && from < end && from < to
@@ -144,7 +144,7 @@ export default function Timeline() {
         </div>
         <span className="grow" />
         <span className="legend">
-          <i className="lg ps-writing" /> In progress <i className="lg rev" /> Under review <i className="lg ps-accepted" /> Accepted <i className="lg ps-rejected" /> Rejected
+          <i className="lg ps-research" /> Researching <i className="lg ps-writing" /> In progress <i className="lg rev" /> Under review <i className="lg ps-accepted" /> Accepted <i className="lg ps-rejected" /> Rejected
         </span>
       </div>
 

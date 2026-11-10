@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { buildRows, todayStr } from './logic'
-import type { AutoData, Coll, Conf, Data, Deadline, Member, Row } from './types'
+import { buildRows, describeChange, todayStr, uid } from './logic'
+import type { AutoData, Coll, Conf, Data, Deadline, LogEntry, Member, Row } from './types'
 
 /**
  * Two storage back-ends behind one interface:
@@ -16,7 +16,7 @@ export const MODE = supabase ? 'supabase' : 'local'
 
 const LS_KEY = 'labconf:data:v1'
 const LS_ME = 'labconf:me'
-const EMPTY: Data = { conferences: [], deadlines: [], papers: [], members: [] }
+const EMPTY: Data = { conferences: [], deadlines: [], papers: [], members: [], log: [] }
 const COLLS = Object.keys(EMPTY) as Coll[]
 
 const getJson = async <T,>(path: string): Promise<T> => (await fetch(`./data/${path}`, { cache: 'no-cache' })).json()
@@ -32,7 +32,7 @@ export async function loadSeed(): Promise<Data> {
     { id: 'professor', name: '교수님', email: '', role: 'Professor' },
     ...names.map((name) => ({ id: name, name, email: '', role: '' as const })),
   ]
-  return { conferences, deadlines, papers: [], members }
+  return { conferences, deadlines, papers: [], members, log: [] }
 }
 
 interface Ctx {
@@ -79,7 +79,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (!s.session) return setData(EMPTY)
         const { data: docs, error } = await supabase.from('docs').select('coll,id,data').limit(10000)
         if (error) throw error
-        const d: Data = { conferences: [], deadlines: [], papers: [], members: [] }
+        const d: Data = { conferences: [], deadlines: [], papers: [], members: [], log: [] }
         for (const doc of docs ?? []) (d[doc.coll as Coll] as unknown[] | undefined)?.push(doc.data)
         setData(d)
       }
@@ -121,31 +121,42 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  /** Activity-log entry for a change, or null when it isn't worth a line. */
+  const logEntry = (coll: Coll, prev: unknown, next: unknown): LogEntry | null => {
+    if (coll === 'log') return null
+    const text = describeChange(coll, prev, next, data)
+    return text ? { id: uid(), at: new Date().toISOString(), by: me || session || 'unknown', text } : null
+  }
+
   const save: Ctx['save'] = async (coll, doc) => {
+    const entry = logEntry(coll, (data[coll] as { id: string }[]).find((x) => x.id === doc.id), doc)
     setData((prev) => {
       const list = prev[coll] as { id: string }[]
       const next = list.some((x) => x.id === doc.id) ? list.map((x) => (x.id === doc.id ? doc : x)) : [...list, doc]
-      const d = { ...prev, [coll]: next } as Data
+      const d = { ...prev, [coll]: next, ...(entry ? { log: [...prev.log, entry] } : {}) } as Data
       if (!supabase) persistLocal(d)
       return d
     })
     if (supabase) {
+      const stamp = { updated_at: new Date().toISOString(), updated_by: session ?? me }
       const { error } = await supabase
         .from('docs')
-        .upsert({ coll, id: doc.id, data: doc, updated_at: new Date().toISOString(), updated_by: session ?? me })
+        .upsert([{ coll, id: doc.id, data: doc, ...stamp }, ...(entry ? [{ coll: 'log', id: entry.id, data: entry, ...stamp }] : [])])
       if (error) setError(error.message)
     }
   }
 
   const remove: Ctx['remove'] = async (coll, id) => {
+    const entry = logEntry(coll, (data[coll] as { id: string }[]).find((x) => x.id === id), undefined)
     setData((prev) => {
-      const d = { ...prev, [coll]: (prev[coll] as { id: string }[]).filter((x) => x.id !== id) } as Data
+      const d = { ...prev, [coll]: (prev[coll] as { id: string }[]).filter((x) => x.id !== id), ...(entry ? { log: [...prev.log, entry] } : {}) } as Data
       if (!supabase) persistLocal(d)
       return d
     })
     if (supabase) {
       const { error } = await supabase.from('docs').delete().eq('coll', coll).eq('id', id)
-      if (error) setError(error.message)
+      if (error) return setError(error.message)
+      if (entry) await supabase.from('docs').upsert({ coll: 'log', id: entry.id, data: entry, updated_at: entry.at, updated_by: session ?? me })
     }
   }
 
@@ -167,11 +178,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     await reload()
   }
 
-  // Older data may still carry the retired 'idea' / 'dropped' statuses; show those papers as writing.
+  // Older data may still carry the retired 'idea' / 'dropped' statuses; show those papers as researching.
   useEffect(() => {
     const retired = (s: string) => s === 'idea' || s === 'dropped'
     if (data.papers.some((p) => retired(p.status)))
-      setData((d) => ({ ...d, papers: d.papers.map((p) => (retired(p.status) ? { ...p, status: 'writing' as const } : p)) }))
+      setData((d) => ({ ...d, papers: d.papers.map((p) => (retired(p.status) ? { ...p, status: 'research' as const } : p)) }))
   }, [data.papers])
 
   const rows = useMemo(() => buildRows(data.conferences, data.deadlines, auto, today), [data, auto, today])

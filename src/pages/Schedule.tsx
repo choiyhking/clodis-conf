@@ -2,14 +2,14 @@ import { Fragment, useMemo, useState } from 'react'
 import { addDays, countdown, diffDays, fmt, roundTag, sortMembers } from '../logic'
 import { useStore } from '../store'
 import type { Paper, Row } from '../types'
-import { AreaTag, Avatar, Avatars, Clock, ConfDrawer, ConfModal, Countdown, Icon, PaperModal, Place, Rank, StatusBadge, newPaper } from '../ui'
+import { AreaTag, Avatar, Avatars, Clock, ConfDrawer, ConfModal, Countdown, Icon, PaperModal, Place, Rank, StatusBadge, TargetModal } from '../ui'
 import { isStale } from '../logic'
 
 const COLS = 10
 const PAST_DAYS = 365 // "Show past" goes back one year; older rows stay in the data but off the table
 
 export default function Schedule() {
-  const { rows, data, today, me } = useStore()
+  const { rows, data, today } = useStore()
   const [q, setQ] = useState('')
   const [area, setArea] = useState('')
   const [rank, setRank] = useState('')
@@ -20,6 +20,7 @@ export default function Schedule() {
   const [open, setOpen] = useState<Row | null>(null)
   const [addConf, setAddConf] = useState(false)
   const [paper, setPaper] = useState<Paper | null>(null)
+  const [pick, setPick] = useState<Row | null>(null)
 
   // Papers being written for, or under review at, each deadline.
   const targets = useMemo(() => {
@@ -177,7 +178,7 @@ export default function Schedule() {
                           </button>
                         ))}
                         {r.deadline >= today && (
-                          <button className="ghost add" title="Add a paper targeting this deadline" onClick={() => setPaper(newPaper(me, today, r))}><Icon name="plus" size={14} /></button>
+                          <button className="ghost add" title="Target this deadline with one of our papers" onClick={() => setPick(r)}><Icon name="plus" size={14} /></button>
                         )}
                       </span>
                     </td>
@@ -192,6 +193,7 @@ export default function Schedule() {
 
       {open && <ConfDrawer row={open} onClose={() => setOpen(null)} />}
       {addConf && <ConfModal conf={null} onClose={() => setAddConf(false)} />}
+      {pick && <TargetModal row={pick} onClose={() => setPick(null)} />}
       {paper && <PaperModal paper={paper} isNew={!data.papers.some((p) => p.id === paper.id)} onClose={() => setPaper(null)} />}
     </section>
   )

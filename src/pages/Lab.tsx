@@ -115,6 +115,23 @@ export default function Lab() {
         <button className="primary" onClick={add}><Icon name="plus" size={14} /> Add member</button>
       </div>
 
+      <h2>Activity</h2>
+      <div className="card activity">
+        {data.log.length === 0 ? (
+          <p className="empty">Changes to dates, papers, conferences and members are recorded here.</p>
+        ) : (
+          <ul>
+            {[...data.log].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 200).map((e) => (
+              <li key={e.id}>
+                <time title={e.at}>{new Date(e.at).toLocaleString('sv-SE').slice(0, 16)}</time>
+                <span className="who"><Avatar name={data.members.some((m) => m.name === e.by) ? e.by : '?'} size={18} /> {e.by}</span>
+                <span>{e.text}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <h2>Data</h2>
       <div className="card pad">
         <p>
