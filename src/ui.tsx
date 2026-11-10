@@ -1,0 +1,556 @@
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import {
+  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, hue, initials, isDate, isStale, rowLabel,
+  sortMembers, toKST, uid,
+} from './logic'
+import { useStore } from './store'
+import type { Conf, Deadline, Paper, PaperStatus, Row } from './types'
+
+// ---------- small pieces ----------
+const ICONS: Record<string, string> = {
+  calendar: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
+  timeline: 'M3 6h10M7 12h12M3 18h8M3 3v18',
+  papers: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5',
+  inbox: 'M22 12h-6l-2 3h-4l-2-3H2M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z',
+  lab: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8',
+  link: 'M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6',
+  plus: 'M12 5v14M5 12h14',
+  close: 'M18 6 6 18M6 6l12 12',
+  check: 'M20 6 9 17l-5-5',
+  edit: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z',
+  left: 'M15 18l-6-6 6-6',
+  right: 'M9 18l6-6-6-6',
+}
+export function Icon({ name, size = 16 }: { name: keyof typeof ICONS | string; size?: number }) {
+  return (
+    <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d={ICONS[name]} />
+    </svg>
+  )
+}
+
+export function Avatar({ name, size = 22 }: { name: string; size?: number }) {
+  if (!name) return null
+  const unknown = name === '?'
+  return (
+    <span className="avatar" title={unknown ? 'Not selected' : name} style={{ width: size, height: size, fontSize: size * 0.42, background: unknown ? 'var(--faint)' : `hsl(${hue(name)} 55% 42%)` }}>
+      {unknown ? '?' : initials(name)}
+    </span>
+  )
+}
+export const Avatars = ({ names }: { names: string[] }) => (
+  <span className="avatars">{names.map((n) => <Avatar key={n} name={n} />)}</span>
+)
+
+export function Rank({ conf }: { conf: Conf }) {
+  return (
+    <span className="rank">
+      {/* Both slots are always rendered so the KIISE and BK columns line up down the table. */}
+      {conf.kiise ? <span className={`pill kiise-${conf.kiise}`} title={`KIISE rank ${conf.kiise}${conf.kiise === 'S' ? ' (top)' : ''}`}>{conf.kiise}</span> : <span className="pill none" title="Not on the KIISE list" />}
+      {conf.bk ? <span className={`pill bk bk-${conf.bk}`} title={`BK21 IF ${conf.bk} of 4`}>{conf.bk}</span> : <span className="pill none" title="Not on the BK21 list" />}
+    </span>
+  )
+}
+
+export function AreaTag({ area }: { area: string }) {
+  return area ? <span className="area">{area}</span> : null
+}
+
+const ZONES = [
+  { label: 'KST', zone: 'Asia/Seoul', hint: 'Korea' },
+  { label: 'AoE', zone: 'Etc/GMT+12', hint: 'Anywhere on Earth (UTC-12) — the usual deadline timezone' },
+  { label: 'UTC', zone: 'UTC', hint: 'Coordinated Universal Time' },
+  { label: 'PT', zone: 'America/Los_Angeles', hint: 'US Pacific' },
+  { label: 'ET', zone: 'America/New_York', hint: 'US Eastern' },
+]
+/** Live clock in the timezones deadlines are usually stated in. */
+export function Clock() {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 15000)
+    return () => clearInterval(t)
+  }, [])
+  const at = (zone: string) => new Intl.DateTimeFormat('en-GB', { timeZone: zone, weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).format(now)
+  return (
+    <div className="clock" title="A deadline of 23:59 AoE is 20:59 KST on the following day">
+      {ZONES.map((z) => (
+        <span key={z.label} className={z.label === 'AoE' ? 'aoe' : ''} title={z.hint}><i>{z.label}</i> {at(z.zone)}</span>
+      ))}
+      <small className="muted">23:59 AoE = 20:59 KST next day</small>
+    </div>
+  )
+}
+
+export function Place({ location }: { location: string }) {
+  if (!location) return <span className="muted">TBD</span>
+  const flag = flagOf(location)
+  return (
+    <span className="place">
+      {flag && <span className="flag">{flag}</span>}
+      {location}
+    </span>
+  )
+}
+
+export function Countdown({ deadline, today }: { deadline: string; today: string }) {
+  const n = diffDays(deadline, today)
+  const tone = n < 0 ? 'closed' : n <= 7 ? 'hot' : n <= 30 ? 'warm' : 'calm'
+  return <span className={`cd ${tone}`}>{countdown(deadline, today)}</span>
+}
+
+export function StatusBadge({ row }: { row: Row }) {
+  const title =
+    row.status === 'verified'
+      ? `Verified by ${row.checkedBy || 'owner'} on ${fmt(row.checkedAt) || 'unknown date'}`
+      : row.status === 'auto'
+        ? `Collected automatically from ${(row.sources ?? [row.source]).join(' + ')} — not yet verified by the owner`
+        : row.derivedFrom
+          ? `Not announced yet. Projected from last year's deadline (${fmt(row.derivedFrom)})`
+          : 'Not announced yet. Expected date'
+  return (
+    <span className={`status st-${row.status}`} title={title}>
+      <i />
+      {STATUS_LABEL[row.status]}
+      {row.status === 'auto' && row.sources?.length === 2 && <b title="The conference site and ccfddl agree">×2</b>}
+    </span>
+  )
+}
+
+export function Modal({ title, onClose, children, wide }: { title: string; onClose: () => void; children: ReactNode; wide?: boolean }) {
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [onClose])
+  return (
+    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className={'modal' + (wide ? ' wide' : '')} role="dialog" aria-label={title}>
+        <header>
+          <h2>{title}</h2>
+          <button className="ghost" onClick={onClose} aria-label="Close"><Icon name="close" /></button>
+        </header>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+export function Field({ label, children, span }: { label: string; children: ReactNode; span?: boolean }) {
+  return (
+    <label className={'field' + (span ? ' span' : '')}>
+      <span>{label}</span>
+      {children}
+    </label>
+  )
+}
+
+export function toDeadline(r: Row): Deadline {
+  const { conf: _c, virtual: _v, derivedFrom: _d, autoDiff: _a, sources: _s, evidence: _e, time: _t, tz: _z, ...d } = r
+  return d
+}
+
+/** Mark a row as checked by a person, keeping its current values. */
+export function useVerify() {
+  const { save, me, today } = useStore()
+  return (r: Row, patch: Partial<Deadline> = {}) =>
+    save('deadlines', {
+      ...toDeadline(r),
+      ...patch,
+      status: 'verified',
+      notiEstimated: false,
+      checkedAt: today,
+      checkedBy: me || r.checkedBy,
+      autoSig: r.autoDiff ? autoSig(r.autoDiff) : r.autoSig,
+    })
+}
+
+// ---------- deadline editor ----------
+export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void }) {
+  const { save, remove, me, today } = useStore()
+  const [d, setD] = useState<Deadline>(() => toDeadline(row))
+  const set = (k: keyof Deadline, v: string | number) => setD((p) => ({ ...p, [k]: v }))
+  const date = (k: 'abstract' | 'deadline' | 'noti' | 'event', label: string) => (
+    <Field label={label}>
+      <input type="date" value={d[k]} onChange={(e) => set(k, e.target.value)} />
+    </Field>
+  )
+  const applyAuto = () =>
+    row.autoDiff &&
+    setD((p) => ({ ...p, abstract: row.autoDiff!.abstract || p.abstract, deadline: row.autoDiff!.deadline, noti: row.autoDiff!.noti || p.noti }))
+  const submit = async () => {
+    if (!isDate(d.deadline)) return alert('A submission deadline is required.')
+    await save('deadlines', {
+      ...d,
+      status: 'verified',
+      notiEstimated: false,
+      checkedAt: today,
+      checkedBy: me || d.checkedBy,
+      source: row.status === 'verified' ? d.source : 'manual',
+      autoSig: row.autoDiff ? autoSig(row.autoDiff) : d.autoSig,
+    })
+    onClose()
+  }
+  return (
+    <Modal title={`${rowLabel(row)} — dates`} onClose={onClose}>
+      <p className="muted">
+        Saving marks these dates as <b>Verified</b>{me ? ` by ${me}` : ''}. Check them against the conference site first.
+      </p>
+      {row.autoDiff && (
+        <div className="notice">
+          Collected value differs: deadline <b>{fmt(row.autoDiff.deadline)}</b>
+          {row.autoDiff.abstract && <> · abstract {fmt(row.autoDiff.abstract)}</>}
+          <button onClick={applyAuto}>Use these</button>
+        </div>
+      )}
+      {d.url && <p><a href={d.url} target="_blank" rel="noreferrer">Open conference site <Icon name="link" size={13} /></a></p>}
+      <div className="grid">
+        {date('abstract', 'Abstract')}
+        {date('deadline', 'Submission *')}
+        {date('noti', 'Notification')}
+        {date('event', 'Conference starts')}
+        <Field label="Edition (year)"><input type="number" value={d.year} onChange={(e) => set('year', Number(e.target.value))} /></Field>
+        <Field label="Round (e.g. 1/2)"><input value={d.round} onChange={(e) => set('round', e.target.value)} /></Field>
+        <Field label="Location"><input value={d.location} onChange={(e) => set('location', e.target.value)} placeholder="City, Country" /></Field>
+        <Field label="URL"><input value={d.url} onChange={(e) => set('url', e.target.value)} /></Field>
+        <Field label="Note" span><input value={d.note} onChange={(e) => set('note', e.target.value)} /></Field>
+      </div>
+      <footer>
+        {!row.virtual && (
+          <button className="danger" onClick={async () => { if (confirm('Delete this deadline?')) { await remove('deadlines', row.id); onClose() } }}>Delete</button>
+        )}
+        <span className="grow" />
+        <button onClick={onClose}>Cancel</button>
+        <button className="primary" onClick={submit}>Save as verified</button>
+      </footer>
+    </Modal>
+  )
+}
+
+// ---------- conference editor ----------
+export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () => void }) {
+  const { save, remove, data, auto } = useStore()
+  const [c, setC] = useState<Conf>(
+    () => conf ?? { id: '', acronym: '', name: '', area: '', kiise: '', bk: null, blind: 'Double', owner: '', ccfddl: '' },
+  )
+  const [grades, setGrades] = useState<Record<string, { kiise?: string; bk?: number }>>({})
+  useEffect(() => {
+    fetch('./data/grades.json').then((r) => r.json()).then(setGrades).catch(() => {})
+  }, [])
+  const set = <K extends keyof Conf>(k: K, v: Conf[K]) => setC((p) => ({ ...p, [k]: v }))
+  const slug = (s: string) => s.toLowerCase().replace(/&/g, 'n').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  const keys = useMemo(() => Object.keys(auto?.ccfddl ?? {}), [auto])
+  const onAcronym = (v: string) => {
+    // For a new conference, pre-fill ranks and the collector key when the acronym is recognised.
+    const g = grades[slug(v)]
+    const key = keys.filter((k) => k.split('/')[1] === slug(v))
+    setC((p) => ({ ...p, acronym: v, ...(conf ? {} : { kiise: g?.kiise ?? p.kiise, bk: g?.bk ?? p.bk, ccfddl: key.length === 1 ? key[0] : p.ccfddl }) }))
+  }
+  const submit = async () => {
+    if (!c.acronym.trim()) return alert('An acronym is required.')
+    const id = conf?.id ?? slug(c.acronym)
+    if (!conf && data.conferences.some((x) => x.id === id)) return alert('This conference is already tracked.')
+    await save('conferences', { ...c, id })
+    onClose()
+  }
+  return (
+    <Modal title={conf ? `Edit ${conf.acronym}` : 'Track a conference'} onClose={onClose}>
+      <div className="grid">
+        <Field label="Acronym *"><input value={c.acronym} onChange={(e) => onAcronym(e.target.value)} autoFocus={!conf} /></Field>
+        <Field label="Area">
+          <input value={c.area} onChange={(e) => set('area', e.target.value)} list="areas" />
+          <datalist id="areas">{[...new Set(data.conferences.map((x) => x.area))].filter(Boolean).map((a) => <option key={a} value={a} />)}</datalist>
+        </Field>
+        <Field label="Full name" span><input value={c.name} onChange={(e) => set('name', e.target.value)} /></Field>
+        <Field label="KIISE rank">
+          <select value={c.kiise} onChange={(e) => set('kiise', e.target.value)}>
+            <option value="">None</option><option value="S">S (top)</option><option value="A">A</option>
+          </select>
+        </Field>
+        <Field label="BK21 IF">
+          <select value={c.bk ?? ''} onChange={(e) => set('bk', e.target.value ? Number(e.target.value) : null)}>
+            <option value="">None</option>{[4, 3, 2, 1].map((n) => <option key={n}>{n}</option>)}
+          </select>
+        </Field>
+        <Field label="Review">
+          <select value={c.blind} onChange={(e) => set('blind', e.target.value)}>
+            <option value="">Unknown</option>{['Single', 'Double', 'Triple'].map((b) => <option key={b} value={b}>{b}-blind</option>)}
+          </select>
+        </Field>
+        <Field label="Owner">
+          <select value={c.owner} onChange={(e) => set('owner', e.target.value)}>
+            <option value="">Unassigned</option>{sortMembers(data.members).map((m) => <option key={m.id}>{m.name}</option>)}
+          </select>
+        </Field>
+        <Field label="Auto-collect key (ccfddl)" span>
+          <input value={c.ccfddl ?? ''} onChange={(e) => set('ccfddl', e.target.value)} list="ccfkeys" placeholder="e.g. DB/sigmod — leave empty to rely on the site crawler only" />
+          <datalist id="ccfkeys">{keys.map((k) => <option key={k} value={k}>{auto?.ccfddl[k].title}</option>)}</datalist>
+        </Field>
+      </div>
+      <footer>
+        {conf && (
+          <button className="danger" onClick={async () => {
+            if (!confirm(`Delete ${conf.acronym} and all of its deadlines?`)) return
+            for (const d of data.deadlines.filter((x) => x.confId === conf.id)) await remove('deadlines', d.id)
+            await remove('conferences', conf.id)
+            onClose()
+          }}>Delete conference</button>
+        )}
+        <span className="grow" />
+        <button onClick={onClose}>Cancel</button>
+        <button className="primary" onClick={submit}>Save</button>
+      </footer>
+    </Modal>
+  )
+}
+
+// ---------- paper editor ----------
+export const newPaper = (me: string, today: string, row?: Row): Paper => ({
+  id: uid(),
+  title: '',
+  group: '',
+  members: me ? [me] : [],
+  start: today,
+  status: 'writing',
+  target: row ? { confId: row.confId, label: rowLabel(row), deadline: row.deadline, noti: row.noti } : null,
+  history: [],
+  note: '',
+  link: '',
+})
+const RESULT_LABEL = { accepted: 'Accepted', rejected: 'Rejected', withdrawn: 'Withdrawn' } as const
+
+export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: boolean; onClose: () => void }) {
+  const { save, remove, data, rows, today } = useStore()
+  const [p, setP] = useState<Paper>(paper)
+  const set = <K extends keyof Paper>(k: K, v: Paper[K]) => setP((x) => ({ ...x, [k]: v }))
+  const upcoming = useMemo(() => rows.filter((r) => r.deadline >= today), [rows, today])
+  const keyOf = (r: { confId: string; deadline: string }) => `${r.confId}|${r.deadline}`
+  const targetKey = p.target ? keyOf(p.target) : ''
+  const toTarget = (r: Row) => ({ confId: r.confId, label: rowLabel(r), deadline: r.deadline, noti: r.noti })
+  const sameAttempt = (x: Paper) => x.history.some((h) => h.label === x.target!.label && h.deadline === x.target!.deadline)
+  // Where could this go next once the current target's result is out?
+  const after = p.target?.noti || p.target?.deadline || today
+  const nextOptions = useMemo(
+    () => upcoming.filter((r) => r.deadline > after && r.confId !== p.target?.confId).slice(0, 8),
+    [upcoming, after, p.target],
+  )
+  const submit = async () => {
+    if (!p.title.trim()) return alert('Give the paper a working title.')
+    let history = p.history
+    if ((p.status === 'accepted' || p.status === 'rejected') && p.target && !sameAttempt(p)) {
+      history = [...history, { label: p.target.label, deadline: p.target.deadline, result: p.status, date: today }]
+    }
+    await save('papers', { ...p, history })
+    onClose()
+  }
+  const retarget = (r: Row) =>
+    setP((x) => ({
+      ...x,
+      history: x.target && x.status === 'rejected' && !sameAttempt(x)
+        ? [...x.history, { label: x.target.label, deadline: x.target.deadline, result: 'rejected' as const, date: today }]
+        : x.history,
+      status: 'writing',
+      target: toTarget(r),
+    }))
+  return (
+    <Modal title={isNew ? 'New paper' : 'Edit paper'} onClose={onClose} wide>
+      <div className="grid">
+        <Field label="Working title *" span>
+          <input value={p.title} onChange={(e) => set('title', e.target.value)} autoFocus={isNew} placeholder="e.g. LLM-seccomp" />
+        </Field>
+        <Field label="Research topic">
+          <input value={p.group} onChange={(e) => set('group', e.target.value)} list="groups" placeholder="e.g. Container security" />
+          <datalist id="groups">{[...new Set(data.papers.map((x) => x.group))].filter(Boolean).map((g) => <option key={g} value={g} />)}</datalist>
+        </Field>
+        <Field label="Status">
+          <select value={p.status} onChange={(e) => set('status', e.target.value as PaperStatus)}>
+            {PAPER_STATUS.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
+          </select>
+        </Field>
+        <Field label="People" span>
+          <div className="chips">
+            {sortMembers(data.members).map((m) => (
+              <label key={m.id} className={'chip pick' + (p.members.includes(m.name) ? ' on' : '')}>
+                <input type="checkbox" checked={p.members.includes(m.name)}
+                  onChange={(e) => set('members', e.target.checked ? [...p.members, m.name] : p.members.filter((x) => x !== m.name))} />
+                <Avatar name={m.name} size={18} /> {m.name}
+              </label>
+            ))}
+          </div>
+        </Field>
+        <Field label="Target" span>
+          <select value={targetKey} onChange={(e) => { const r = upcoming.find((x) => keyOf(x) === e.target.value); set('target', r ? toTarget(r) : null) }}>
+            <option value="">Not decided</option>
+            {p.target && !upcoming.some((r) => keyOf(r) === targetKey) && <option value={targetKey}>{p.target.label} — {fmt(p.target.deadline)}</option>}
+            {upcoming.map((r) => (
+              <option key={r.id} value={keyOf(r)}>
+                {fmt(r.deadline)} · {rowLabel(r)} · {countdown(r.deadline, today)}{r.status !== 'verified' ? ` · ${STATUS_LABEL[r.status].toLowerCase()}` : ''}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Started"><input type="date" value={p.start} onChange={(e) => set('start', e.target.value)} /></Field>
+        <Field label="Link (Overleaf, repo…)"><input value={p.link} onChange={(e) => set('link', e.target.value)} /></Field>
+        <Field label="Notes" span><textarea rows={2} value={p.note} onChange={(e) => set('note', e.target.value)} /></Field>
+      </div>
+      {p.target && nextOptions.length > 0 && (
+        <div className="next">
+          <span className="muted">If it doesn't get in — deadlines after the {p.target.label} result ({fmt(p.target.noti) || 'date TBD'}). Click to retarget.</span>
+          <div className="chips">
+            {nextOptions.map((r) => (
+              <button key={r.id} className="chip" onClick={() => retarget(r)}>{rowLabel(r)} <small>{fmtShort(r.deadline)}</small></button>
+            ))}
+          </div>
+        </div>
+      )}
+      {p.history.length > 0 && (
+        <div className="next">
+          <span className="muted">Submission history</span>
+          <ul className="history">
+            {p.history.map((h, i) => (
+              <li key={i}>
+                <span className={`tag res-${h.result}`}>{RESULT_LABEL[h.result]}</span> {h.label} · submitted {fmt(h.deadline)}
+                <button className="ghost" onClick={() => set('history', p.history.filter((_, j) => j !== i))} aria-label="Remove entry"><Icon name="close" size={13} /></button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <footer>
+        {!isNew && <button className="danger" onClick={async () => { if (confirm('Delete this paper and its history?')) { await remove('papers', p.id); onClose() } }}>Delete</button>}
+        <span className="grow" />
+        <button onClick={onClose}>Cancel</button>
+        <button className="primary" onClick={submit}>Save</button>
+      </footer>
+    </Modal>
+  )
+}
+export { RESULT_LABEL }
+
+// ---------- conference detail drawer ----------
+export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) {
+  const { rows, data, today, me } = useStore()
+  const verify = useVerify()
+  const [edit, setEdit] = useState(false)
+  const [editConf, setEditConf] = useState(false)
+  const [paper, setPaper] = useState<Paper | null>(null)
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => e.key === 'Escape' && !edit && !editConf && !paper && onClose()
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [onClose, edit, editConf, paper])
+
+  // Re-read the row from the store so the drawer reflects edits made from inside it.
+  const live = rows.find((r) => r.confId === row.confId && r.deadline === row.deadline) ?? rows.find((r) => r.id === row.id) ?? row
+  const conf = data.conferences.find((c) => c.id === live.confId) ?? live.conf
+  const others = rows.filter((r) => r.confId === conf.id && r.id !== live.id && diffDays(r.deadline, today) > -200)
+  const papers = data.papers.filter((p) => p.target?.confId === conf.id || p.history.some((h) => h.label.startsWith(conf.acronym)))
+  const steps: { label: string; date: string; main?: boolean; soft?: boolean }[] = [
+    { label: 'Abstract', date: live.abstract },
+    { label: 'Submission', date: live.deadline, main: true },
+    { label: 'Notification', date: live.noti, soft: live.notiEstimated },
+    { label: 'Conference', date: live.event },
+  ]
+  // Filled dot = already passed, blue dot = the next date coming up, hollow = later or unknown.
+  const nextStep = steps.find((s) => s.date && s.date >= today)
+  return (
+    <div className="drawer-wrap" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <aside className="drawer" role="dialog" aria-label={`${conf.acronym} details`}>
+        <header>
+          <div>
+            <h2>{rowLabel(live)} <small>{live.year}</small></h2>
+            <p className="fullname">{conf.name}</p>
+          </div>
+          <button className="ghost" onClick={onClose} aria-label="Close"><Icon name="close" /></button>
+        </header>
+
+        <div className="tags">
+          <Rank conf={conf} />
+          <AreaTag area={conf.area} />
+          {conf.blind && <span className="tag">{conf.blind}-blind</span>}
+          <span className="tag"><Place location={live.location} /></span>
+        </div>
+
+        <ol className="steps">
+          {steps.map((s) => (
+            <li key={s.label} className={s === nextStep ? 'upnext' : s.date && s.date < today ? 'done' : ''} title={s === nextStep ? 'Next date coming up' : s.date && s.date < today ? 'Passed' : ''}>
+              <span>{s.label}</span>
+              <b className={live.status === 'estimated' || s.soft ? 'est' : ''}>{fmt(s.date) || 'TBD'}</b>
+              {s.main && <Countdown deadline={live.deadline} today={today} />}
+              {s.main && live.time && live.tz && (
+                <small className="muted when">{live.time} {/^UTC-12$/i.test(live.tz) ? 'AoE' : live.tz}{toKST(live.deadline, live.time, live.tz) && <> = <b>{toKST(live.deadline, live.time, live.tz)} KST</b></>}</small>
+              )}
+              {s.label === 'Notification' && live.noti && <small className="muted">{diffDays(live.noti, live.deadline)} days of review</small>}
+            </li>
+          ))}
+        </ol>
+
+        <section className="trust">
+          <div className="trust-head">
+            <StatusBadge row={live} />
+            {isStale(live, today) && <span className="tag warn">Re-check</span>}
+            {live.autoDiff && <span className="tag warn">Changed</span>}
+          </div>
+          <p className="muted">
+            {live.status === 'verified' && <>Verified by {live.checkedBy || 'owner'} on {fmt(live.checkedAt) || 'an unknown date'}.</>}
+            {live.status === 'auto' && <>Collected on {fmt(live.checkedAt)} from {(live.sources ?? [live.source]).map((s) => (s === 'site' ? 'the conference site' : s)).join(' and ')}. Not verified by a person yet.</>}
+            {live.status === 'estimated' && <>This edition's dates aren't out yet. Showing last year's{live.derivedFrom ? ` (${fmt(live.derivedFrom)})` : ''} shifted by a year; they'll be replaced automatically once announced.</>}
+          </p>
+          {live.autoDiff && (
+            <p className="diff">
+              {live.autoDiff.source === 'site' ? 'The conference site' : 'ccfddl'} now says deadline <b>{fmt(live.autoDiff.deadline)}</b>
+              {live.autoDiff.abstract && <> (abstract {fmt(live.autoDiff.abstract)})</>}.
+            </p>
+          )}
+          {!!live.evidence?.length && (
+            <details>
+              <summary>Text read from the conference site</summary>
+              <ul className="evidence">{live.evidence.map((l, i) => <li key={i}>{l}</li>)}</ul>
+            </details>
+          )}
+          <div className="acts">
+            {live.url && <a className="btn" href={live.url} target="_blank" rel="noreferrer">Open site <Icon name="link" size={13} /></a>}
+            {live.status !== 'verified' && live.status !== 'estimated' && <button className="primary" onClick={() => verify(live)}><Icon name="check" size={14} /> Looks right</button>}
+            <button onClick={() => setEdit(true)}><Icon name="edit" size={14} /> {live.status === 'estimated' ? 'Enter real dates' : 'Edit dates'}</button>
+          </div>
+        </section>
+
+        <section>
+          <h3>Owner</h3>
+          <p className="owner">{conf.owner ? <><Avatar name={conf.owner} /> {conf.owner}</> : <span className="muted">Unassigned</span>}
+            <button className="ghost" onClick={() => setEditConf(true)}>Edit conference</button></p>
+        </section>
+
+        <section>
+          <h3>Papers</h3>
+          {papers.length === 0 && <p className="muted">Nobody is targeting {conf.acronym} yet.</p>}
+          {papers.map((p) => (
+            <button key={p.id} className="mini" onClick={() => setPaper(p)}>
+              <i className={`sdot ps-${p.status}`} /> <b>{p.title}</b> <Avatars names={p.members} />
+              <span className="muted">{p.target?.confId === conf.id ? p.target.label : 'Earlier attempt'}</span>
+            </button>
+          ))}
+          {live.deadline >= today && <button onClick={() => setPaper(newPaper(me, today, live))}><Icon name="plus" size={14} /> Target this deadline</button>}
+        </section>
+
+        {others.length > 0 && (
+          <section>
+            <h3>Other rounds &amp; editions</h3>
+            <ul className="others">
+              {others.map((r) => (
+                <li key={r.id}>
+                  <span>{rowLabel(r)} <small className="muted">{r.year}</small></span>
+                  <span className={r.status === 'estimated' ? 'est' : ''}>{fmt(r.deadline)}</span>
+                  <Countdown deadline={r.deadline} today={today} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {live.note && <section><h3>Note</h3><p>{live.note}</p></section>}
+      </aside>
+      {edit && <DeadlineModal row={live} onClose={() => setEdit(false)} />}
+      {editConf && <ConfModal conf={conf} onClose={() => setEditConf(false)} />}
+      {paper && <PaperModal paper={paper} isNew={!data.papers.some((p) => p.id === paper.id)} onClose={() => setPaper(null)} />}
+    </div>
+  )
+}
