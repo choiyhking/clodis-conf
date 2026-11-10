@@ -385,3 +385,14 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
 .activity li:first-child { border-top: none; }
 .activity time { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
 .activity .who { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* role icons, paper links, backup plan */
+.avatar.emoji { color: inherit; letter-spacing: 0; line-height: 1; font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif; }
+.m-icon { width: 150px; }
+.links { display: flex; flex-direction: column; gap: 6px; }
+.links .btn { padding: 0 9px; }
+.add-link { align-self: flex-start; }
+.fallback { background: var(--sunken); border-radius: var(--radius); padding: 12px 14px; gap: 4px; }
+.fallback ul { list-style: none; margin: 6px 0 0; padding: 0; }
+.fallback li { display: grid; grid-template-columns: minmax(0, 1.2fr) 96px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 5px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.fallback li button { height: 26px; font-size: 12px; }

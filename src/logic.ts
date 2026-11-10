@@ -95,7 +95,7 @@ export function describeChange(coll: Coll, prev: unknown, next: unknown, data: D
     const parts: string[] = []
     if (a.status !== b.status) parts.push(`status ${arrow(paperStatusLabel(a.status), paperStatusLabel(b.status))}`)
     if (a.target?.label !== b.target?.label || a.target?.deadline !== b.target?.deadline) parts.push(`target ${arrow(a.target?.label, b.target?.label)}`)
-    const other = changed(a, b, ['title', 'group', 'members', 'start', 'note', 'link']).map((k) => (k === 'group' ? 'topic' : k === 'members' ? 'people' : k))
+    const other = changed(a, b, ['title', 'group', 'members', 'start', 'note', 'links']).map((k) => (k === 'group' ? 'topic' : k === 'members' ? 'people' : k))
     if (other.length) parts.push(`edited ${other.join(', ')}`)
     return parts.length ? `"${title}": ${parts.join('; ')}` : ''
   }
@@ -110,7 +110,7 @@ export function describeChange(coll: Coll, prev: unknown, next: unknown, data: D
     const a = prev as Member | undefined, b = next as Member | undefined
     if (!b) return `Removed member ${a!.name}`
     if (!a) return `Added member ${b.name}${b.role ? ` (${b.role})` : ''}`
-    const keys = changed(a, b, ['name', 'role', 'email'])
+    const keys = changed(a, b, ['name', 'role', 'email', 'icon'])
     return keys.length ? `Changed member ${a.name}: ${keys.map((k) => `${k} ${arrow(a[k], b[k])}`).join(', ')}` : ''
   }
   return ''
@@ -124,6 +124,13 @@ export const roleRank = (role: string) => {
   return i < 0 ? ROLES.length : i
 }
 export const sortMembers = (ms: Member[]) => [...ms].sort((a, b) => roleRank(a.role) - roleRank(b.role) || a.name.localeCompare(b.name))
+export const ROLE_ICON: Record<string, string> = { Professor: '🧑‍🏫', Postdoc: '🔬', PhD: '🎓', MS: '📘', Undergrad: '🌱', Alumni: '🕊️' }
+export const ICON_CHOICES = ['🧑‍🏫', '🎓', '📘', '🔬', '🌱', '🕊️', '🦊', '🐻', '🐼', '🐯', '🦉', '🐧', '🐙', '🐳', '🚀', '⚡', '🔥', '🍀', '☕', '🎧']
+/** The emoji for a member: their own choice, else their role's. '' when neither is set. */
+export const memberIcon = (m: Member) => m.icon || ROLE_ICON[m.role] || ''
+/** A paper's links, including the single link older data stored. */
+export const paperLinks = (p: Paper): string[] => p.links ?? (p.link ? [p.link] : [])
+
 /** Stable hue per name so a person keeps the same avatar colour everywhere. */
 export function hue(name: string) {
   let h = 0

@@ -99,7 +99,8 @@ export interface Paper {
   target: PaperTarget | null
   history: PaperHistory[]
   note: string
-  link: string
+  link: string // legacy single link; new data uses `links`
+  links?: string[]
 }
 
 export const ROLES = ['Professor', 'Postdoc', 'PhD', 'MS', 'Undergrad', 'Alumni'] as const
@@ -110,6 +111,7 @@ export interface Member {
   name: string
   email: string
   role: Role
+  icon?: string // emoji shown as this person's avatar; empty = the default for their role
 }
 
 /** One line of the activity log: who changed what, and when. */
