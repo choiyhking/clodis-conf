@@ -247,64 +247,108 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
 }
 
 // ---------- conference editor ----------
+/** A row of mutually exclusive buttons, for the handful of fields with three or four possible values. */
+function Choice<T extends string | number>({ value, options, onChange }: { value: T; options: { value: T; label: string; title?: string }[]; onChange: (v: T) => void }) {
+  return (
+    <div className="seg choice" role="radiogroup">
+      {options.map((o) => (
+        <button type="button" key={String(o.value)} role="radio" aria-checked={o.value === value} title={o.title} className={o.value === value ? 'on' : ''} onClick={() => onChange(o.value)}>
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () => void }) {
   const { save, remove, data, auto } = useStore()
-  const [c, setC] = useState<Conf>(
-    () => conf ?? { id: '', acronym: '', name: '', area: '', kiise: '', bk: null, blind: 'Double', owner: '', ccfddl: '' },
-  )
+  const [c, setC] = useState<Conf>(() => conf ?? { id: '', acronym: '', name: '', area: '', kiise: '', bk: null, blind: 'Double', owner: '', ccfddl: '' })
   const [grades, setGrades] = useState<Record<string, { kiise?: string; bk?: number }>>({})
   useEffect(() => {
     fetch('./data/grades.json').then((r) => r.json()).then(setGrades).catch(() => {})
   }, [])
   const set = <K extends keyof Conf>(k: K, v: Conf[K]) => setC((p) => ({ ...p, [k]: v }))
   const slug = (s: string) => s.toLowerCase().replace(/&/g, 'n').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-  const keys = useMemo(() => Object.keys(auto?.ccfddl ?? {}), [auto])
-  const onAcronym = (v: string) => {
-    // For a new conference, pre-fill ranks and the collector key when the acronym is recognised.
-    const g = grades[slug(v)]
-    const key = keys.filter((k) => k.split('/')[1] === slug(v))
-    setC((p) => ({ ...p, acronym: v, ...(conf ? {} : { kiise: g?.kiise ?? p.kiise, bk: g?.bk ?? p.bk, ccfddl: key.length === 1 ? key[0] : p.ccfddl }) }))
+
+  const areas = useMemo(() => [...new Set(data.conferences.map((x) => x.area).filter(Boolean))].sort(), [data.conferences])
+  const [newArea, setNewArea] = useState(false)
+
+  // Conferences the collector already knows. Picking one links it, so its dates arrive on their own.
+  const catalog = useMemo(() => Object.entries(auto?.ccfddl ?? {}).map(([key, v]) => ({ key, title: v.title })), [auto])
+  const q = c.acronym.trim().toLowerCase()
+  const linked = catalog.find((x) => x.key === c.ccfddl)
+  const matches = !conf && q.length >= 2 && !linked ? catalog.filter((x) => x.title.toLowerCase().includes(q)).slice(0, 6) : []
+  const link = (x: { key: string; title: string }) => {
+    const g = grades[slug(x.title)]
+    setC((p) => ({ ...p, acronym: x.title, ccfddl: x.key, kiise: g?.kiise ?? p.kiise, bk: g?.bk ?? p.bk }))
   }
+
   const submit = async () => {
     if (!c.acronym.trim()) return alert('An acronym is required.')
     const id = conf?.id ?? slug(c.acronym)
     if (!conf && data.conferences.some((x) => x.id === id)) return alert('This conference is already tracked.')
-    await save('conferences', { ...c, id })
+    await save('conferences', { ...c, acronym: c.acronym.trim(), id })
     onClose()
   }
+
   return (
     <Modal title={conf ? `Edit ${conf.acronym}` : 'Track a conference'} onClose={onClose}>
-      <div className="grid">
-        <Field label="Acronym *"><input value={c.acronym} onChange={(e) => onAcronym(e.target.value)} autoFocus={!conf} /></Field>
+      <div className="grid conf-form">
+        <div className="field span">
+          <span>Acronym *</span>
+          <input value={c.acronym} onChange={(e) => setC((p) => ({ ...p, acronym: e.target.value, ccfddl: conf ? p.ccfddl : '' }))} autoFocus={!conf} placeholder="e.g. SIGMOD" />
+          {matches.length > 0 && (
+            <ul className="suggest">
+              {matches.map((x) => (
+                <li key={x.key}>
+                  <button type="button" onClick={() => link(x)}><b>{x.title}</b> <span className="muted">{x.key.split('/')[0]}</span> <small className="muted">dates collected automatically</small></button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <small className={'collect ' + (linked ? 'on' : '')}>
+            {linked
+              ? <><i className="dot ok" /> Dates are collected automatically ({linked.key}). <button type="button" className="link" onClick={() => set('ccfddl', '')}>Unlink</button></>
+              : <><i className="dot" /> Not linked to the collector — dates for this one are entered by hand.</>}
+          </small>
+        </div>
+        <Field label="Full name" span><input value={c.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g. ACM SIGMOD International Conference on Management of Data" /></Field>
+
         <Field label="Area">
-          <input value={c.area} onChange={(e) => set('area', e.target.value)} list="areas" />
-          <datalist id="areas">{[...new Set(data.conferences.map((x) => x.area))].filter(Boolean).map((a) => <option key={a} value={a} />)}</datalist>
-        </Field>
-        <Field label="Full name" span><input value={c.name} onChange={(e) => set('name', e.target.value)} /></Field>
-        <Field label="KIISE rank">
-          <select value={c.kiise} onChange={(e) => set('kiise', e.target.value)}>
-            <option value="">None</option><option value="S">S (top)</option><option value="A">A</option>
-          </select>
-        </Field>
-        <Field label="BK21 IF">
-          <select value={c.bk ?? ''} onChange={(e) => set('bk', e.target.value ? Number(e.target.value) : null)}>
-            <option value="">None</option>{[4, 3, 2, 1].map((n) => <option key={n}>{n}</option>)}
-          </select>
-        </Field>
-        <Field label="Review">
-          <select value={c.blind} onChange={(e) => set('blind', e.target.value)}>
-            <option value="">Unknown</option>{['Single', 'Double', 'Triple'].map((b) => <option key={b} value={b}>{b}-blind</option>)}
-          </select>
+          {newArea || areas.length === 0 ? (
+            <span className="combo">
+              <input value={c.area} onChange={(e) => set('area', e.target.value)} placeholder="Name the new area" autoFocus={newArea} />
+              {areas.length > 0 && <button type="button" onClick={() => { setNewArea(false); set('area', '') }}>Cancel</button>}
+            </span>
+          ) : (
+            <span className="combo">
+              <select value={c.area} onChange={(e) => set('area', e.target.value)}>
+                <option value="">Not set</option>
+                {areas.map((a) => <option key={a}>{a}</option>)}
+              </select>
+              <button type="button" onClick={() => { setNewArea(true); set('area', '') }}><Icon name="plus" size={14} /> New</button>
+            </span>
+          )}
         </Field>
         <Field label="Owner">
           <select value={c.owner} onChange={(e) => set('owner', e.target.value)}>
-            <option value="">Unassigned</option>{sortMembers(data.members).map((m) => <option key={m.id}>{m.name}</option>)}
+            <option value="">Unassigned</option>
+            {sortMembers(data.members).map((m) => <option key={m.id}>{m.name}</option>)}
           </select>
         </Field>
-        <Field label="Auto-collect key (ccfddl)" span>
-          <input value={c.ccfddl ?? ''} onChange={(e) => set('ccfddl', e.target.value)} list="ccfkeys" placeholder="e.g. DB/sigmod — leave empty to rely on the site crawler only" />
-          <datalist id="ccfkeys">{keys.map((k) => <option key={k} value={k}>{auto?.ccfddl[k].title}</option>)}</datalist>
-        </Field>
+
+        <div className="field">
+          <span>KIISE rank</span>
+          <Choice value={c.kiise} onChange={(v) => set('kiise', v)} options={[{ value: '', label: 'None' }, { value: 'A', label: 'A' }, { value: 'S', label: 'S', title: 'Top tier' }]} />
+        </div>
+        <div className="field">
+          <span>BK21 IF</span>
+          <Choice value={c.bk ?? 0} onChange={(v) => set('bk', v || null)} options={[{ value: 0, label: 'None' }, ...[1, 2, 3, 4].map((n) => ({ value: n, label: String(n) }))]} />
+        </div>
+        <div className="field span">
+          <span>Review</span>
+          <Choice value={c.blind} onChange={(v) => set('blind', v)} options={[{ value: '', label: 'Unknown' }, { value: 'Single', label: 'Single-blind' }, { value: 'Double', label: 'Double-blind' }, { value: 'Triple', label: 'Triple-blind' }]} />
+        </div>
       </div>
       <footer>
         {conf && (
@@ -317,7 +361,7 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
         )}
         <span className="grow" />
         <button onClick={onClose}>Cancel</button>
-        <button className="primary" onClick={submit}>Save</button>
+        <button className="primary" onClick={submit}>{conf ? 'Save' : 'Track'}</button>
       </footer>
     </Modal>
   )

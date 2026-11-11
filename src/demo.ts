@@ -40,8 +40,14 @@ export function demoData(rows: Row[], members: Member[], today: string): DemoDat
   const inReview = (r: Row) => r.deadline < today && !!r.noti && r.noti > today
   const decided = (r: Row) => !!r.noti && r.noti < today && r.noti > addDays(today, -200)
   /** A decided deadline whose result arrived comfortably before `next` was due: a believable earlier attempt. */
-  const before = (next: Row | undefined, prefer: string[] = []) =>
-    next ? pick((r) => !!r.noti && r.noti < today && r.noti < addDays(next.deadline, -20) && r.deadline > addDays(next.deadline, -400), prefer) : undefined
+  const before = (next: Row | undefined) => {
+    if (!next) return undefined
+    const r = rows
+      .filter((x) => !used.has(x.confId) && !!x.noti && x.noti < today && x.noti < addDays(next.deadline, -20) && x.deadline > addDays(next.deadline, -400))
+      .sort((a, b) => b.noti.localeCompare(a.noti))[0]
+    if (r) used.add(r.confId)
+    return r
+  }
   const past = (r: Row | undefined, result: 'accepted' | 'rejected'): PaperHistory[] =>
     r ? [{ label: rowLabel(r), deadline: r.deadline, result, date: r.noti || r.deadline }] : []
 
@@ -62,10 +68,10 @@ export function demoData(rows: Row[], members: Member[], today: string): DemoDat
   const won2 = pick(decided, ['icdcs', 'middleware', 'cluster'])
   const lost1 = pick(decided, ['usenix-security', 'ndss', 'sensys'])
   const lost2 = pick(decided, ['sc', 'hpdc', 'icpp'])
-  const auditTry2 = before(month, ['usenix-security', 'ccs', 'ndss']) // Namespace escape audit: second rejection
-  const auditTry1 = before(auditTry2, ['sosp', 'snp', 'osdi']) // …and the first
-  const crawlTry = before(rev2, ['eurosys', 'atc', 'sosp'])
-  const driftTry = before(won2, ['kdd', 'vldb', 'sigmod'])
+  const auditTry2 = before(month) // Namespace escape audit: second rejection
+  const auditTry1 = before(auditTry2) // …and the first
+  const crawlTry = before(rev2)
+  const driftTry = before(won2)
 
   type Draft = Omit<Paper, 'id' | 'link' | 'note' | 'links'> & { note?: string; links?: string[] }
   const drafts: Draft[] = [
