@@ -621,3 +621,11 @@ html { scrollbar-gutter: stable; }
 .targeting.none { justify-content: flex-start; }
 .sched col.c-target { width: 140px; }
 .sched col.c-conf { width: 52%; } .sched col.c-loc { width: 48%; }
+
+/* a side track reads as part of the name: "WSDM (Short Paper)" */
+.conf-top .track { font-weight: 500; color: var(--muted); white-space: nowrap; }
+/* paper cards: the countdown leads, the date follows in brackets */
+.pc-target .when { color: var(--muted); }
+/* Targeting: room for a readable title next to the avatars */
+.sched col.c-target { width: 200px; }
+.pc-target .when { white-space: nowrap; }
