@@ -1,5 +1,5 @@
 import { Fragment, useMemo, useState } from 'react'
-import { addDays, countdown, diffDays, fmt, roundTag, sortMembers } from '../logic'
+import { diffDays, fmt, roundTag, sortMembers } from '../logic'
 import { useStore } from '../store'
 import type { Paper, Row } from '../types'
 import { AreaTag, Avatar, Avatars, Clock, ConfDrawer, ConfModal, Countdown, Icon, PaperModal, Place, Rank, StatusBadge, TargetModal } from '../ui'
@@ -7,7 +7,6 @@ import { isStale } from '../logic'
 
 const COLS = 10
 const PAST_DAYS = 365 // "Show past" goes back one year; older rows stay in the data but off the table
-const RECENT_DAYS = 7 // just-closed deadlines stay above the Today line this long
 
 export default function Schedule() {
   const { rows, data, today } = useStore()
@@ -43,7 +42,7 @@ export default function Schedule() {
     const reviewing = tg?.some((p) => p.status === 'submitted')
     // Closed is judged by the real closing moment, not the date: 17:00 PT on the 11th is still open on the morning of the 12th in Korea.
     const closedFor = (now - r.at) / 86400000
-    if (closedFor > 0 && !reviewing && closedFor > (past ? PAST_DAYS : RECENT_DAYS)) return false
+    if (closedFor > 0 && !reviewing && (!past || closedFor > PAST_DAYS)) return false
     if (area && c.area !== area) return false
     if (rank === 'S' && c.kiise !== 'S') return false
     if (rank === 'SA' && !c.kiise) return false
@@ -54,17 +53,6 @@ export default function Schedule() {
     if (q && !`${c.acronym} ${c.name} ${r.location}`.toLowerCase().includes(q.toLowerCase())) return false
     return true
   })
-
-  // What's coming up for our own papers: the next submissions due and the next results expected.
-  const upNext = data.papers
-    .flatMap((p) => {
-      if (!p.target) return []
-      if (p.status === 'writing' && p.target.deadline >= today) return [{ p, kind: 'Due', date: p.target.deadline }]
-      if (p.status === 'submitted' && p.target.noti && p.target.noti >= today) return [{ p, kind: 'Result', date: p.target.noti }]
-      return []
-    })
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(0, 4)
 
   const firstFuture = shown.findIndex((r) => r.at > now)
   return (
@@ -77,23 +65,7 @@ export default function Schedule() {
         <button className="primary" onClick={() => setAddConf(true)}><Icon name="plus" size={14} /> Track a conference</button>
       </header>
 
-      <div className="upnext">
-        <Clock />
-        {upNext.length > 0 && (
-          <div className="up-cards">
-            {upNext.map(({ p, kind, date }) => {
-              const left = diffDays(date, today)
-              return (
-                <button key={p.id + kind} className={'up ' + (kind === 'Result' ? 'is-result' : left <= 14 ? 'hot' : '')} onClick={() => setPaper(p)}>
-                  <span className="up-kind">{kind === 'Due' ? 'Submission due' : 'Result expected'}</span>
-                  <span className="up-main"><b>{countdown(date, today)}</b> {p.target!.label}</span>
-                  <span className="up-sub"><Avatars names={p.members} /> <span>{p.title}</span> <small className="muted">{date}</small></span>
-                </button>
-              )
-            })}
-          </div>
-        )}
-      </div>
+      <Clock />
 
       <div className="filters">
         <input type="search" placeholder="Search conference or city" value={q} onChange={(e) => setQ(e.target.value)} />
@@ -116,7 +88,7 @@ export default function Schedule() {
           <option value="estimated">Estimated</option>
         </select>
         <button className={'toggle' + (onlyTarget ? ' on' : '')} onClick={() => setOnlyTarget(!onlyTarget)} aria-pressed={onlyTarget}>Our targets</button>
-        <button className={'toggle' + (past ? ' on' : '')} onClick={() => setPast(!past)} aria-pressed={past} title="Deadlines closed in the last week are always shown above the Today line; this goes back 12 months">Show past year</button>
+        <button className={'toggle' + (past ? ' on' : '')} onClick={() => setPast(!past)} aria-pressed={past} title="Also show deadlines that closed in the last 12 months">Show past year</button>
         <span className="grow" />
         <span className="legend"><i className="sw targeted" /> Targeted <i className="sw reviewing" /> Under review</span>
         <span className="muted">{shown.length} deadlines</span>
@@ -145,7 +117,7 @@ export default function Schedule() {
               const tone = tg.some((p) => p.status === 'submitted') ? 'reviewing' : tg.length ? 'targeted' : ''
               return (
                 <Fragment key={r.id}>
-                  {i === firstFuture && i > 0 && (
+                  {past && i === firstFuture && i > 0 && (
                     <tr className="todayrow">
                       <td colSpan={COLS}><span>Today · {today}</span></td>
                     </tr>
@@ -162,7 +134,7 @@ export default function Schedule() {
                     </td>
                     <td className={'date c' + est}>{fmt(r.abstract) || <span className="faint">–</span>}</td>
                     <td className={'date strong c' + est}>{fmt(r.deadline)}</td>
-                    <td className="c"><Countdown deadline={r.deadline} today={today} at={r.at} /></td>
+                    <td className="c"><Countdown deadline={r.deadline} today={today} at={r.at} assumed={!r.exact && r.status !== 'estimated'} /></td>
                     <td className={'date c emph' + (est || r.notiEstimated ? ' est' : '')}
                       title={r.noti && (est || r.notiEstimated) ? 'Estimated: the notification date has not been announced, so this is projected from the previous edition' : undefined}>{fmt(r.noti) || <span className="faint">TBD</span>}</td>
                     <td className="date c emph days">{r.noti ? `${diffDays(r.noti, r.deadline)}d` : <span className="faint">–</span>}</td>

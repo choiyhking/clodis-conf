@@ -51,6 +51,7 @@ export interface Row extends Deadline {
   time?: string // deadline time of day, e.g. "23:59"
   tz?: string // timezone that time is in, e.g. "AoE" or "UTC-8"
   at: number // the exact moment submissions close, as a UTC timestamp (see closesAt)
+  exact: boolean // false when the source gave no time of day and 23:59 AoE was assumed
 }
 
 export interface CcfEdition {

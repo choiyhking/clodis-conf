@@ -95,11 +95,21 @@ export function Place({ location }: { location: string }) {
   )
 }
 
-/** Time left. Pass `at` (a row's exact closing moment) when there is one; plain dates fall back to whole days. */
-export function Countdown({ deadline, today, at }: { deadline: string; today: string; at?: number }) {
+/**
+ * Time left. Pass `at` (a row's exact closing moment) when there is one; plain dates fall back to whole days.
+ * `assumed` adds a small ? when the closing time wasn't stated and 23:59 AoE was assumed.
+ */
+export function Countdown({ deadline, today, at, assumed }: { deadline: string; today: string; at?: number; assumed?: boolean }) {
   if (at) {
     const t = timeLeft(at, Date.now())
-    return <span className={`cd ${t.tone}`} title={`Closes ${new Date(at).toLocaleString('sv-SE').slice(0, 16)} your time`}>{t.text}</span>
+    const local = new Date(at).toLocaleString('sv-SE').slice(0, 16)
+    const open = t.tone !== 'closed'
+    return (
+      <span className={'cd-wrap' + (assumed && open ? ' assumed' : '')}
+        title={assumed ? `No closing time was given, so 23:59 AoE is assumed (${local} your time). Check the conference site.` : `Closes ${local} your time`}>
+        <span className={`cd ${t.tone}`}>{t.text}</span>
+      </span>
+    )
   }
   const n = diffDays(deadline, today)
   const tone = n < 0 ? 'closed' : n <= 7 ? 'hot' : n <= 30 ? 'warm' : 'calm'
@@ -153,7 +163,7 @@ export function Field({ label, children, span }: { label: string; children: Reac
 }
 
 export function toDeadline(r: Row): Deadline {
-  const { conf: _c, virtual: _v, derivedFrom: _d, autoDiff: _a, sources: _s, evidence: _e, time: _t, tz: _z, at: _at, ...d } = r
+  const { conf: _c, virtual: _v, derivedFrom: _d, autoDiff: _a, sources: _s, evidence: _e, time: _t, tz: _z, at: _at, exact: _x, ...d } = r
   return d
 }
 
@@ -562,7 +572,8 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
             <li key={s.label} className={s === nextStep ? 'upnext' : s.date && s.date < today ? 'done' : ''} title={s === nextStep ? 'Next date coming up' : s.date && s.date < today ? 'Passed' : ''}>
               <span>{s.label}</span>
               <b className={live.status === 'estimated' || s.soft ? 'est' : ''}>{fmt(s.date) || 'TBD'}</b>
-              {s.main && <Countdown deadline={live.deadline} today={today} at={live.at} />}
+              {s.main && <Countdown deadline={live.deadline} today={today} at={live.at} assumed={!live.exact} />}
+              {s.main && !live.exact && live.at > Date.now() && <small className="muted when">Closing time not stated — assuming 23:59 AoE. Check the site.</small>}
               {s.main && live.time && live.tz && (
                 <small className="muted when">{live.time} {/^UTC-12$/i.test(live.tz) ? 'AoE' : live.tz}{toKST(live.deadline, live.time, live.tz) && <> = <b>{toKST(live.deadline, live.time, live.tz)} KST</b></>}</small>
               )}

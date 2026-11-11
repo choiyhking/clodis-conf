@@ -106,20 +106,6 @@ main { padding: 26px 24px 80px; min-width: 0; }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
 .filters input[type='search'] { width: 230px; }
 
-/* up next: clock + the lab's nearest submissions and results */
-.upnext { margin-bottom: 16px; }
-.up-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.up { height: auto; flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px 14px; border: 1px solid var(--line); border-left: 4px solid var(--writing); border-radius: var(--radius); box-shadow: var(--shadow); white-space: normal; text-align: left; min-width: 0; }
-.up.hot { border-left-color: var(--hot); }
-.up.is-result { border-left-color: var(--submitted); }
-.up-kind { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-.up-main { font-size: 14px; font-weight: 600; }
-.up-main b { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-right: 6px; }
-.up.hot .up-main b { color: var(--hot); }
-.up-sub { display: flex; align-items: center; gap: 6px; font-weight: 400; font-size: 12.5px; width: 100%; min-width: 0; }
-.up-sub > span:not(.avatars) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.up-sub small { margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
-
 /* tags, pills, avatars */
 .tag { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 6px; background: var(--sunken); color: var(--muted); font-size: 11.5px; font-weight: 500; white-space: nowrap; }
 .tag.warn { background: var(--hot-soft); color: var(--hot); }
@@ -372,7 +358,6 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
   .side-foot { margin: 0 0 0 auto; }
   .sync { display: none; }
   main { padding: 16px 14px 60px; }
-  .up-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .grid, .two { grid-template-columns: 1fr; }
   .ilist > li { flex-wrap: wrap; }
 }
@@ -405,3 +390,9 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
 .brand > span { display: flex; flex-direction: column; line-height: 1.2; }
 .brand small { font-size: 11px; }
 .nobody { margin-bottom: 8px; }
+
+/* countdown: under a day left is solid, and an assumed closing time carries a small ? */
+.cd.urgent { background: var(--hot); color: #fff; font-weight: 700; }
+.cd-wrap { display: inline-flex; align-items: flex-start; }
+.cd-wrap.assumed::after { content: '?'; display: inline-block; width: 0; overflow: visible; font-size: 10px; font-weight: 700; color: var(--est); line-height: 1; padding-left: 2px; }
+.clock { margin-bottom: 16px; }
