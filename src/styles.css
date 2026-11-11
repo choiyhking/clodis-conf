@@ -629,3 +629,14 @@ html { scrollbar-gutter: stable; }
 /* Targeting: room for a readable title next to the avatars */
 .sched col.c-target { width: 200px; }
 .pc-target .when { white-space: nowrap; }
+
+/* track names are part of the conference name */
+.conf-top .track { color: var(--text); }
+.sched col.c-target { width: 250px; }
+/* where there is room, people stand side by side instead of overlapping */
+.pc-foot .avatars, .tl-left .avatars { gap: 4px; }
+.pc-foot .avatars .avatar + .avatar, .tl-left .avatars .avatar + .avatar { margin-left: 0; box-shadow: none; }
+/* Targeting grows with the screen; on a laptop the conference name keeps its room */
+.sched col.c-target { width: 200px; }
+@media (min-width: 1500px) { .sched col.c-target { width: 250px; } }
+@media (min-width: 1800px) { .sched col.c-target { width: 290px; } }
