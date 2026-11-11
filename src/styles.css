@@ -640,3 +640,11 @@ html { scrollbar-gutter: stable; }
 .sched col.c-target { width: 200px; }
 @media (min-width: 1500px) { .sched col.c-target { width: 250px; } }
 @media (min-width: 1800px) { .sched col.c-target { width: 290px; } }
+
+/* people are name tags, not circles: a rounded rectangle, side by side, never overlapping */
+.avatar { border-radius: 5px; letter-spacing: 0; }
+.avatar.full { padding: 0 6px; white-space: nowrap; font-weight: 600; }
+.avatars { gap: 3px; flex-wrap: wrap; }
+.avatars .avatar + .avatar, .pc-foot .avatars .avatar + .avatar, .tl-left .avatars .avatar + .avatar { margin-left: 0; box-shadow: none; }
+.paper-chip .avatars { flex-wrap: nowrap; gap: 2px; }
+.paper-chip .avatar { border-radius: 4px; }
