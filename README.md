@@ -17,7 +17,7 @@ who is aiming at which one, and how past submissions went.
 
 - **Verified** — a person checked the conference site. Who and when is recorded.
 - **Auto** — collected automatically, shown immediately, waiting for the owner to confirm. `×2` means both collectors agree.
-- **Estimated** — this edition hasn't been announced, so last year's dates shifted by 364 days (same weekday) are shown.
+- **Estimated** — this edition hasn't been announced, so last year's dates moved one year forward are shown.
   They disappear by themselves once real dates arrive.
 
 Verified wins over Auto, Auto over Estimated. A collected value never overwrites a verified one; if they differ for an
