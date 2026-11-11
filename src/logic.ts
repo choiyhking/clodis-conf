@@ -117,7 +117,12 @@ export function rowTags(r: { conf: Conf; round: string }): string[] {
 }
 export const rowLabel = (r: { conf: Conf; round: string }) => [venueOf(r.conf.acronym).name, ...rowTags(r)].join(' ')
 /** Timeline entries that are a separate track rather than another round of the main one. */
-const SIDE_TRACK = /short|poster|workshop|demo|industr|tutorial|doctoral|journal|tool|artifact|commitment|optional abstract/i
+const SIDE_TRACK = /short|poster|workshop|demo|industr|tutorial|doctoral|journal|tool|artifact|optional abstract/i
+/**
+ * Entries that are not a deadline for submitting a paper at all: ACL-family "commitment" dates only apply
+ * to papers that already went through ARR review. They are left out entirely.
+ */
+const NOT_A_SUBMISSION = /commitment|reviewed papers only/i
 export const STATUS_LABEL: Record<Row['status'], string> = { verified: 'Verified', auto: 'Auto', estimated: 'Estimated' }
 export const PAPER_STATUS: { key: PaperStatus; label: string }[] = [
   { key: 'research', label: 'Researching' },
@@ -265,7 +270,7 @@ export function collected(conf: Conf, auto: AutoData): Collected[] {
   for (const year of years) {
     const c = ccf.find((e) => e.year === year)
     const s = crawl.find((e) => e.year === year)
-    const cRounds = (c?.rounds ?? []).filter((r) => isDate(r.deadline))
+    const cRounds = (c?.rounds ?? []).filter((r) => isDate(r.deadline) && !NOT_A_SUBMISSION.test(r.comment ?? ''))
     const sRounds = (s?.rounds ?? []).filter((r) => isDate(r.deadline))
     if (cRounds.length) {
       out.push({

@@ -573,3 +573,6 @@ td.conf { max-width: 184px; }
 /* …and the conference name shares that spare width, so long names are cut less on wide screens */
 .sched th:nth-child(2), .sched td.conf { width: 45%; max-width: 0; min-width: 184px; }
 .sched th:nth-child(9), .sched td:nth-child(9) { width: 55%; }
+
+/* a conference nobody owns still gets an (empty) avatar slot so the status column lines up */
+.avatar.none { background: none; box-shadow: inset 0 0 0 1.5px var(--line-strong); }
