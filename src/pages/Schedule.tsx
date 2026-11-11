@@ -68,6 +68,19 @@ export default function Schedule() {
     return true
   })
 
+  // Everything currently narrowing the table, as removable chips.
+  const without = (list: string[], v: string) => list.filter((x) => x !== v)
+  const active: { key: string; label: string; clear: () => void }[] = [
+    ...(q ? [{ key: 'q', label: `Search: ${q}`, clear: () => setQ('') }] : []),
+    ...area.map((v) => ({ key: `a${v}`, label: v, clear: () => setArea(without(area, v)) })),
+    ...rank.map((v) => ({ key: `r${v}`, label: RANK_OPTIONS.find((o) => o.value === v)!.label, clear: () => setRank(without(rank, v)) })),
+    ...owner.map((v) => ({ key: `o${v}`, label: v ? `Owner: ${v}` : 'No owner', clear: () => setOwner(without(owner, v)) })),
+    ...status.map((v) => ({ key: `s${v}`, label: STATUS_OPTIONS.find((o) => o.value === v)!.label, clear: () => setStatus(without(status, v)) })),
+    ...(onlyTarget ? [{ key: 'ours', label: 'Our targets only', clear: () => setOnlyTarget(false) }] : []),
+    ...(past ? [{ key: 'past', label: 'Past year shown', clear: () => setPast(false) }] : []),
+  ]
+  const clearAll = () => { setQ(''); setArea([]); setRank([]); setOwner([]); setStatus([]); setOnlyTarget(false); setPast(false) }
+
   const firstFuture = shown.findIndex((r) => r.at > now)
   return (
     <section>
@@ -97,6 +110,15 @@ export default function Schedule() {
       {/* what the row colours mean, right above the rows they describe */}
       <div className="table-note">
         <span className="muted">{shown.length} deadlines</span>
+        {active.length > 0 && (
+          <span className="active-filters">
+            <b>{active.length} {active.length === 1 ? 'filter' : 'filters'}</b>
+            {active.map((f) => (
+              <button key={f.key} className="fchip" onClick={f.clear} title="Remove this filter">{f.label} <Icon name="close" size={11} /></button>
+            ))}
+            <button className="link clear-all" onClick={clearAll}>Clear all</button>
+          </span>
+        )}
         <span className="grow" />
         <span className="key-item"><i className="sw reviewing" /> Under review</span>
         <span className="key-item"><i className="sw targeted" /> Targeted</span>

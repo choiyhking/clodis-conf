@@ -592,3 +592,12 @@ td.conf { max-width: 184px; }
 .pc-target small { display: flex; align-items: center; gap: 6px; color: var(--text); font-weight: 400; font-variant-numeric: tabular-nums; }
 .pc-target small i { font-style: normal; color: var(--muted); }
 .pc-target .cd { height: 18px; min-width: 0; padding: 0 7px; font-size: 11px; }
+
+/* active filters, listed where the row count is */
+.table-note { flex-wrap: wrap; row-gap: 6px; }
+.active-filters { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.active-filters > b { font-weight: 600; color: var(--accent-ink); margin-right: 2px; }
+.fchip { height: 24px; padding: 0 8px; gap: 5px; border-radius: 12px; font-size: 12px; font-weight: 500; color: var(--accent-ink); background: var(--accent-soft); border-color: transparent; }
+.fchip:hover { background: var(--accent-soft); border-color: var(--accent); }
+.fchip .icon { opacity: 0.7; }
+.clear-all { font-size: 12.5px; text-decoration: underline; color: var(--muted); margin-left: 4px; }
