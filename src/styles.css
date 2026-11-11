@@ -585,3 +585,10 @@ td.conf { max-width: 184px; }
 .sched th:nth-child(9), .sched td:nth-child(9) { min-width: 148px; }
 .sched th:nth-child(8), .sched td:nth-child(8) { min-width: 180px; }
 .sched th:nth-child(9), .sched td:nth-child(9) { min-width: 134px; }
+
+/* paper card: venue, then "Deadline <date> <left>" or "Result <date> <left>" */
+.pc-target { display: flex; flex-direction: column; gap: 3px; width: 100%; }
+.pc-target b { font-weight: 600; }
+.pc-target small { display: flex; align-items: center; gap: 6px; color: var(--text); font-weight: 400; font-variant-numeric: tabular-nums; }
+.pc-target small i { font-style: normal; color: var(--muted); }
+.pc-target .cd { height: 18px; min-width: 0; padding: 0 7px; font-size: 11px; }
