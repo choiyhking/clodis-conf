@@ -6,7 +6,7 @@ import Papers from './pages/Papers'
 import Schedule from './pages/Schedule'
 import Timeline from './pages/Timeline'
 import { MODE, supabase, useStore } from './store'
-import { Avatar, Icon } from './ui'
+import { Avatar, Field, Icon, Modal } from './ui'
 
 const TABS = [
   { key: 'deadlines', label: 'Deadlines', icon: 'calendar' },
@@ -27,31 +27,79 @@ const Logo = () => (
   </svg>
 )
 
-function Login() {
+/** Accounts are created by the lab's admin; there is no sign-up. */
+function Login({ onBack }: { onBack: () => void }) {
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [msg, setMsg] = useState('')
-  const send = async () => {
-    const { error } = await supabase!.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href.split('#')[0] } })
-    setMsg(error ? 'Could not send the link: ' + error.message : 'Check your inbox for a sign-in link.')
+  const [busy, setBusy] = useState(false)
+  const signIn = async () => {
+    if (!email || !password) return setMsg('Enter your email and password.')
+    setBusy(true)
+    const { error } = await supabase!.auth.signInWithPassword({ email, password })
+    setBusy(false)
+    if (error) setMsg(/invalid/i.test(error.message) ? 'Wrong email or password.' : error.message)
+  }
+  // For an account that has no password yet (or forgot it): a one-time link, then set a password from the sidebar.
+  const sendLink = async () => {
+    if (!email) return setMsg('Enter your email first.')
+    setBusy(true)
+    const { error } = await supabase!.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: location.href.split('#')[0] } })
+    setBusy(false)
+    setMsg(error ? 'Could not send the link. Ask the lab admin whether your account exists.' : 'Check your inbox for a sign-in link.')
   }
   return (
-    <div className="login">
+    <form className="login" onSubmit={(e) => { e.preventDefault(); void signIn() }}>
       <div className="brand"><Logo /> <b>{APP_NAME}</b></div>
-      <p className="muted">Sign in with the email your lab registered for you.</p>
-      <input type="email" placeholder="you@university.ac.kr" value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} />
-      <button className="primary" onClick={send}>Email me a sign-in link</button>
-      {msg && <p>{msg}</p>}
-    </div>
+      <p className="muted">Lab members sign in with the account the lab admin created for them.</p>
+      <input type="email" placeholder="Email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
+      <input type="password" placeholder="Password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      <button className="primary" disabled={busy}>Sign in</button>
+      <button type="button" className="link" onClick={sendLink} disabled={busy}>Email me a one-time sign-in link instead</button>
+      {msg && <p role="status">{msg}</p>}
+      <button type="button" className="link back" onClick={onBack}>← Back to deadlines</button>
+    </form>
+  )
+}
+
+function PasswordModal({ onClose }: { onClose: () => void }) {
+  const [a, setA] = useState('')
+  const [b, setB] = useState('')
+  const [msg, setMsg] = useState('')
+  const submit = async () => {
+    if (a.length < 8) return setMsg('Use at least 8 characters.')
+    if (a !== b) return setMsg('The two passwords do not match.')
+    const { error } = await supabase!.auth.updateUser({ password: a })
+    if (error) return setMsg(error.message)
+    alert('Password changed.')
+    onClose()
+  }
+  return (
+    <Modal title="Change password" onClose={onClose}>
+      <form className="grid" onSubmit={(e) => { e.preventDefault(); void submit() }}>
+        <Field label="New password" span><input type="password" autoComplete="new-password" value={a} onChange={(e) => setA(e.target.value)} autoFocus /></Field>
+        <Field label="Again" span><input type="password" autoComplete="new-password" value={b} onChange={(e) => setB(e.target.value)} /></Field>
+        {msg && <p className="span" role="status">{msg}</p>}
+        <footer className="span">
+          <span className="grow" />
+          <button type="button" onClick={onClose}>Cancel</button>
+          <button className="primary">Save</button>
+        </footer>
+      </form>
+    </Modal>
   )
 }
 
 export default function App() {
-  const { ready, error, rows, data, today, me, setMe, session, auto } = useStore()
+  const { ready, error, rows, data, today, me, setMe, session, guest, auto } = useStore()
+  const [signingIn, setSigningIn] = useState(false)
+  const [changePw, setChangePw] = useState(false)
+  useEffect(() => { if (session) setSigningIn(false) }, [session])
   const [tab, setTab] = useState<Tab>(() => (isTab(location.hash.slice(1)) ? (location.hash.slice(1) as Tab) : 'deadlines'))
   useEffect(() => {
     location.hash = tab
-    document.title = `${TABS.find((t) => t.key === tab)!.label} · ${APP_NAME}`
-  }, [tab])
+    document.title = `${guest ? 'Deadlines' : TABS.find((t) => t.key === tab)!.label} · ${APP_NAME}`
+  }, [tab, guest])
   useEffect(() => {
     // Follow the back button and hand-edited #tab URLs.
     const onHash = () => isTab(location.hash.slice(1)) && setTab(location.hash.slice(1) as Tab)
@@ -60,7 +108,10 @@ export default function App() {
   }, [])
 
   if (!ready) return <p className="loading">Loading…</p>
-  if (MODE === 'supabase' && !session) return <Login />
+  if (MODE === 'supabase' && guest && signingIn) return <Login onBack={() => setSigningIn(false)} />
+  // A guest sees the deadlines and nothing else, whatever the address bar says.
+  const tabs = guest ? TABS.filter((t) => t.key === 'deadlines') : TABS
+  const shownTab: Tab = guest ? 'deadlines' : tab
 
   const mineOnly = (owner: string) => !me || owner === me
   const todo =
@@ -73,15 +124,21 @@ export default function App() {
       <aside className="side">
         <div className="brand" title={LAB_NAME}><Logo /> <b>{APP_NAME}</b></div>
         <nav>
-          {TABS.map((t) => (
-            <button key={t.key} className={tab === t.key ? 'on' : ''} onClick={() => setTab(t.key)} aria-current={tab === t.key ? 'page' : undefined}>
+          {tabs.map((t) => (
+            <button key={t.key} className={shownTab === t.key ? 'on' : ''} onClick={() => setTab(t.key)} aria-current={shownTab === t.key ? 'page' : undefined}>
               <Icon name={t.icon} size={17} /> <span>{t.label}</span>
               {t.key === 'inbox' && todo > 0 && <span className="count">{todo}</span>}
             </button>
           ))}
         </nav>
         <div className="side-foot">
-          <label className="me">
+          {guest && (
+            <div className="guest-box">
+              <p className="muted">Public view — conference deadlines only.</p>
+              {MODE === 'supabase' && <button onClick={() => setSigningIn(true)}>Lab member sign in</button>}
+            </div>
+          )}
+          {!guest && <label className="me">
             <Avatar name={me || '?'} dot />
             <span title={session ? `Signed in as ${session}` : undefined}>
               {MODE === 'supabase' && me ? (
@@ -106,7 +163,13 @@ export default function App() {
               )}
               <small className="muted">{meRole || (me ? 'Role not set' : MODE === 'supabase' ? 'Pick your name once' : 'Pick your name')}</small>
             </span>
-          </label>
+          </label>}
+          {!guest && MODE === 'supabase' && (
+            <p className="account">
+              <button className="link" onClick={() => setChangePw(true)}>Change password</button>
+              <button className="link" onClick={() => confirm('Sign out?') && supabase!.auth.signOut()}>Sign out</button>
+            </p>
+          )}
           <p className="sync muted">
             <i className={'dot' + (auto ? ' ok' : '')} /> {auto ? `Dates collected ${auto.generatedAt.slice(0, 10)}` : 'Collector has not run'}
             {MODE === 'local' && <><br /><i className="dot warn" /> Local mode — not shared</>}
@@ -115,12 +178,13 @@ export default function App() {
       </aside>
       <main>
         {error && <p className="error">Something went wrong: {error}</p>}
-        {tab === 'deadlines' && <Schedule />}
-        {tab === 'timeline' && <Timeline />}
-        {tab === 'papers' && <Papers />}
-        {tab === 'inbox' && <Inbox />}
-        {tab === 'lab' && <Lab />}
+        {shownTab === 'deadlines' && <Schedule />}
+        {shownTab === 'timeline' && <Timeline />}
+        {shownTab === 'papers' && <Papers />}
+        {shownTab === 'inbox' && <Inbox />}
+        {shownTab === 'lab' && <Lab />}
       </main>
+      {changePw && <PasswordModal onClose={() => setChangePw(false)} />}
     </div>
   )
 }

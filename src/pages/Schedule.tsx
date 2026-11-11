@@ -5,7 +5,6 @@ import type { Paper, Row } from '../types'
 import { AreaTag, Clock, ConfDrawer, ConfModal, Countdown, Icon, MultiFilter, PaperModal, Place, Rank, StatusBadge, TargetModal, type FilterOption } from '../ui'
 import { isStale } from '../logic'
 
-const COLS = 11
 const RANK_OPTIONS: FilterOption[] = [
   { group: 'KIISE', value: 'k:S', label: 'KIISE S' },
   { group: 'KIISE', value: 'k:A', label: 'KIISE A' },
@@ -21,7 +20,8 @@ const STATUS_OPTIONS: FilterOption[] = [
 const PAST_DAYS = 365 // "Show past" goes back one year; older rows stay in the data but off the table
 
 export default function Schedule() {
-  const { rows, data, today } = useStore()
+  const { rows, data, today, guest } = useStore()
+  const COLS = guest ? 9 : 11
   const [q, setQ] = useState('')
   // Each filter holds any number of values; an empty list means that filter is off.
   const [area, setArea] = useState<string[]>([])
@@ -96,14 +96,14 @@ export default function Schedule() {
         <input type="search" placeholder="Search conferences" value={q} onChange={(e) => setQ(e.target.value)} />
         <MultiFilter label="All areas" noun="Area" value={area} onChange={setArea} options={areas.map((a) => ({ value: a, label: a }))} />
         <MultiFilter label="Any rank" noun="Rank" value={rank} onChange={setRank} options={RANK_OPTIONS} />
-        <MultiFilter label="Any owner" noun="Owner" value={owner} onChange={setOwner} options={[...sortMembers(data.members).map((m) => ({ value: m.name, label: m.name })), { value: '', label: 'Unassigned' }]} />
+        {!guest && <MultiFilter label="Any owner" noun="Owner" value={owner} onChange={setOwner} options={[...sortMembers(data.members).map((m) => ({ value: m.name, label: m.name })), { value: '', label: 'Unassigned' }]} />}
         <MultiFilter label="Any status" noun="Status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
         <button className={'toggle' + (past ? ' on' : '')} onClick={() => setPast(!past)} aria-pressed={past} title="Also show deadlines that closed in the last 12 months">Show past year</button>
         <span className="grow" />
-        <button className={'only-ours' + (onlyTarget ? ' on' : '')} onClick={() => setOnlyTarget(!onlyTarget)} aria-pressed={onlyTarget} title="Show only the deadlines our papers are aimed at or under review for">
+        {!guest && <button className={'only-ours' + (onlyTarget ? ' on' : '')} onClick={() => setOnlyTarget(!onlyTarget)} aria-pressed={onlyTarget} title="Show only the deadlines our papers are aimed at or under review for">
           <i className="switch" /> Our targets only
-        </button>
-        <button className="primary" onClick={() => setAddConf(true)}><Icon name="plus" size={14} /> Track a conference</button>
+        </button>}
+        {!guest && <button className="primary" onClick={() => setAddConf(true)}><Icon name="plus" size={14} /> Track a conference</button>}
       </div>
 
       {/* what the row colours mean, right above the rows they describe */}
@@ -119,8 +119,8 @@ export default function Schedule() {
           </span>
         )}
         <span className="grow" />
-        <span className="key-item"><i className="sw reviewing" /> Under review</span>
-        <span className="key-item"><i className="sw targeted" /> Targeted</span>
+        {!guest && <span className="key-item"><i className="sw reviewing" /> Under review</span>}
+        {!guest && <span className="key-item"><i className="sw targeted" /> Targeted</span>}
       </div>
 
       <div className="card tablewrap">
@@ -128,7 +128,7 @@ export default function Schedule() {
           {/* Fixed column widths: the layout must not shift when a filter changes which rows are shown. */}
           <colgroup>
             <col className="c-rank" /><col className="c-conf" /><col className="c-date" /><col className="c-date" /><col className="c-left" />
-            <col className="c-date" /><col className="c-review" /><col className="c-loc" /><col className="c-target" /><col className="c-owner" /><col className="c-status" />
+            <col className="c-date" /><col className="c-review" /><col className="c-loc" />{!guest && <col className="c-target" />}{!guest && <col className="c-owner" />}<col className="c-status" />
           </colgroup>
           <thead>
             <tr>
@@ -140,8 +140,8 @@ export default function Schedule() {
               <th className="c">Notification</th>
               <th className="c" title="Days from submission to notification">Review</th>
               <th>Location</th>
-              <th>Targeting</th>
-              <th className="c" title="Who keeps this conference's dates correct">Owner</th>
+              {!guest && <th>Targeting</th>}
+              {!guest && <th className="c" title="Who keeps this conference's dates correct">Owner</th>}
               <th title="How far the dates can be trusted">Status</th>
             </tr>
           </thead>
@@ -180,7 +180,7 @@ export default function Schedule() {
                       <Place location={r.location} />
                       <small>Starts {fmt(r.event) || 'TBD'}</small>
                     </td>
-                    <td onClick={(e) => e.stopPropagation()}>
+                    {!guest && <td onClick={(e) => e.stopPropagation()}>
                       <span className={'targeting' + (tg.length ? '' : ' none')}>
                         {/* One line only: the first paper, then how many more. The drawer lists them all. */}
                         {tg.slice(0, 1).map((p) => (
@@ -197,14 +197,14 @@ export default function Schedule() {
                           <button className="ghost add" title="Target this deadline with one of our papers" onClick={() => setPick(r)}><Icon name="plus" size={14} /></button>
                         )}
                       </span>
-                    </td>
-                    <td className="c owner-cell">
+                    </td>}
+                    {!guest && <td className="c owner-cell">
                       <span className={'owner-name' + (r.conf.owner ? '' : ' none')} title={r.conf.owner ? undefined : 'No owner assigned'}>{r.conf.owner || '–'}</span>
-                    </td>
+                    </td>}
                     <td className="st-cell">
                       <StatusBadge row={r} compact />
-                      {r.autoDiff && <span className="tag warn" title={`Collected value: ${fmt(r.autoDiff.deadline)}`}>Changed</span>}
-                      {isStale(r, today) && <span className="tag" title={`Last checked ${fmt(r.checkedAt) || 'never'}`}>Re-check</span>}
+                      {!guest && r.autoDiff && <span className="tag warn" title={`Collected value: ${fmt(r.autoDiff.deadline)}`}>Changed</span>}
+                      {!guest && isStale(r, today) && <span className="tag" title={`Last checked ${fmt(r.checkedAt) || 'never'}`}>Re-check</span>}
                     </td>
                   </tr>
                 </Fragment>
