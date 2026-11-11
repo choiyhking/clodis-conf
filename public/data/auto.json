@@ -1,13 +1,22 @@
 {
- "generatedAt": "2026-11-10T07:21:55.036Z",
+ "generatedAt": "2026-11-11T01:03:09.197Z",
  "crawl": {
+  "acsac": [
+   {
+    "year": 2026,
+    "url": "https://www.acsac.org/2026/submissions/papers/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
+   }
+  ],
   "acl": [
    {
     "year": 2027,
     "url": "https://2027.aclweb.org/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "aaai": [
@@ -16,16 +25,7 @@
     "url": "https://aaai.org/conference/aaai/aaai-27/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "acsac": [
-   {
-    "year": 2026,
-    "url": "https://www.acsac.org/2026/submissions/papers/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "aamas": [
@@ -68,7 +68,7 @@
      "Notification : 24 Dec 2026",
      "Abstract Deadline: 31 Dec 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "aistats": [
@@ -91,7 +91,7 @@
      "The site will start accepting submissions on September 15, 2026.",
      "Update September 30, 2026: the AI Use Statement only needs to be included in the paper, not in the submission form."
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "ccs": [
@@ -100,7 +100,33 @@
     "url": "https://www.sigsac.org/ccs/CCS2027/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "ccs-poster": [
+   {
+    "year": 2026,
+    "url": "https://www.sigsac.org/ccs/CCS2026/call-for/call-for-posters.html",
+    "rounds": [
+     {
+      "abstract": "",
+      "deadline": "2026-07-23",
+      "noti": "2026-08-27"
+     }
+    ],
+    "evidence": [
+     "Submission deadline: July 23, 2026, 23:59:59 (AoE, or UTC -12)",
+     "Author notification: August 27, 2026, 23:59:59 (AoE, or UTC -12)"
+    ],
+    "fetchedAt": "2026-11-11"
+   },
+   {
+    "year": 2027,
+    "url": "https://www.sigsac.org/ccs/CCS2027/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11",
+    "firstSeen": "2026-11-10"
    }
   ],
   "asplos": [
@@ -125,51 +151,7 @@
      "Full paper submission — September 9, 2026",
      "Notification — December 21, 2026"
     ],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "ccs-poster": [
-   {
-    "year": 2026,
-    "url": "https://www.sigsac.org/ccs/CCS2026/call-for/call-for-posters.html",
-    "rounds": [
-     {
-      "abstract": "",
-      "deadline": "2026-07-23",
-      "noti": "2026-08-27"
-     }
-    ],
-    "evidence": [
-     "Submission deadline: July 23, 2026, 23:59:59 (AoE, or UTC -12)",
-     "Author notification: August 27, 2026, 23:59:59 (AoE, or UTC -12)"
-    ],
-    "fetchedAt": "2026-11-10"
-   },
-   {
-    "year": 2027,
-    "url": "https://www.sigsac.org/ccs/CCS2027/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10",
-    "firstSeen": "2026-11-10"
-   }
-  ],
-  "cluster": [
-   {
-    "year": 2026,
-    "url": "https://clustercomp.org/2026/papers/",
-    "rounds": [
-     {
-      "abstract": "",
-      "deadline": "2026-05-07",
-      "noti": "2026-07-05"
-     }
-    ],
-    "evidence": [
-     "Full Papers submission: May 7, 2026 AoE",
-     "Paper Acceptance Notification: July 5, 2026 AoE"
-    ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "coling": [
@@ -178,7 +160,7 @@
     "url": "https://2027.coling-iccl.org/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "conext": [
@@ -187,42 +169,15 @@
     "url": "https://conferences.sigcomm.org/co-next/2026/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    },
    {
     "year": 2027,
     "url": "https://conferences.sigcomm.org/co-next/2027/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10",
+    "fetchedAt": "2026-11-11",
     "firstSeen": "2026-11-10"
-   }
-  ],
-  "cloud": [
-   {
-    "year": 2026,
-    "url": "https://services.conferences.computer.org/2026/cloud/cloud-call-for-papers/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "dasfaa": [
-   {
-    "year": 2027,
-    "url": "https://dasfaa2027.github.io/CallforResearchTrack/list.htm",
-    "rounds": [
-     {
-      "abstract": "",
-      "deadline": "2026-11-25",
-      "noti": "2027-01-25"
-     }
-    ],
-    "evidence": [
-     "Paper Submission: November 25, 2026",
-     "Acceptance Notification: January 25, 2027"
-    ],
-    "fetchedAt": "2026-11-10"
    }
   ],
   "asiaccs": [
@@ -247,7 +202,7 @@
      "Paper Submission: 11 December 2026 (AoE)",
      "Author Notification: 31 March 2027 (AoE)"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "csf": [
@@ -279,7 +234,52 @@
      "Winter cycle paper submission January 28, 2027",
      "Winter cycle author notification April 5, 2027"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "cluster": [
+   {
+    "year": 2026,
+    "url": "https://clustercomp.org/2026/papers/",
+    "rounds": [
+     {
+      "abstract": "",
+      "deadline": "2026-05-07",
+      "noti": "2026-07-05"
+     }
+    ],
+    "evidence": [
+     "Full Papers submission: May 7, 2026 AoE",
+     "Paper Acceptance Notification: July 5, 2026 AoE"
+    ],
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "dasfaa": [
+   {
+    "year": 2027,
+    "url": "https://dasfaa2027.github.io/CallforResearchTrack/list.htm",
+    "rounds": [
+     {
+      "abstract": "",
+      "deadline": "2026-11-25",
+      "noti": "2027-01-25"
+     }
+    ],
+    "evidence": [
+     "Paper Submission: November 25, 2026",
+     "Acceptance Notification: January 25, 2027"
+    ],
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "cloud": [
+   {
+    "year": 2026,
+    "url": "https://services.conferences.computer.org/2026/cloud/cloud-call-for-papers/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "edbt": [
@@ -288,7 +288,7 @@
     "url": "https://edbticdt2027.github.io/?contents=important_dates.html",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "dsn": [
@@ -297,7 +297,7 @@
     "url": "https://dsn2027-berlin.github.io/call-for-contributions/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "emnlp": [
@@ -306,16 +306,35 @@
     "url": "https://2026.emnlp.org/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "ecai": [
+  "ase": [
    {
-    "year": 2027,
-    "url": "https://ecai2027.org/",
+    "year": 2026,
+    "url": "https://conf.researchr.org/home/ase-2026",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "eurosys": [
+   {
+    "year": 2027,
+    "url": "https://2027.eurosys.org/cfp.html",
+    "rounds": [
+     {
+      "abstract": "2026-09-17",
+      "deadline": "2026-09-24",
+      "noti": "2027-01-29"
+     }
+    ],
+    "evidence": [
+     "Paper titles and abstracts due: Thursday, September 17, 2026",
+     "Full paper submissions due: Thursday, September 24, 2026",
+     "Notification to authors: Friday, January 29, 2027"
+    ],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "disc": [
@@ -336,25 +355,7 @@
      "Paper registration: May 27, 2026 (23:59 AoE)",
      "Submission deadline: June 1, 2026 (23:59 AoE)"
     ],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "esorics": [
-   {
-    "year": 2026,
-    "url": "https://sites.google.com/di.uniroma1.it/esorics2026/call-for/papers?authuser=0",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "ase": [
-   {
-    "year": 2026,
-    "url": "https://conf.researchr.org/home/ase-2026",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "cikm": [
@@ -373,26 +374,25 @@
      "May 23, 2026 – Full Paper Submission Deadline",
      "August 7, 2026 – Notification of Acceptance"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "eurosys": [
+  "ecai": [
    {
     "year": 2027,
-    "url": "https://2027.eurosys.org/cfp.html",
-    "rounds": [
-     {
-      "abstract": "2026-09-17",
-      "deadline": "2026-09-24",
-      "noti": "2027-01-29"
-     }
-    ],
-    "evidence": [
-     "Paper titles and abstracts due: Thursday, September 17, 2026",
-     "Full paper submissions due: Thursday, September 24, 2026",
-     "Notification to authors: Friday, January 29, 2027"
-    ],
-    "fetchedAt": "2026-11-10"
+    "url": "https://ecai2027.org/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "esorics": [
+   {
+    "year": 2026,
+    "url": "https://sites.google.com/di.uniroma1.it/esorics2026/call-for/papers?authuser=0",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "fse": [
@@ -431,35 +431,33 @@
      "Fri 26 Mar 2027 Software Engineering Education Author notification",
      "Fri 2 Oct 2026 Research Papers Full paper submission"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "hpca": [
+  "europar": [
    {
-    "year": 2027,
-    "url": "https://conf.researchr.org/track/hpca-2027/hpca-2027-main-conference",
+    "year": 2026,
+    "url": "https://2026.euro-par.org/calls/papers",
     "rounds": [
      {
-      "abstract": "2026-07-24",
-      "deadline": "2026-07-31",
-      "noti": "2026-11-06"
+      "abstract": "2026-03-06",
+      "deadline": "2026-03-13",
+      "noti": "2026-04-30"
      }
     ],
     "evidence": [
-     "Paper Registration and Abstract Submission 11:59 pm July 24 2026 AoE",
-     "Paper Submission 11:59 pm July 31 2026 AoE",
-     "Notification November 6 2026"
+     "Abstract Submission : 27 February 2026 6 March 2026 (AoE) (extended deadline)",
+     "Paper Submission : 6 March 2026 13 March 2026 (AoE) (extended firm deadline)",
+     "Author Notification : 30 April 2026"
     ],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "fast": [
+    "fetchedAt": "2026-11-11"
+   },
    {
-    "year": 2028,
-    "url": "https://www.usenix.org/conference/fast28/",
+    "year": 2027,
+    "url": "https://2027.euro-par.org/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10",
+    "fetchedAt": "2026-11-11",
     "firstSeen": "2026-11-10"
    }
   ],
@@ -479,43 +477,7 @@
      "Full paper submission: January 25, 2027",
      "Notification of paper acceptance/rejection: March 19, 2027"
     ],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "hpdc": [
-   {
-    "year": 2026,
-    "url": "https://hpdc.sci.utah.edu/2026/calls-cfp.html",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "europar": [
-   {
-    "year": 2026,
-    "url": "https://2026.euro-par.org/calls/papers",
-    "rounds": [
-     {
-      "abstract": "2026-03-06",
-      "deadline": "2026-03-13",
-      "noti": "2026-04-30"
-     }
-    ],
-    "evidence": [
-     "Abstract Submission : 27 February 2026 6 March 2026 (AoE) (extended deadline)",
-     "Paper Submission : 6 March 2026 13 March 2026 (AoE) (extended firm deadline)",
-     "Author Notification : 30 April 2026"
-    ],
-    "fetchedAt": "2026-11-10"
-   },
-   {
-    "year": 2027,
-    "url": "https://2027.euro-par.org/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10",
-    "firstSeen": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "fase": [
@@ -540,7 +502,7 @@
      "Submission deadline for ESOP round 2: October 16, 2025",
      "Submission deadline for TACAS, FoSSaCS, FASE: October 16, 2025"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    },
    {
     "year": 2027,
@@ -556,7 +518,59 @@
      "Submission deadline for ESOP-round 1: May 28, 2026",
      "Notification for ESOP-round 1: August 6, 2026"
     ],
-    "fetchedAt": "2026-11-10",
+    "fetchedAt": "2026-11-11",
+    "firstSeen": "2026-11-10"
+   }
+  ],
+  "hpca": [
+   {
+    "year": 2027,
+    "url": "https://conf.researchr.org/track/hpca-2027/hpca-2027-main-conference",
+    "rounds": [
+     {
+      "abstract": "2026-07-24",
+      "deadline": "2026-07-31",
+      "noti": "2026-11-06"
+     }
+    ],
+    "evidence": [
+     "Paper Registration and Abstract Submission 11:59 pm July 24 2026 AoE",
+     "Paper Submission 11:59 pm July 31 2026 AoE",
+     "Notification November 6 2026"
+    ],
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "fast": [
+   {
+    "year": 2027,
+    "url": "https://www.usenix.org/conference/fast27/call-for-papers",
+    "rounds": [
+     {
+      "abstract": "",
+      "deadline": "2026-03-17",
+      "noti": "2026-06-04"
+     },
+     {
+      "abstract": "",
+      "deadline": "2026-09-15",
+      "noti": "2026-12-08"
+     }
+    ],
+    "evidence": [
+     "Paper submissions due: Tuesday, March 17, 2026, 23:59 AoE",
+     "Notification to authors: Thursday, June 4, 2026",
+     "Paper submissions due: Tuesday, September 15, 2026, 23:59 AoE",
+     "Notification to authors: Tuesday, December 8, 2026"
+    ],
+    "fetchedAt": "2026-11-11"
+   },
+   {
+    "year": 2028,
+    "url": "https://www.usenix.org/conference/fast28/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11",
     "firstSeen": "2026-11-10"
    }
   ],
@@ -566,7 +580,16 @@
     "url": "https://icde2027.github.io/cf-research-papers-temp.html",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "hpdc": [
+   {
+    "year": 2026,
+    "url": "https://hpdc.sci.utah.edu/2026/calls-cfp.html",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "ic2e": [
@@ -584,7 +607,7 @@
      "Abstract submission deadline: May 8th, 2026 (AoE, firm deadline)",
      "Full and short paper submission deadline: May 15th, 2026 (AoE, firm deadline)"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    },
    {
     "year": 2027,
@@ -600,8 +623,17 @@
      "Abstract submission deadline: April 16, 2027",
      "Full and short paper submission deadline: April 23, 2027"
     ],
-    "fetchedAt": "2026-11-10",
+    "fetchedAt": "2026-11-11",
     "firstSeen": "2026-11-10"
+   }
+  ],
+  "hipc": [
+   {
+    "year": 2026,
+    "url": "https://hipc.org/papers/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "icpp": [
@@ -619,42 +651,24 @@
      "Abstract Submission: April 24, 2026",
      "Paper Submission: May 1, 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    },
    {
     "year": 2027,
     "url": "https://icpp2027.github.io/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10",
+    "fetchedAt": "2026-11-11",
     "firstSeen": "2026-11-10"
    }
   ],
-  "icdcs-poster": [
+  "icml": [
    {
     "year": 2026,
-    "url": "https://icdcs2026.icdcs.org/calls/call-for-papers/",
-    "rounds": [
-     {
-      "abstract": "",
-      "deadline": "2026-01-21",
-      "noti": "2026-04-27"
-     }
-    ],
-    "evidence": [
-     "Paper Abstract Registration: January 21, 2026",
-     "Paper Submission Due: January 21, 2026",
-     "Author Notification: April 27, 2026"
-    ],
-    "fetchedAt": "2026-11-10"
-   },
-   {
-    "year": 2027,
-    "url": "https://icdcs2027.icdcs.org/",
+    "url": "https://icml.cc/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10",
-    "firstSeen": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "ics": [
@@ -681,25 +695,34 @@
      "Paper submission: February 9th, 2026 – submission closed",
      "Author notification: April 6th, 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "icml": [
+  "icdcs-poster": [
    {
     "year": 2026,
-    "url": "https://icml.cc/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "hipc": [
+    "url": "https://icdcs2026.icdcs.org/calls/call-for-papers/",
+    "rounds": [
+     {
+      "abstract": "",
+      "deadline": "2026-01-21",
+      "noti": "2026-04-27"
+     }
+    ],
+    "evidence": [
+     "Paper Abstract Registration: January 21, 2026",
+     "Paper Submission Due: January 21, 2026",
+     "Author Notification: April 27, 2026"
+    ],
+    "fetchedAt": "2026-11-11"
+   },
    {
-    "year": 2026,
-    "url": "https://hipc.org/papers/",
+    "year": 2027,
+    "url": "https://icdcs2027.icdcs.org/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11",
+    "firstSeen": "2026-11-10"
    }
   ],
   "icse": [
@@ -718,7 +741,7 @@
      "Submission : June 30, 2026",
      "Notification : October 20, 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "ifip-sec": [
@@ -736,7 +759,7 @@
      "Submission due: December 15, 2026 (AoE)",
      "Notification of acceptance: February 18, 2027"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "icws": [
@@ -745,35 +768,7 @@
     "url": "https://services.conferences.computer.org/2026/icws/icws-call-for-papers/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "ijcai": [
-   {
-    "year": 2027,
-    "url": "https://2027.ijcai.org/",
-    "rounds": [
-     {
-      "abstract": "2027-01-04",
-      "deadline": "2027-01-11",
-      "noti": "2027-04-21"
-     }
-    ],
-    "evidence": [
-     "Abstract Submission Deadline: January 4, 2027",
-     "Full Paper Submission Deadline: January 11, 2027",
-     "Paper Notification: April 21, 2027"
-    ],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "iiswc": [
-   {
-    "year": 2026,
-    "url": "https://iiswc.org/iiswc2026/cfp.html",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "imc": [
@@ -802,7 +797,16 @@
      "For Cycle 2 submission (deadline April 7, 2027), please submit your paper at https://imc2027-cycle2.hotcrp.com .",
      "Please submit your Expression of Interest for the Replicability Track (deadline January 13, 2027) at https://imc2027-repro.hotcrp.com/ ."
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "iiswc": [
+   {
+    "year": 2026,
+    "url": "https://iiswc.org/iiswc2026/cfp.html",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "infovis": [
@@ -827,7 +831,7 @@
      "Notification of results of first review cycle June 6, 2026",
      "Paper submission for second review cycle July 1, 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "ipdps": [
@@ -850,7 +854,16 @@
      "Full manuscript submissions (double-anonymous): October 8, 2026 - FIRM DEADLINE",
      "First round decisions: December 18, 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "ispass": [
+   {
+    "year": 2026,
+    "url": "https://ispass.org/ispass2026/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "icsoc": [
@@ -867,16 +880,7 @@
     "evidence": [
      "15 October 2026 (Firm deadline)"
     ],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "ispass": [
-   {
-    "year": 2026,
-    "url": "https://ispass.org/ispass2026/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "kdd": [
@@ -895,7 +899,7 @@
      "Paper Deadline: July 26, 2026",
      "Notification: November 14, 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "middleware": [
@@ -918,42 +922,7 @@
      "December 4, 2026 (firm deadline)",
      "June 4, 2027 (firm deadline)"
     ],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "mobisys": [
-   {
-    "year": 2026,
-    "url": "https://sigmobile.org/mobisys/2026/call_for_papers/",
-    "rounds": [
-     {
-      "abstract": "2025-11-28",
-      "deadline": "2025-12-05",
-      "noti": ""
-     }
-    ],
-    "evidence": [
-     "Abstract Registration November 28, 2025 23:59 AoE",
-     "Paper Submission December 5, 2025 23:59 AoE"
-    ],
-    "fetchedAt": "2026-11-10"
-   },
-   {
-    "year": 2027,
-    "url": "https://sigmobile.org/mobisys/2027/call_for_papers/",
-    "rounds": [
-     {
-      "abstract": "2026-11-27",
-      "deadline": "2026-12-04",
-      "noti": ""
-     }
-    ],
-    "evidence": [
-     "Abstract Registration November 27, 2026 23:59 AoE",
-     "Paper Submission December 4, 2026 23:59 AoE"
-    ],
-    "fetchedAt": "2026-11-10",
-    "firstSeen": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "mobicom": [
@@ -962,7 +931,7 @@
     "url": "https://www.sigmobile.org/mobicom/2027/cfp.html",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "issta": [
@@ -980,7 +949,42 @@
      "Fri 8 Jan 2027 Research Papers Mandatory Abstract submission",
      "Mon 11 Jan 2027 Research Papers Full paper submission"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "mobisys": [
+   {
+    "year": 2026,
+    "url": "https://sigmobile.org/mobisys/2026/call_for_papers/",
+    "rounds": [
+     {
+      "abstract": "2025-11-28",
+      "deadline": "2025-12-05",
+      "noti": ""
+     }
+    ],
+    "evidence": [
+     "Abstract Registration November 28, 2025 23:59 AoE",
+     "Paper Submission December 5, 2025 23:59 AoE"
+    ],
+    "fetchedAt": "2026-11-11"
+   },
+   {
+    "year": 2027,
+    "url": "https://sigmobile.org/mobisys/2027/call_for_papers/",
+    "rounds": [
+     {
+      "abstract": "2026-11-27",
+      "deadline": "2026-12-04",
+      "noti": ""
+     }
+    ],
+    "evidence": [
+     "Abstract Registration November 27, 2026 23:59 AoE",
+     "Paper Submission December 4, 2026 23:59 AoE"
+    ],
+    "fetchedAt": "2026-11-11",
+    "firstSeen": "2026-11-10"
    }
   ],
   "msr": [
@@ -989,7 +993,33 @@
     "url": "https://conf.researchr.org/home/msr-2027",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "issta-demo": [
+   {
+    "year": 2026,
+    "url": "https://conf.researchr.org/home/issta-2026",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
+   },
+   {
+    "year": 2027,
+    "url": "https://conf.researchr.org/dates/issta-2027",
+    "rounds": [
+     {
+      "abstract": "2027-01-08",
+      "deadline": "2027-01-11",
+      "noti": ""
+     }
+    ],
+    "evidence": [
+     "Fri 8 Jan 2027 Research Papers Mandatory Abstract submission",
+     "Mon 11 Jan 2027 Research Papers Full paper submission"
+    ],
+    "fetchedAt": "2026-11-11",
+    "firstSeen": "2026-11-10"
    }
   ],
   "ndss": [
@@ -1013,61 +1043,7 @@
      "Wed, 29 July 2026 (tentative): Author notification",
      "Wed, 19 August 2026: Paper submission deadline"
     ],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "issta-demo": [
-   {
-    "year": 2026,
-    "url": "https://conf.researchr.org/home/issta-2026",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
-   },
-   {
-    "year": 2027,
-    "url": "https://conf.researchr.org/dates/issta-2027",
-    "rounds": [
-     {
-      "abstract": "2027-01-08",
-      "deadline": "2027-01-11",
-      "noti": ""
-     }
-    ],
-    "evidence": [
-     "Fri 8 Jan 2027 Research Papers Mandatory Abstract submission",
-     "Mon 11 Jan 2027 Research Papers Full paper submission"
-    ],
-    "fetchedAt": "2026-11-10",
-    "firstSeen": "2026-11-10"
-   }
-  ],
-  "pakdd": [
-   {
-    "year": 2027,
-    "url": "https://pakdd2027.org/pages/calls/research",
-    "rounds": [
-     {
-      "abstract": "",
-      "deadline": "2026-11-20",
-      "noti": "2027-02-26"
-     }
-    ],
-    "evidence": [
-     "Submission deadline Friday, 20 November 2026",
-     "Acceptance notification Friday, 26 February 2027"
-    ],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "nsdi": [
-   {
-    "year": 2028,
-    "url": "https://www.usenix.org/conference/nsdi28/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10",
-    "firstSeen": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "mascots": [
@@ -1084,16 +1060,16 @@
     "evidence": [
      "The submission deadline is June 5th 2026 AoE (extended)."
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "icdcs": [
+  "oopsla": [
    {
     "year": 2027,
-    "url": "https://icdcs2027.icdcs.org/",
+    "url": "https://2027.splashcon.org/track/splashoopsla2027",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "performance": [
@@ -1112,43 +1088,25 @@
      "Full paper submission: 22 May 2026",
      "Notification to authors: 7 August 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "osdi": [
+  "pakdd": [
    {
     "year": 2027,
-    "url": "https://www.usenix.org/conference/osdi27/call-for-papers",
+    "url": "https://pakdd2027.org/pages/calls/research",
     "rounds": [
      {
-      "abstract": "2026-12-01",
-      "deadline": "2026-12-08",
-      "noti": "2027-03-16"
+      "abstract": "",
+      "deadline": "2026-11-20",
+      "noti": "2027-02-26"
      }
     ],
     "evidence": [
-     "Abstract registrations due: Tuesday, December 1, 2026, 5:59 pm EST (10:59 pm UTC)",
-     "Complete paper submissions due: Tuesday, December 8, 2026, 5:59 pm EST (10:59 pm UTC)",
-     "Notification to authors: Tuesday, March 16, 2027"
+     "Submission deadline Friday, 20 November 2026",
+     "Acceptance notification Friday, 26 February 2027"
     ],
-    "fetchedAt": "2026-11-10"
-   },
-   {
-    "year": 2028,
-    "url": "https://www.usenix.org/conference/osdi28/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10",
-    "firstSeen": "2026-11-10"
-   }
-  ],
-  "oopsla": [
-   {
-    "year": 2027,
-    "url": "https://2027.splashcon.org/track/splashoopsla2027",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "pods": [
@@ -1175,7 +1133,69 @@
      "December 10, 2026: Full paper submission deadline",
      "February 8, 2027: Initial notification"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "nsdi": [
+   {
+    "year": 2027,
+    "url": "https://www.usenix.org/conference/nsdi27/call-for-papers",
+    "rounds": [
+     {
+      "abstract": "2026-04-16",
+      "deadline": "2026-04-23",
+      "noti": "2026-07-23"
+     },
+     {
+      "abstract": "2026-09-10",
+      "deadline": "2026-09-17",
+      "noti": "2026-12-08"
+     }
+    ],
+    "evidence": [
+     "Paper titles and abstracts due: Thursday, April 16, 2026, 11:59 pm US EDT",
+     "Full paper submissions due: Thursday, April 23, 2026, 11:59 pm US EDT",
+     "Notification to authors: Thursday, July 23, 2026",
+     "Paper titles and abstracts due: Thursday, September 10, 2026, 11:59 pm US EDT",
+     "Full paper submissions due: Thursday, September 17, 2026, 11:59 pm US EDT",
+     "Notification to authors: Tuesday, December 8, 2026"
+    ],
+    "fetchedAt": "2026-11-11"
+   },
+   {
+    "year": 2028,
+    "url": "https://www.usenix.org/conference/nsdi28/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11",
+    "firstSeen": "2026-11-10"
+   }
+  ],
+  "osdi": [
+   {
+    "year": 2027,
+    "url": "https://www.usenix.org/conference/osdi27/call-for-papers",
+    "rounds": [
+     {
+      "abstract": "2026-12-01",
+      "deadline": "2026-12-08",
+      "noti": "2027-03-16"
+     }
+    ],
+    "evidence": [
+     "Abstract registrations due: Tuesday, December 1, 2026, 5:59 pm EST (10:59 pm UTC)",
+     "Complete paper submissions due: Tuesday, December 8, 2026, 5:59 pm EST (10:59 pm UTC)",
+     "Notification to authors: Tuesday, March 16, 2027"
+    ],
+    "fetchedAt": "2026-11-11"
+   },
+   {
+    "year": 2028,
+    "url": "https://www.usenix.org/conference/osdi28/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11",
+    "firstSeen": "2026-11-10"
    }
   ],
   "raid": [
@@ -1184,7 +1204,34 @@
     "url": "https://raid2026.org/call.html",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "podc": [
+   {
+    "year": 2026,
+    "url": "https://www.podc.org/podc2026/call-for-papers/",
+    "rounds": [
+     {
+      "abstract": "2026-02-11",
+      "deadline": "2026-02-16",
+      "noti": "2026-04-29"
+     }
+    ],
+    "evidence": [
+     "Abstract submission: February 11, 2026",
+     "Full paper submission: February 16, 2026",
+     "Notification: April 29, 2026"
+    ],
+    "fetchedAt": "2026-11-11"
+   },
+   {
+    "year": 2027,
+    "url": "https://www.podc.org/podc2027/call-for-papers/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11",
+    "firstSeen": "2026-11-10"
    }
   ],
   "snp": [
@@ -1213,34 +1260,44 @@
      "Early-reject notification: January 18, 2027",
      "Acceptance notification: March 5, 2027"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "podc": [
+  "rtas": [
    {
-    "year": 2026,
-    "url": "https://www.podc.org/podc2026/call-for-papers/",
+    "year": 2027,
+    "url": "https://2027.rtas.org/cfp/",
     "rounds": [
      {
-      "abstract": "2026-02-11",
-      "deadline": "2026-02-16",
-      "noti": "2026-04-29"
+      "abstract": "",
+      "deadline": "2026-11-05",
+      "noti": "2027-01-28"
      }
     ],
     "evidence": [
-     "Abstract submission: February 11, 2026",
-     "Full paper submission: February 16, 2026",
-     "Notification: April 29, 2026"
+     "Submission Deadline (Firm) Thursday, November 5, 2026",
+     "Author Notification (tentative) Thursday, January 28, 2027"
     ],
-    "fetchedAt": "2026-11-10"
-   },
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "ijcai": [
    {
     "year": 2027,
-    "url": "https://www.podc.org/podc2027/call-for-papers/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10",
-    "firstSeen": "2026-11-10"
+    "url": "https://2027.ijcai.org/",
+    "rounds": [
+     {
+      "abstract": "2027-01-04",
+      "deadline": "2027-01-11",
+      "noti": "2027-04-21"
+     }
+    ],
+    "evidence": [
+     "Abstract Submission Deadline: January 4, 2027",
+     "Full Paper Submission Deadline: January 11, 2027",
+     "Paper Notification: April 21, 2027"
+    ],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "sac": [
@@ -1279,25 +1336,16 @@
      "January 15, 2027 Submission of STAP(Student Travel Award Program) application",
      "January 30, 2027 Notification of STAP Awardee"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "rtas": [
+  "rtss": [
    {
-    "year": 2027,
-    "url": "https://2027.rtas.org/cfp/",
-    "rounds": [
-     {
-      "abstract": "",
-      "deadline": "2026-11-05",
-      "noti": "2027-01-28"
-     }
-    ],
-    "evidence": [
-     "Submission Deadline (Firm) Thursday, November 5, 2026",
-     "Author Notification (tentative) Thursday, January 28, 2027"
-    ],
-    "fetchedAt": "2026-11-10"
+    "year": 2026,
+    "url": "https://2026.rtss.org/submissions/dates/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "saner": [
@@ -1314,7 +1362,16 @@
     "evidence": [
      "Notice on Paper Submissions Thu 10 Sep 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "icdcs": [
+   {
+    "year": 2027,
+    "url": "https://icdcs2027.icdcs.org/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "sec": [
@@ -1323,24 +1380,15 @@
     "url": "https://acm-ieee-sec.org/2026/call_for_papers.php",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    },
    {
     "year": 2027,
     "url": "https://acm-ieee-sec.org/2027/call_for_papers.php",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10",
+    "fetchedAt": "2026-11-11",
     "firstSeen": "2026-11-10"
-   }
-  ],
-  "rtss": [
-   {
-    "year": 2026,
-    "url": "https://2026.rtss.org/submissions/dates/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
    }
   ],
   "sensys": [
@@ -1369,7 +1417,16 @@
      "Early notification: Thursday, December 17, 2026",
      "Review results notification: Thursday, January 28, 2027"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "sacmat": [
+   {
+    "year": 2027,
+    "url": "https://sacmat.org/2027/call-for-papers.php",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "sigir": [
@@ -1388,16 +1445,7 @@
      "Full paper submission: January 21, 2027",
      "Full paper notification: April 5, 2027"
     ],
-    "fetchedAt": "2026-11-10"
-   }
-  ],
-  "sigir-short": [
-   {
-    "year": 2027,
-    "url": "https://sigir2027.org/pages/submit-short.html",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "sigmod": [
@@ -1455,7 +1503,7 @@
      "March 4, 2027: Notification",
      "February 1, 2027: Notification"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "sigmetrics": [
@@ -1490,7 +1538,7 @@
      "Upcoming Paper submission + January 11, 2027 23:59 AoE",
      "Upcoming Notification + March 10, 2027"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "socc": [
@@ -1517,16 +1565,16 @@
      "Submission deadline: July 14, 2026 (23:59)",
      "Author Notification: September 26, 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "sacmat": [
+  "sigir-short": [
    {
     "year": 2027,
-    "url": "https://sacmat.org/2027/call-for-papers.php",
+    "url": "https://sigir2027.org/pages/submit-short.html",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "usenix-security": [
@@ -1552,31 +1600,14 @@
      "Paper registrations due: Tuesday, January 19, 2027",
      "Paper submissions due: Tuesday, January 26, 2027"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    },
    {
     "year": 2028,
     "url": "https://www.usenix.org/conference/usenixsecurity28",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10",
-    "firstSeen": "2026-11-10"
-   }
-  ],
-  "vldb": [
-   {
-    "year": 2026,
-    "url": "https://vldb.org/2026/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10"
-   },
-   {
-    "year": 2027,
-    "url": "https://vldb.org/2027/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-10",
+    "fetchedAt": "2026-11-11",
     "firstSeen": "2026-11-10"
    }
   ],
@@ -1596,7 +1627,7 @@
      "Full Paper Submission: May 8th, 2026",
      "Notification to Authors: July 3rd, 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "wsdm": [
@@ -1615,16 +1646,24 @@
      "Abstract deadline* Aug 17, 2026",
      "Paper submission deadline Aug 24, 2026"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "sosp": [
+  "vldb": [
    {
     "year": 2026,
-    "url": "https://sigops.org/s/conferences/sosp/2026/cfp.html",
+    "url": "https://vldb.org/2026/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   },
+   {
+    "year": 2027,
+    "url": "https://vldb.org/2027/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11",
+    "firstSeen": "2026-11-10"
    }
   ],
   "www": [
@@ -1664,16 +1703,16 @@
      "Paper Submission 17 December 2026",
      "Notification to Authors 20 January 2027"
     ],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
-  "ppopp": [
+  "sosp": [
    {
-    "year": 2027,
-    "url": "https://ppopp27.sigplan.org/",
+    "year": 2026,
+    "url": "https://sigops.org/s/conferences/sosp/2026/cfp.html",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ],
   "systor": [
@@ -1682,7 +1721,16 @@
     "url": "https://www.systor.org/2026/cfp/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
+   }
+  ],
+  "ppopp": [
+   {
+    "year": 2027,
+    "url": "https://ppopp27.sigplan.org/",
+    "rounds": [],
+    "evidence": [],
+    "fetchedAt": "2026-11-11"
    }
   ],
   "sc": [
@@ -1691,7 +1739,7 @@
     "url": "https://sc26.supercomputing.org/program/papers/",
     "rounds": [],
     "evidence": [],
-    "fetchedAt": "2026-11-10"
+    "fetchedAt": "2026-11-11"
    }
   ]
  },
@@ -1810,7 +1858,14 @@
        "deadline": "2026-10-08",
        "time": "23:59",
        "noti": "2026-12-21",
-       "comment": ""
+       "comment": "Main track"
+      },
+      {
+       "abstract": "",
+       "deadline": "2026-12-11",
+       "time": "23:59",
+       "noti": "2027-02-01",
+       "comment": "AAAI fast track; eligible AAAI-27 Main Technical Track resubmissions only"
       }
      ]
     }
@@ -1897,7 +1952,7 @@
      "year": 2027,
      "link": "https://2027.aclweb.org/",
      "place": "Kyoto, Japan",
-     "date": "August 17-22, 2027",
+     "date": "August 20-22, 2027",
      "timezone": "UTC-12",
      "rounds": [
       {
@@ -2551,7 +2606,7 @@
      "year": 2027,
      "link": "https://cvpr.thecvf.com/Conferences/2027",
      "place": "Seattle, WA, United States",
-     "date": "June 20-25, 2027",
+     "date": "June 22-25, 2027",
      "timezone": "UTC-12",
      "rounds": [
       {
