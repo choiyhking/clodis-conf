@@ -686,3 +686,7 @@ html { scrollbar-gutter: stable; }
 .owner-name.none { color: var(--faint); }
 .sched td.st-cell { white-space: nowrap; }
 .sched td.st-cell > .tag { display: inline-flex; margin-left: 5px; vertical-align: middle; padding: 0 5px; height: 17px; font-size: 10.5px; }
+/* target dialog: choices are plain until hovered — a filled blue row read as "already selected" */
+.tm-group.free h3 { color: var(--text); }
+.tm-group.free .mini { border-color: var(--line-strong); background: var(--surface); }
+.tm-group .mini:not(:disabled):hover { border-color: var(--accent); background: var(--accent-soft); }
