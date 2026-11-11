@@ -66,7 +66,7 @@ export default function Timeline() {
     by === 'person'
       ? sortMembers(data.members).map((m) => ({
           key: m.id,
-          head: <><Avatar name={m.name} size={24} /> <b>{m.name}</b> {m.role && <span className="tag">{m.role}</span>}</>,
+          head: <><Avatar name={m.name} size={24} whole /> {m.role && <span className="tag">{m.role}</span>}</>,
           papers: papers.filter((p) => p.members.includes(m.name) && visible(p)),
         }))
       : [...new Set(papers.map((p) => p.group || 'No topic'))].map((g) => ({

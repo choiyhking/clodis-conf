@@ -101,7 +101,7 @@ export default function Lab() {
                 {members.filter((m) => m.role === g).map((m) => (
                   <tr key={m.id}>
                     <td className="m-name">
-                      <Avatar name={m.name} size={26} />
+                      <Avatar name={m.name} dot />
                       <input defaultValue={m.name} key={m.name} aria-label="Name" onBlur={(e) => rename(m, e.target.value)} onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()} />
                     </td>
                     <td>
@@ -136,7 +136,7 @@ export default function Lab() {
             {[...data.log].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 200).map((e) => (
               <li key={e.id}>
                 <time title={e.at}>{new Date(e.at).toLocaleString('sv-SE').slice(0, 16)}</time>
-                <span className="who"><Avatar name={data.members.some((m) => m.name === e.by) ? e.by : '?'} size={18} /> {e.by}</span>
+                <span className="who">{data.members.some((m) => m.name === e.by) ? <Avatar name={e.by} size={20} whole /> : e.by}</span>
                 <span>{e.text}</span>
               </li>
             ))}

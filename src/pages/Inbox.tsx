@@ -32,7 +32,7 @@ export default function Inbox() {
         {extra}
       </div>
       <StatusBadge row={r} />
-      <Avatar name={r.conf.owner} full />
+      <Avatar name={r.conf.owner} />
       <div className="acts">
         {r.url && <a className="btn" href={r.url} target="_blank" rel="noreferrer" title="Open conference site"><Icon name="link" size={14} /></a>}
         {actions}
@@ -86,7 +86,7 @@ export default function Inbox() {
               <div className="it-dates"><span className="kv"><i>First seen</i> {fmt(site.firstSeen ?? '')}</span></div>
               {site.evidence.length > 0 && <ul className="evidence">{site.evidence.slice(0, 6).map((h, i) => <li key={i}>{h}</li>)}</ul>}
             </div>
-            <Avatar name={conf.owner} full />
+            <Avatar name={conf.owner} />
           </li>
         ))}
       </Section>
