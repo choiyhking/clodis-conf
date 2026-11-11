@@ -530,3 +530,9 @@ td.conf { max-width: 184px; }
 /* timeline: the Today label sits above the month header, in its own strip, so it never covers anything */
 .tl-inner { padding-top: 22px; padding-bottom: 0; }
 .tl-today span { top: 3px; bottom: auto; }
+
+/* several papers on one deadline stack inside the cell instead of widening the table */
+.sched td:nth-child(9) { max-width: 194px; }
+.targeting { max-width: 180px; }
+.paper-chip { max-width: 100%; }
+.targeting .add { flex: none; }
