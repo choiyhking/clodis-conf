@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, hue, initials, isDate, isStale, paperLinks, rowLabel,
   settleStatus, sortMembers, timeLeft, toKST, uid,
 } from './logic'
 import { useStore } from './store'
-import type { Conf, Deadline, Paper, PaperStatus, Row } from './types'
+import type { Conf, Deadline, Paper, PaperStatus, PaperTarget, Row } from './types'
 
 // ---------- small pieces ----------
 const ICONS: Record<string, string> = {
@@ -19,6 +19,7 @@ const ICONS: Record<string, string> = {
   check: 'M20 6 9 17l-5-5',
   edit: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z',
   left: 'M15 18l-6-6 6-6',
+  down: 'M6 9l6 6 6-6',
   right: 'M9 18l6-6-6-6',
 }
 export function Icon({ name, size = 16 }: { name: keyof typeof ICONS | string; size?: number }) {
@@ -321,6 +322,56 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
   )
 }
 
+// ---------- target picker ----------
+/** Dropdown for a paper's target: venue, deadline and time left side by side, with a search box. */
+function TargetPicker({ value, rows, today, onPick }: { value: PaperTarget | null; rows: Row[]; today: string; onPick: (r: Row | null) => void }) {
+  const [open, setOpen] = useState(false)
+  const [q, setQ] = useState('')
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const away = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false)
+    document.addEventListener('mousedown', away)
+    return () => document.removeEventListener('mousedown', away)
+  }, [open])
+  const same = (r: Row) => !!value && r.confId === value.confId && r.deadline === value.deadline
+  const current = rows.find(same)
+  const list = rows.filter((r) => !q || `${rowLabel(r)} ${r.conf.name}`.toLowerCase().includes(q.toLowerCase()))
+  const choose = (r: Row | null) => { onPick(r); setOpen(false); setQ('') }
+  return (
+    <div className="tp" ref={ref} onKeyDown={(e) => { if (e.key === 'Escape' && open) { e.stopPropagation(); setOpen(false) } }}>
+      <button type="button" className="tp-btn" onClick={() => setOpen(!open)} aria-haspopup="listbox" aria-expanded={open}>
+        {value ? (
+          <>
+            <b>{value.label}</b>
+            <span className={'tp-date' + (current?.status === 'estimated' ? ' est' : '')}>{value.deadline}</span>
+            {current ? <Countdown deadline={current.deadline} today={today} at={current.at} /> : <span className="cd closed">Closed</span>}
+          </>
+        ) : <span className="muted">Not decided</span>}
+        <Icon name="down" size={14} />
+      </button>
+      {open && (
+        <div className="tp-pop">
+          <input autoFocus type="search" placeholder="Search conferences" value={q} onChange={(e) => setQ(e.target.value)} />
+          <ul role="listbox">
+            <li><button type="button" className="tp-item" onClick={() => choose(null)}><span className="muted">Not decided</span></button></li>
+            {list.map((r) => (
+              <li key={r.id}>
+                <button type="button" className={'tp-item' + (same(r) ? ' on' : '')} role="option" aria-selected={same(r)} onClick={() => choose(r)}>
+                  <b>{rowLabel(r)}</b>
+                  <span className={'tp-date' + (r.status === 'estimated' ? ' est' : '')}>{r.deadline}</span>
+                  <Countdown deadline={r.deadline} today={today} at={r.at} />
+                </button>
+              </li>
+            ))}
+            {list.length === 0 && <li className="tp-none muted">No upcoming deadline matches.</li>}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ---------- paper editor ----------
 export const newPaper = (me: string, today: string, row?: Row): Paper => ({
   id: uid(),
@@ -362,7 +413,7 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
     if ((p.status === 'accepted' || p.status === 'rejected') && p.target && !sameAttempt(p)) {
       history = [...history, { label: p.target.label, deadline: p.target.deadline, result: p.status, date: today }]
     }
-    await save('papers', settleStatus({ ...p, history, links: links.map((l) => l.trim()).filter(Boolean), link: '' }))
+    await save('papers', { ...p, history, links: links.map((l) => l.trim()).filter(Boolean), link: '' })
     onClose()
   }
   const retarget = (r: Row) =>
@@ -383,15 +434,17 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
         <Field label="Research topic">
           {newTopic || topics.length === 0 ? (
             <span className="combo">
-              <input value={p.group} onChange={(e) => set('group', e.target.value)} placeholder="New topic, e.g. Container security" autoFocus={newTopic && !isNew} />
-              {topics.length > 0 && <button className="ghost" onClick={() => { setNewTopic(false); set('group', '') }} title="Pick an existing topic instead">Pick</button>}
+              <input value={p.group} onChange={(e) => set('group', e.target.value)} placeholder="Name the new topic" autoFocus={newTopic} />
+              {topics.length > 0 && <button onClick={() => { setNewTopic(false); set('group', '') }} title="Back to the list of existing topics">Cancel</button>}
             </span>
           ) : (
-            <select value={p.group} onChange={(e) => (e.target.value === '+' ? (setNewTopic(true), set('group', '')) : set('group', e.target.value))}>
-              <option value="">No topic</option>
-              {topics.map((g) => <option key={g}>{g}</option>)}
-              <option value="+">＋ New topic…</option>
-            </select>
+            <span className="combo">
+              <select value={p.group} onChange={(e) => set('group', e.target.value)}>
+                <option value="">No topic</option>
+                {topics.map((g) => <option key={g}>{g}</option>)}
+              </select>
+              <button onClick={() => { setNewTopic(true); set('group', '') }} title="Create a new topic"><Icon name="plus" size={14} /> New</button>
+            </span>
           )}
         </Field>
         <Field label="Status">
@@ -410,17 +463,11 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
             ))}
           </div>
         </Field>
-        <Field label="Target" span>
-          <select value={targetKey} onChange={(e) => { const r = upcoming.find((x) => keyOf(x) === e.target.value); set('target', r ? toTarget(r) : null) }}>
-            <option value="">Not decided</option>
-            {p.target && !upcoming.some((r) => keyOf(r) === targetKey) && <option value={targetKey}>{p.target.label} — {fmt(p.target.deadline)}</option>}
-            {upcoming.map((r) => (
-              <option key={r.id} value={keyOf(r)}>
-                {rowLabel(r)} — due {fmt(r.deadline)} ({diffDays(r.deadline, today)} days left){r.status === 'estimated' ? ', date not announced yet' : ''}
-              </option>
-            ))}
-          </select>
-        </Field>
+        {/* Not a <label>: a label would forward stray clicks inside the open list to the toggle button and close it. */}
+        <div className="field span">
+          <span>Target</span>
+          <TargetPicker value={p.target} rows={upcoming} today={today} onPick={(r) => set('target', r ? toTarget(r) : null)} />
+        </div>
         <Field label="Started"><input type="date" value={p.start} onChange={(e) => set('start', e.target.value)} /></Field>
         <Field label="Notes"><textarea rows={1} value={p.note} onChange={(e) => set('note', e.target.value)} /></Field>
         <Field label="Links (Overleaf, repo, slides…)" span>
@@ -438,19 +485,19 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
       </div>
       {p.target && p.status !== 'accepted' && nextOptions.length > 0 && (
         <div className="next fallback">
-          <b>{p.status === 'rejected' ? `Rejected at ${p.target.label} — where next?` : `Backup plan if ${p.target.label} rejects it`}</b>
-          <span className="muted">
+          <b>{p.status === 'rejected' ? <>Rejected at {p.target.label} — where next?</> : <>Backup plan if {p.target.label} rejects it</>}</b>
+          <span>
             {p.status === 'rejected'
               ? 'The nearest deadlines still open:'
               : p.target.noti
-                ? `The decision comes on ${fmt(p.target.noti)}. These are the first deadlines after that:`
+                ? <>Decision on <b className="when-date">{fmt(p.target.noti)}</b>. The first deadlines after that:</>
                 : 'No decision date yet, so these are simply the next deadlines after this one:'}
           </span>
           <ul>
             {nextOptions.map((r) => (
               <li key={r.id}>
-                <b>{rowLabel(r)}</b>
-                <span>{fmt(r.deadline)}</span>
+                <b className="venue">{rowLabel(r)}</b>
+                <span className="tp-date">{fmt(r.deadline)}</span>
                 <span className="muted">{diffDays(r.deadline, after)} days {p.status === 'rejected' ? 'from now' : p.target?.noti ? 'after the decision' : 'after this deadline'}</span>
                 <button onClick={() => retarget(r)}>Make this the target</button>
               </li>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { MONTHS, countdown, fmt, fmtShort, fromMs, paperStatusLabel, rowLabel, sortMembers, toMs } from '../logic'
+import { MONTHS, PAPER_STATUS, countdown, fmt, fmtShort, fromMs, paperStatusLabel, rowLabel, sortMembers, toMs } from '../logic'
 import { useStore } from '../store'
-import type { Paper, Row } from '../types'
+import type { Paper, PaperStatus, Row } from '../types'
 import { Avatar, Avatars, ConfDrawer, Icon, PaperModal, newPaper } from '../ui'
 
 const LANE_H = 22
@@ -38,7 +38,8 @@ export default function Timeline() {
   const x = (d: string) => Math.max(0, Math.min(100, ((toMs(d) - toMs(start)) / span) * 100))
   const inWin = (d: string) => d >= start && d < end
 
-  const papers = data.papers
+  const [only, setOnly] = useState<PaperStatus | ''>('')
+  const papers = data.papers.filter((p) => !only || p.status === only)
   const targeted = new Set(papers.filter((p) => p.target).map((p) => `${p.target!.confId}|${p.target!.deadline}`))
 
   // Deadline markers, packed into as few lanes as fit without overlapping labels.
@@ -93,14 +94,27 @@ export default function Timeline() {
     const show = to > start && from < end && from < to
     const w = x(to) - x(from)
     const reviewing = t && !working && t.noti && t.noti > t.deadline && t.noti > start && t.deadline < end
+    // While a paper is being written, only the time already spent is filled in; the stretch from today to the
+    // deadline is drawn as an outline, so the bar reads as "this far, this much to go".
+    const split = working && !!t && today > from && today < to
+    const fits = (pct: number) => !!t && (pct / 100) * width > t.label.length * 6.5 + 20
+    const restW = x(to) - x(today)
     return (
       <>
-        {show && (
+        {show && !split && (
           <div className={`bar ps-${p.status}` + (t ? '' : ' open')} style={{ left: `${x(from)}%`, width: `${w}%` }}>
-            {t && (w / 100) * width > t.label.length * 6.5 + 20 && <span>{t.label}</span>}
+            {fits(w) && <span>{t!.label}</span>}
           </div>
         )}
-        {t && show && working && (w / 100) * width <= t.label.length * 6.5 + 20 && <span className="bar-out" style={{ left: `calc(${x(to)}% + 8px)` }}>{t.label}</span>}
+        {show && split && (
+          <>
+            <div className={`bar sofar ps-${p.status}`} style={{ left: `${x(from)}%`, width: `${x(today) - x(from)}%` }} />
+            <div className="todo" style={{ left: `${x(today)}%`, width: `${restW}%` }} title={`${countdown(to, today)} until ${t!.label}`}>
+              {fits(restW) && <span>{t!.label}</span>}
+            </div>
+          </>
+        )}
+        {t && show && working && !fits(split ? restW : w) && <span className="bar-out" style={{ left: `calc(${x(to)}% + 8px)` }}>{t.label}</span>}
         {reviewing && (
           <div className="rev" style={{ left: `${x(t.deadline)}%`, width: `${x(t.noti) - x(t.deadline)}%` }} title={`Under review until ${fmt(t.noti)}`} />
         )}
@@ -118,15 +132,12 @@ export default function Timeline() {
     )
   }
 
-  const review = papers.filter((p) => p.status === 'submitted' && p.target)
   return (
     <section>
       <header className="page-head">
         <div>
           <h1>Timeline</h1>
-          <p className="muted">
-            {review.length ? <>Under review: {review.map((p) => `${p.title} (${p.target!.label})`).join(', ')}</> : 'Nothing under review right now'}
-          </p>
+          <p className="muted">Where every paper stands against its deadline, month by month</p>
         </div>
         <button className="primary" onClick={() => setPaper(newPaper(me, today))}><Icon name="plus" size={14} /> New paper</button>
       </header>
@@ -142,9 +153,13 @@ export default function Timeline() {
           <button className={by === 'person' ? 'on' : ''} onClick={() => setBy('person')}>By person</button>
           <button className={by === 'topic' ? 'on' : ''} onClick={() => setBy('topic')}>By topic</button>
         </div>
+        <select value={only} onChange={(e) => setOnly(e.target.value as PaperStatus | '')} aria-label="Status">
+          <option value="">All papers</option>
+          {PAPER_STATUS.map((s) => <option key={s.key} value={s.key}>{s.label} only</option>)}
+        </select>
         <span className="grow" />
         <span className="legend">
-          <i className="lg ps-research" /> Researching <i className="lg ps-writing" /> In progress <i className="lg rev" /> Under review <i className="lg ps-accepted" /> Accepted <i className="lg ps-rejected" /> Rejected
+          <i className="lg ps-research" /> Researching <i className="lg ps-writing" /> Writing <i className="lg todo" /> Left to do <i className="lg rev" /> Under review <i className="lg ps-accepted" /> Accepted <i className="lg ps-rejected" /> Rejected <i className="lgx">✕</i> Earlier rejection
         </span>
       </div>
 
@@ -168,7 +183,7 @@ export default function Timeline() {
               {keys.map(({ r, lane, isTarget }) => (
                 <button key={r.id} className={`key st-${r.status}` + (isTarget ? ' target' : '')} style={{ left: `${x(r.deadline)}%`, top: 7 + lane * LANE_H }}
                   onClick={() => setOpen(r)} title={`${rowLabel(r)} · ${fmt(r.deadline)}${r.status === 'estimated' ? ' (estimated)' : ''}`}>
-                  <i /><span>{rowLabel(r)}</span><small>{Number(r.deadline.slice(8))}</small>
+                  <i /><span>{rowLabel(r)}{r.status === 'estimated' && <sup title="Date not announced yet">?</sup>}</span><small>{Number(r.deadline.slice(8))}</small>
                 </button>
               ))}
               {keys.length === 0 && <span className="tl-empty muted">Target a deadline from a paper to see it here.</span>}
