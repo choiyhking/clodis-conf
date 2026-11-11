@@ -145,11 +145,10 @@ export default function Timeline() {
           <>
             <div className={`bar sofar ps-${p.status}`} style={{ left: `${x(from)}%`, width: `${x(today) - x(from)}%` }} />
             <div className="todo" style={{ left: `${x(today)}%`, width: `${restW}%` }} title={`${countdown(to, today)} until ${t!.label}`}>
-              {fits(restW, t!.label) && <span>{t!.label}</span>}
             </div>
           </>
         )}
-        {t && show && working && !fits(split ? restW : w, t.label) && <span className="bar-out" style={{ left: `calc(${x(to)}% + 8px)` }}>{t.label}</span>}
+        {t && show && working && (split || !fits(w, t.label)) && <span className="bar-out" style={{ left: `calc(${x(to)}% + 8px)` }}>{t.label}</span>}
         {reviewing && (
           <div className="rev" style={{ left: `${x(t.deadline)}%`, width: `${x(t.noti) - x(t.deadline)}%` }} title={`Under review until ${fmt(t.noti)}`} />
         )}
@@ -189,7 +188,7 @@ export default function Timeline() {
         </select>
         <span className="grow" />
         <span className="legend">
-          <i className="lg ps-research" /> Researching <i className="lg ps-writing" /> Writing <i className="lg todo" /> Left to do <i className="lg rev" /> Under review <i className="lg ps-accepted" /> Accepted <i className="lg ps-rejected" /> Rejected <i className="lg try" /> Earlier attempt
+          <i className="lg ps-research" /> Researching <i className="lg ps-writing" /> Writing <i className="lg todo" /> Remaining <i className="lg rev" /> Under review <i className="lg ps-accepted" /> Accepted <i className="lg ps-rejected" /> Rejected <i className="lg try" /> Earlier attempt
         </span>
       </div>
 

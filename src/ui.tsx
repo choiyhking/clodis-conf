@@ -117,7 +117,8 @@ export function Countdown({ deadline, today, at, assumed }: { deadline: string; 
   return <span className={`cd ${tone}`}>{countdown(deadline, today)}</span>
 }
 
-export function StatusBadge({ row }: { row: Row }) {
+/** `compact` leaves out the ×2 agreement mark; the full badge (drawer, inbox) keeps it. */
+export function StatusBadge({ row, compact }: { row: Row; compact?: boolean }) {
   const title =
     row.status === 'verified'
       ? `Verified by ${row.checkedBy || 'owner'} on ${fmt(row.checkedAt) || 'unknown date'}`
@@ -130,7 +131,7 @@ export function StatusBadge({ row }: { row: Row }) {
     <span className={`status st-${row.status}`} title={title}>
       <i />
       {STATUS_LABEL[row.status]}
-      {row.status === 'auto' && row.sources?.length === 2 && <b title="The conference site and ccfddl agree">×2</b>}
+      {!compact && row.status === 'auto' && row.sources?.length === 2 && <b title="The conference site and ccfddl agree">×2</b>}
     </span>
   )
 }
@@ -485,7 +486,7 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
       </div>
       {p.target && p.status !== 'accepted' && nextOptions.length > 0 && (
         <div className="next fallback">
-          <b>{p.status === 'rejected' ? <>Rejected at {p.target.label} — where next?</> : <>Backup plan if {p.target.label} rejects it</>}</b>
+          <span className="fb-title">{p.status === 'rejected' ? <>Rejected at <b>{p.target.label}</b> — where next?</> : <>Backup plan if <b>{p.target.label}</b> rejects it</>}</span>
           <span>
             {p.status === 'rejected'
               ? 'The nearest deadlines still open:'
