@@ -5,7 +5,7 @@ import type { Paper, Row } from '../types'
 import { AreaTag, Clock, ConfDrawer, ConfModal, Countdown, Icon, MultiFilter, PaperModal, Place, Rank, StatusBadge, TargetModal, type FilterOption } from '../ui'
 import { isStale } from '../logic'
 
-const COLS = 10
+const COLS = 11
 const RANK_OPTIONS: FilterOption[] = [
   { group: 'KIISE', value: 'k:S', label: 'KIISE S' },
   { group: 'KIISE', value: 'k:A', label: 'KIISE A' },
@@ -128,7 +128,7 @@ export default function Schedule() {
           {/* Fixed column widths: the layout must not shift when a filter changes which rows are shown. */}
           <colgroup>
             <col className="c-rank" /><col className="c-conf" /><col className="c-date" /><col className="c-date" /><col className="c-left" />
-            <col className="c-date" /><col className="c-review" /><col className="c-loc" /><col className="c-target" /><col className="c-status" />
+            <col className="c-date" /><col className="c-review" /><col className="c-loc" /><col className="c-target" /><col className="c-owner" /><col className="c-status" />
           </colgroup>
           <thead>
             <tr>
@@ -141,7 +141,8 @@ export default function Schedule() {
               <th className="c" title="Days from submission to notification">Review</th>
               <th>Location</th>
               <th>Targeting</th>
-              <th title="Who keeps this conference's dates correct, and how far the dates can be trusted">Owner · Status</th>
+              <th className="c" title="Who keeps this conference's dates correct">Owner</th>
+              <th title="How far the dates can be trusted">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -197,11 +198,11 @@ export default function Schedule() {
                         )}
                       </span>
                     </td>
-                    <td>
-                      <span className="owner-status">
-                        <span className={'owner-name' + (r.conf.owner ? '' : ' none')} title={r.conf.owner ? `Owner: ${r.conf.owner}` : 'No owner assigned'}>{r.conf.owner || '–'}</span>
-                        <StatusBadge row={r} compact />
-                      </span>
+                    <td className="c owner-cell">
+                      <span className={'owner-name' + (r.conf.owner ? '' : ' none')} title={r.conf.owner ? undefined : 'No owner assigned'}>{r.conf.owner || '–'}</span>
+                    </td>
+                    <td className="st-cell">
+                      <StatusBadge row={r} compact />
                       {r.autoDiff && <span className="tag warn" title={`Collected value: ${fmt(r.autoDiff.deadline)}`}>Changed</span>}
                       {isStale(r, today) && <span className="tag" title={`Last checked ${fmt(r.checkedAt) || 'never'}`}>Re-check</span>}
                     </td>
