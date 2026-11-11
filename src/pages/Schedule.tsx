@@ -146,12 +146,18 @@ export default function Schedule() {
                       <small>Starts {fmt(r.event) || 'TBD'}</small>
                     </td>
                     <td onClick={(e) => e.stopPropagation()}>
-                      <span className={'targeting' + (tg.length ? '' : ' empty')}>
-                        {tg.map((p) => (
+                      <span className={'targeting' + (tg.length ? '' : ' none')}>
+                        {/* One line only: the first paper, then how many more. The drawer lists them all. */}
+                        {tg.slice(0, 1).map((p) => (
                           <button key={p.id} className="paper-chip" onClick={() => setPaper(p)} title={`${p.title} — ${p.members.join(', ')}`}>
-                            <Avatars names={p.members} /> <span>{p.title}</span>
+                            <Avatars names={p.members.slice(0, 2)} /> <span>{p.title}</span>
                           </button>
                         ))}
+                        {tg.length > 1 && (
+                          <button className="more-chip" onClick={() => setOpen(r)} title={tg.slice(1).map((p) => `${p.title} — ${p.members.join(', ')}`).join(' / ')}>
+                            +{tg.length - 1}
+                          </button>
+                        )}
                         {r.at > now && (
                           <button className="ghost add" title="Target this deadline with one of our papers" onClick={() => setPick(r)}><Icon name="plus" size={14} /></button>
                         )}

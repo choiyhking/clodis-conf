@@ -520,7 +520,7 @@ td.conf { max-width: 184px; }
 .sched tr.todayrow.first td { height: 15px; border-top: none; box-shadow: inset 0 2px 0 var(--hot); }
 .sched tr.todayrow.first span { top: 0; border-radius: 0 0 9px 9px; }
 /* the + sits in the middle of an empty targeting cell */
-.targeting.empty { justify-content: center; }
+.targeting.none { justify-content: center; }
 /* keep the filter bar on one line and the table inside the window */
 .filters input[type='search'] { width: 190px; }
 .sched td:nth-child(9) { width: 194px; min-width: 194px; }
@@ -536,3 +536,8 @@ td.conf { max-width: 184px; }
 .targeting { max-width: 180px; }
 .paper-chip { max-width: 100%; }
 .targeting .add { flex: none; }
+
+/* targeting never grows a row: one paper, then "+N" */
+.targeting { flex-wrap: nowrap; }
+.paper-chip { flex: 0 1 auto; min-width: 0; }
+.more-chip { flex: none; height: 26px; padding: 0 8px; border-radius: 13px; font-size: 12px; font-weight: 700; color: var(--accent-ink); background: var(--accent-soft); border-color: transparent; }
