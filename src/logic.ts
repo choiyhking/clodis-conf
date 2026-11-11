@@ -100,7 +100,22 @@ export function eventStart(text: string): string {
 // ---------- labels ----------
 /** "2/4" → "R2/4". Anything else is a named track ("Short Paper") and is shown as written. */
 export const roundTag = (round: string) => (/^\d+\/\d+$/.test(round) ? `R${round}` : round)
-export const rowLabel = (r: { conf: Conf; round: string }) => r.conf.acronym + (r.round ? ` ${roundTag(r.round)}` : '')
+const TRACK_NAMES: [RegExp, string][] = [[/short/i, 'Short Paper'], [/poster/i, 'Poster'], [/demo/i, 'Demo'], [/workshop/i, 'Workshop'], [/industr/i, 'Industry'], [/journal/i, 'Journal Track']]
+const trackName = (s: string) => TRACK_NAMES.find(([re]) => re.test(s))?.[1] ?? s
+/**
+ * Splits a conference that is really a side track of another — "SIGIR (short)", "CCS Poster" — into the
+ * venue and the track, so it reads the same as a track the collector reported ("WSDM" + "Short Paper").
+ */
+export function venueOf(acronym: string): { name: string; track: string } {
+  const m = acronym.match(/^(.+?)\s*\((.+)\)$/) ?? acronym.match(/^(.+?)\s+(Poster|Demo|Workshop)$/i)
+  return m ? { name: m[1], track: trackName(m[2]) } : { name: acronym, track: '' }
+}
+/** The chips after a venue name: its track, if any, then the round. */
+export function rowTags(r: { conf: Conf; round: string }): string[] {
+  const round = /^\d+\/\d+$/.test(r.round) ? roundTag(r.round) : r.round ? trackName(r.round) : ''
+  return [venueOf(r.conf.acronym).track, round].filter(Boolean)
+}
+export const rowLabel = (r: { conf: Conf; round: string }) => [venueOf(r.conf.acronym).name, ...rowTags(r)].join(' ')
 /** Timeline entries that are a separate track rather than another round of the main one. */
 const SIDE_TRACK = /short|poster|workshop|demo|industr|tutorial|doctoral|journal|tool|artifact|commitment|optional abstract/i
 export const STATUS_LABEL: Record<Row['status'], string> = { verified: 'Verified', auto: 'Auto', estimated: 'Estimated' }

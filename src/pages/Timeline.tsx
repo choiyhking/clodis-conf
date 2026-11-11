@@ -77,13 +77,14 @@ export default function Timeline() {
 
   const Grid = () => <>{months.slice(1).map((m) => <i key={m.start} className="gl" style={{ left: `${x(m.start)}%` }} />)}</>
 
-  const sub = (p: Paper) => {
+  /** What the row used to print under the title; now a tooltip, since the bar already shows it. */
+  const tip = (p: Paper) => {
     const t = p.target
-    if (!t) return 'Researching · no target yet'
-    if (p.status === 'submitted') return `${t.label} · result ${t.noti ? fmtShort(t.noti) : 'TBD'}`
-    if (p.status === 'accepted') return `Accepted at ${t.label}`
-    if (p.status === 'rejected') return `Rejected at ${t.label}`
-    return `${t.label} · ${fmtShort(t.deadline)} · ${countdown(t.deadline, today)}`
+    if (!t) return `${p.title} — no target yet`
+    if (p.status === 'submitted') return `${p.title} — under review at ${t.label}, result ${t.noti ? fmt(t.noti) : 'TBD'}`
+    if (p.status === 'accepted') return `${p.title} — accepted at ${t.label}`
+    if (p.status === 'rejected') return `${p.title} — rejected at ${t.label}`
+    return `${p.title} — ${t.label}, due ${fmt(t.deadline)} (${countdown(t.deadline, today)})`
   }
 
   const bar = (p: Paper) => {
@@ -95,7 +96,7 @@ export default function Timeline() {
     // then waits for its result; the current attempt only starts once the last result came back. (The
     // current target's own history entry, written when it is decided, is drawn as the current bar.)
     const prior = p.history
-      .filter((h) => !(t && h.label === t.label && h.deadline === t.deadline))
+      .filter((h) => !(t && h.label === t.label && h.deadline === t.deadline) && !(t && h.deadline >= t.deadline))
       .sort((a, b) => a.deadline.localeCompare(b.deadline))
     // A recorded start later than the first submission can't be right; assume work began a few months before it.
     const firstTry = prior[0] ? fromMs(toMs(prior[0].deadline) - 120 * 86400000) : ''
@@ -226,10 +227,9 @@ export default function Timeline() {
                 <div className="tl-track"><Grid /></div>
               </div>
               {g.papers.map((p) => (
-                <div className="tl-row tl-paper" key={p.id} onClick={() => setPaper(p)} tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setPaper(p)}>
+                <div className="tl-row tl-paper" key={p.id} title={tip(p)} onClick={() => setPaper(p)} tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setPaper(p)}>
                   <div className="tl-left">
                     <span className="p-title">{p.title}</span>
-                    <small className="muted">{sub(p)}</small>
                     {by === 'topic' && <Avatars names={p.members} />}
                   </div>
                   <div className="tl-track"><Grid />{bar(p)}</div>

@@ -1,5 +1,5 @@
 import { Fragment, useMemo, useState } from 'react'
-import { diffDays, fmt, roundTag, sortMembers } from '../logic'
+import { diffDays, fmt, rowTags, sortMembers, venueOf } from '../logic'
 import { useStore } from '../store'
 import type { Paper, Row } from '../types'
 import { AreaTag, Avatar, Avatars, Clock, ConfDrawer, ConfModal, Countdown, Icon, PaperModal, Place, Rank, StatusBadge, TargetModal } from '../ui'
@@ -128,8 +128,8 @@ export default function Schedule() {
                     <td><Rank conf={r.conf} /></td>
                     <td className="conf">
                       <div className="conf-top">
-                        <b>{r.conf.acronym}</b>
-                        {r.round && <span className="round">{roundTag(r.round)}</span>}
+                        <b>{venueOf(r.conf.acronym).name}</b>
+                        {rowTags(r).map((t) => <span key={t} className="round">{t}</span>)}
                         <AreaTag area={r.conf.area} />
                       </div>
                       <div className="conf-name" title={r.conf.name}>{r.conf.name}</div>

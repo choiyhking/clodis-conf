@@ -71,7 +71,7 @@ export default function App() {
   return (
     <div className="app">
       <aside className="side">
-        <div className="brand" title={LAB_NAME}><Logo /> <span><b>{APP_NAME}</b><small className="muted">Deadlines &amp; papers</small></span></div>
+        <div className="brand" title={LAB_NAME}><Logo /> <b>{APP_NAME}</b></div>
         <nav>
           {TABS.map((t) => (
             <button key={t.key} className={tab === t.key ? 'on' : ''} onClick={() => setTab(t.key)} aria-current={tab === t.key ? 'page' : undefined}>
