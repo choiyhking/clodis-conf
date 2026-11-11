@@ -88,7 +88,7 @@ export default function Papers() {
               <tbody>
                 {people.map(({ m, research, writing, review, acc, rej, next }) => (
                   <tr key={m.id}>
-                    <td><span className="person"><Avatar name={m.name} /> {m.name} {m.role && <span className="tag">{m.role}</span>}</span></td>
+                    <td><span className="person"><Avatar name={m.name} whole /> {m.role && <span className="tag">{m.role}</span>}</span></td>
                     <td>{research || <span className="muted">–</span>}</td>
                     <td>{writing || <span className="muted">–</span>}</td>
                     <td>{review || <span className="muted">–</span>}</td>

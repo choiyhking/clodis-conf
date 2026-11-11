@@ -32,25 +32,29 @@ export function Icon({ name, size = 16 }: { name: keyof typeof ICONS | string; s
 
 /** A person shown as their name (given name for Korean names, initials otherwise) on their own colour. */
 /**
- * A person, as a small coloured name tag. `full` writes the whole name (Korean names are short enough);
- * without it the tag is a square of initials, for places where the name is written right beside it.
+ * A person, as a coloured name tag.
+ *  - default: the name, or initials when it is too long to sit in a card ("Younghoon Choi" → "YC")
+ *  - whole:   always the whole name — for places where the tag is the only mention of the person
+ *  - dot:     just the person's colour, for places where the name is typed or written right beside it
  */
-export function Avatar({ name, size = 22, full = false }: { name: string; size?: number; full?: boolean }) {
+export function Avatar({ name, size = 22, whole = false, dot = false }: { name: string; size?: number; whole?: boolean; dot?: boolean }) {
   const { data } = useStore()
   if (!name) return null
   const unknown = name === '?'
   const role = data.members.find((x) => x.name === name)?.role
-  // Only short Korean names are written out; anything longer stays as initials.
-  const wide = full && !unknown && /[가-힣]/.test(name) && name.trim().length <= 4
+  const bg = unknown ? 'var(--faint)' : `hsl(${hue(name)} 55% 42%)`
+  const title = unknown ? 'Not selected' : role ? `${name} · ${role}` : name
+  if (dot) return <i className="who-dot" title={title} style={{ background: bg }} />
+  const n = name.trim()
+  const fits = /[가-힣]/.test(n) ? n.length <= 4 : n.length <= 8
   return (
-    <span className={'avatar' + (wide ? ' full' : '')} title={unknown ? 'Not selected' : role ? `${name} · ${role}` : name}
-      style={{ width: wide ? undefined : size, height: size, fontSize: wide ? Math.max(10.5, size * 0.5) : size * 0.42, background: unknown ? 'var(--faint)' : `hsl(${hue(name)} 55% 42%)` }}>
-      {unknown ? '?' : wide ? name.trim() : initials(name)}
+    <span className="avatar" title={title} style={{ height: size, fontSize: Math.min(13, Math.max(10.5, size * 0.5)), background: bg }}>
+      {unknown ? '?' : whole || fits ? n : initials(n)}
     </span>
   )
 }
-export const Avatars = ({ names, short = false }: { names: string[]; short?: boolean }) => (
-  <span className="avatars">{names.map((n) => <Avatar key={n} name={n} full={!short} />)}</span>
+export const Avatars = ({ names }: { names: string[] }) => (
+  <span className="avatars">{names.map((n) => <Avatar key={n} name={n} />)}</span>
 )
 
 export function Rank({ conf }: { conf: Conf }) {
@@ -553,7 +557,7 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
               <label key={m.id} className={'chip pick' + (p.members.includes(m.name) ? ' on' : '')}>
                 <input type="checkbox" checked={p.members.includes(m.name)}
                   onChange={(e) => set('members', e.target.checked ? [...p.members, m.name] : p.members.filter((x) => x !== m.name))} />
-                <Avatar name={m.name} size={18} /> {m.name}
+                <Avatar name={m.name} dot /> {m.name}
               </label>
             ))}
           </div>
@@ -771,7 +775,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
 
         <section>
           <h3>Owner</h3>
-          <p className="owner">{conf.owner ? <><Avatar name={conf.owner} /> {conf.owner}</> : <span className="muted">Unassigned</span>}
+          <p className="owner">{conf.owner ? <Avatar name={conf.owner} whole /> : <span className="muted">Unassigned</span>}
             <button className="ghost" onClick={() => setEditConf(true)}>Edit conference</button></p>
         </section>
 

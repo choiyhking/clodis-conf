@@ -82,7 +82,7 @@ export default function App() {
         </nav>
         <div className="side-foot">
           <label className="me">
-            <Avatar name={me || '?'} size={28} />
+            <Avatar name={me || '?'} dot />
             <span title={session ? `Signed in as ${session}` : undefined}>
               {MODE === 'supabase' && me ? (
                 // Shared mode: identity follows the login. To change it, move the email in Lab → Members.

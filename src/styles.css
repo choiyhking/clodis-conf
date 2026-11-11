@@ -648,3 +648,10 @@ html { scrollbar-gutter: stable; }
 .avatars .avatar + .avatar, .pc-foot .avatars .avatar + .avatar, .tl-left .avatars .avatar + .avatar { margin-left: 0; box-shadow: none; }
 .paper-chip .avatars { flex-wrap: nowrap; gap: 2px; }
 .paper-chip .avatar { border-radius: 4px; }
+
+/* every person tag is the same shape: a rounded name chip, as wide as the name */
+.avatar { padding: 0 6px; white-space: nowrap; font-weight: 600; min-width: 0; }
+.avatar.none { color: var(--faint); padding: 0 8px; }
+.paper-chip .avatar { width: auto !important; height: 18px !important; font-size: 10.5px !important; padding: 0 5px; }
+.who-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; display: inline-block; }
+.me .who-dot { width: 10px; height: 10px; }
