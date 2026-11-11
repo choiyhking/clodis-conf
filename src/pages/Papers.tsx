@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
-import { PAPER_STATUS, countdown, fmt, fmtShort, sortMembers } from '../logic'
+import { PAPER_STATUS, fmt, fmtShort, sortMembers } from '../logic'
 import { useStore } from '../store'
 import type { Paper } from '../types'
-import { Avatar, Avatars, Icon, PaperModal, RESULT_LABEL, newPaper } from '../ui'
+import { Avatar, Avatars, Countdown, Icon, PaperModal, RESULT_LABEL, newPaper } from '../ui'
 
 export default function Papers() {
   const { data, today, me } = useStore()
@@ -60,11 +60,12 @@ export default function Papers() {
                   {p.group && <span className="tag">{p.group}</span>}
                   {p.target && (
                     <span className="pc-target">
-                      {p.target.label}
-                      <small>
-                        {s.key === 'submitted' ? ` · result ${p.target.noti ? `${fmtShort(p.target.noti)} (${countdown(p.target.noti, today)})` : 'TBD'}`
-                          : s.key === 'writing' ? ` · ${fmtShort(p.target.deadline)} (${countdown(p.target.deadline, today)})` : ''}
-                      </small>
+                      <b>{p.target.label}</b>
+                      {/* the one date that matters at this stage, always with its label */}
+                      {s.key === 'writing' && <small><i>Deadline</i> {fmt(p.target.deadline)} <Countdown deadline={p.target.deadline} today={today} /></small>}
+                      {s.key === 'submitted' && (
+                        <small><i>Result</i> {p.target.noti ? <>{fmt(p.target.noti)} <Countdown deadline={p.target.noti} today={today} /></> : 'TBD'}</small>
+                      )}
                     </span>
                   )}
                   <span className="pc-foot">
