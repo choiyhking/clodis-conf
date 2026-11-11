@@ -601,3 +601,16 @@ td.conf { max-width: 184px; }
 .fchip:hover { background: var(--accent-soft); border-color: var(--accent); }
 .fchip .icon { opacity: 0.7; }
 .clear-all { font-size: 12.5px; text-decoration: underline; color: var(--muted); margin-left: 4px; }
+
+/* Deadlines table: fixed layout. Date-like columns have set widths; name, location and targeting share the rest. */
+.sched { table-layout: fixed; min-width: 1150px; }
+.sched th, .sched td, .sched td.conf { width: auto; min-width: 0; max-width: none; overflow: hidden; }
+.sched th:nth-child(n), .sched td:nth-child(n) { width: auto; min-width: 0; max-width: none; }
+.sched col.c-rank { width: 62px; } .sched col.c-date { width: 102px; } .sched col.c-left { width: 70px; }
+.sched col.c-review { width: 60px; } .sched col.c-status { width: 174px; }
+.sched col.c-conf { width: 38%; } .sched col.c-loc { width: 32%; } .sched col.c-target { width: 30%; }
+.sched tr.todayrow td { overflow: visible; }
+.sched th { text-overflow: ellipsis; }
+/* keep the scrollbar's space reserved, so a short (filtered) list is laid out exactly like the full one */
+.tablewrap { scrollbar-gutter: stable; }
+html { scrollbar-gutter: stable; }

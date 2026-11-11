@@ -126,6 +126,11 @@ export default function Schedule() {
 
       <div className="card tablewrap">
         <table className="sched">
+          {/* Fixed column widths: the layout must not shift when a filter changes which rows are shown. */}
+          <colgroup>
+            <col className="c-rank" /><col className="c-conf" /><col className="c-date" /><col className="c-date" /><col className="c-left" />
+            <col className="c-date" /><col className="c-review" /><col className="c-loc" /><col className="c-target" /><col className="c-status" />
+          </colgroup>
           <thead>
             <tr>
               <th title="KIISE rank (S, A) and BK21 IF (1–4, 4 is highest)">Rank</th>
