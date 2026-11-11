@@ -2,14 +2,14 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { MONTHS, PAPER_STATUS, countdown, fmt, fmtShort, fromMs, paperStatusLabel, rowLabel, sortMembers, toMs } from '../logic'
 import { useStore } from '../store'
 import type { Paper, PaperStatus, Row } from '../types'
-import { Avatar, Avatars, ConfDrawer, Icon, PaperModal, newPaper } from '../ui'
+import { Avatar, Avatars, ConfDrawer, Icon, PaperModal } from '../ui'
 
 const LANE_H = 22
 const MAX_LANES = 6
 
 /** Twelve months on one screen: key deadlines on top, one bar per paper running to its target deadline. */
 export default function Timeline() {
-  const { data, rows, today, me } = useStore()
+  const { data, rows, today } = useStore()
   const [offset, setOffset] = useState(0)
   const [by, setBy] = useState<'person' | 'topic'>('person')
   const [paper, setPaper] = useState<Paper | null>(null)
@@ -102,7 +102,7 @@ export default function Timeline() {
     const firstTry = prior[0] ? fromMs(toMs(prior[0].deadline) - 120 * 86400000) : ''
     let cursor = p.start && (!firstTry || p.start < firstTry) ? p.start : firstTry || start
     const tries = prior.map((h) => {
-      const seg = { h, from: cursor, back: h.date > h.deadline ? h.date : h.deadline }
+      const seg = { h, from: cursor, wait: h.deadline > cursor ? h.deadline : cursor, back: h.date > h.deadline ? h.date : h.deadline }
       cursor = seg.back
       return seg
     })
@@ -118,7 +118,7 @@ export default function Timeline() {
     const restW = x(to) - x(today)
     return (
       <>
-        {tries.map(({ h, from: f, back }, i) => {
+        {tries.map(({ h, from: f, wait, back }, i) => {
           const a = f > start ? f : start
           const wide = x(h.deadline) - x(a)
           return (
@@ -128,7 +128,7 @@ export default function Timeline() {
                   {fits(wide, h.label) && <span>{h.label}</span>}
                 </div>
               )}
-              {back > h.deadline && back > start && h.deadline < end && <div className="rev faded" style={{ left: `${x(h.deadline)}%`, width: `${x(back) - x(h.deadline)}%` }} />}
+              {back > wait && back > start && wait < end && <div className="rev" style={{ left: `${x(wait)}%`, width: `${x(back) - x(wait)}%` }} title={`${h.label}: under review until ${fmt(back)}`} />}
               {inWin(back) && (
                 <i className={`result res-${h.result}`} style={{ left: `${x(back)}%` }} title={`${h.result === 'accepted' ? 'Accepted' : h.result === 'rejected' ? 'Rejected' : 'Withdrawn'} at ${h.label} · ${fmt(back)}`}>
                   {h.result === 'accepted' ? '✓' : '✕'}
@@ -169,7 +169,6 @@ export default function Timeline() {
           <h1>Timeline</h1>
           <p className="muted">Where every paper stands against its deadline, month by month</p>
         </div>
-        <button className="primary" onClick={() => setPaper(newPaper(me, today))}><Icon name="plus" size={14} /> New paper</button>
       </header>
 
       <div className="filters">

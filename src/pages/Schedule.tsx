@@ -87,11 +87,12 @@ export default function Schedule() {
           <option value="auto">Auto</option>
           <option value="estimated">Estimated</option>
         </select>
-        <button className={'toggle' + (onlyTarget ? ' on' : '')} onClick={() => setOnlyTarget(!onlyTarget)} aria-pressed={onlyTarget}>Our targets</button>
         <button className={'toggle' + (past ? ' on' : '')} onClick={() => setPast(!past)} aria-pressed={past} title="Also show deadlines that closed in the last 12 months">Show past year</button>
         <span className="grow" />
-        <span className="legend"><i className="sw targeted" /> Targeted <i className="sw reviewing" /> Under review</span>
         <span className="muted">{shown.length} deadlines</span>
+        <button className={'only-ours' + (onlyTarget ? ' on' : '')} onClick={() => setOnlyTarget(!onlyTarget)} aria-pressed={onlyTarget} title="Show only the deadlines our papers are aimed at or under review for">
+          <i className="switch" /> Our targets only
+        </button>
       </div>
 
       <div className="card tablewrap">
@@ -118,7 +119,7 @@ export default function Schedule() {
               return (
                 <Fragment key={r.id}>
                   {i === firstFuture && (
-                    <tr className="todayrow" aria-label={`Today, ${today}`}>
+                    <tr className={'todayrow' + (i === 0 ? ' first' : '')} aria-label={`Today, ${today}`}>
                       <td colSpan={4} />
                       <td><span title={today}>Today</span></td>
                       <td colSpan={COLS - 5} />
@@ -145,10 +146,10 @@ export default function Schedule() {
                       <small>Starts {fmt(r.event) || 'TBD'}</small>
                     </td>
                     <td onClick={(e) => e.stopPropagation()}>
-                      <span className="targeting">
+                      <span className={'targeting' + (tg.length ? '' : ' empty')}>
                         {tg.map((p) => (
                           <button key={p.id} className="paper-chip" onClick={() => setPaper(p)} title={`${p.title} — ${p.members.join(', ')}`}>
-                            <Avatars names={p.members} /> {p.title}
+                            <Avatars names={p.members} /> <span>{p.title}</span>
                           </button>
                         ))}
                         {r.at > now && (
@@ -169,6 +170,8 @@ export default function Schedule() {
           </tbody>
         </table>
       </div>
+
+      <p className="legend below"><i className="sw targeted" /> One of our papers is aimed at this deadline <i className="sw reviewing" /> One of our papers is under review here</p>
 
       {open && <ConfDrawer row={open} onClose={() => setOpen(null)} />}
       {addConf && <ConfModal conf={null} onClose={() => setAddConf(false)} />}

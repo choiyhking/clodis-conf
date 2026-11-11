@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { PAPER_STATUS, countdown, fmt, fmtShort, paperLinks, sortMembers } from '../logic'
+import { PAPER_STATUS, countdown, fmt, fmtShort, sortMembers } from '../logic'
 import { useStore } from '../store'
 import type { Paper } from '../types'
 import { Avatar, Avatars, Icon, PaperModal, RESULT_LABEL, newPaper } from '../ui'
@@ -69,8 +69,6 @@ export default function Papers() {
                   )}
                   <span className="pc-foot">
                     <Avatars names={p.members} />
-                    {paperLinks(p).length > 0 && <small className="muted" title={paperLinks(p).join('\n')}>{paperLinks(p).length} {paperLinks(p).length === 1 ? 'link' : 'links'}</small>}
-                    {p.history.length > 0 && <small className="muted">{p.history.length} earlier {p.history.length === 1 ? 'attempt' : 'attempts'}</small>}
                   </span>
                 </button>
               ))}

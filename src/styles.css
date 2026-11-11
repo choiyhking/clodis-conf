@@ -486,3 +486,43 @@ td.conf { max-width: 196px; }
 
 /* an assumed closing time is a caution, not an unknown date: amber ! instead of the blue ? used for estimates */
 .cd-wrap.assumed::after { content: '!'; color: var(--auto); font-size: 11px; font-weight: 800; padding-left: 3px; }
+
+/* deadlines: the targeting cell uses its whole width for the paper title */
+.sched td:nth-child(9) { width: 216px; min-width: 216px; }
+.targeting { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 4px; min-width: 0; }
+.paper-chip { display: inline-flex; align-items: center; gap: 5px; max-width: calc(100% - 30px); line-height: 1; }
+.paper-chip > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+td.conf { max-width: 184px; }
+
+/* "Our targets only": a real switch at the right end of the filter bar */
+.only-ours { gap: 8px; font-weight: 600; border-color: var(--line-strong); }
+.only-ours .switch { width: 26px; height: 14px; border-radius: 7px; background: var(--line-strong); position: relative; flex: none; transition: background 0.12s; }
+.only-ours .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: #fff; transition: left 0.12s; }
+.only-ours.on { background: var(--row-target); border-color: #d9a400; }
+.only-ours.on .switch { background: #d9a400; }
+.only-ours.on .switch::after { left: 14px; }
+
+/* target dialog */
+.tm-when { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--sunken); border-radius: var(--radius); margin-bottom: 10px; }
+.tm-when > span:first-child { font-size: 12px; color: var(--muted); }
+.tm-when b { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tm-when .muted { margin-left: auto; font-size: 12.5px; }
+.tm-group { margin-top: 12px; }
+.tm-group h3 { display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px; }
+.tm-group h3 span { font-weight: 500; color: var(--faint); }
+.tm-group h3 small { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--muted); }
+.tm-group.free h3 { color: var(--accent-ink); }
+.tm-group.free .mini { border-color: var(--accent); background: var(--accent-soft); }
+.tm-group.busy .mini b:first-child { font-weight: 500; }
+.tm-group .mini .muted b { color: var(--text); font-weight: 600; }
+
+/* Today line as the very first row: the label hangs below the header instead of hiding behind it */
+.sched tr.todayrow.first td { height: 15px; border-top: none; box-shadow: inset 0 2px 0 var(--hot); }
+.sched tr.todayrow.first span { top: 0; border-radius: 0 0 9px 9px; }
+/* the + sits in the middle of an empty targeting cell */
+.targeting.empty { justify-content: center; }
+/* keep the filter bar on one line and the table inside the window */
+.filters input[type='search'] { width: 190px; }
+.sched td:nth-child(9) { width: 194px; min-width: 194px; }
+.legend.below { margin-top: 10px; }
+.legend.below .sw:first-child { margin-left: 0; }
