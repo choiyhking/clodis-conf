@@ -72,16 +72,18 @@ const HOUR = 3600000
  * taken as 23:59 Anywhere on Earth — the usual convention and the latest it can be, so a deadline is never
  * shown as closed while it might still be open.
  */
-export function closesAt(date: string, time?: string, tz?: string): number {
+export function closesAt(date: string, time?: string, tz?: string): { at: number; exact: boolean } {
   const off = time && tz && /^\d{2}:\d{2}$/.test(time) ? tzOffset(tz, date) : null
-  return off === null ? Date.parse(`${date}T23:59:00Z`) + 12 * HOUR : Date.parse(`${date}T${time}:00Z`) - off * HOUR
+  return off === null
+    ? { at: Date.parse(`${date}T23:59:00Z`) + 12 * HOUR, exact: false }
+    : { at: Date.parse(`${date}T${time}:00Z`) - off * HOUR, exact: true }
 }
-/** "Closed", hours in the last two days ("31h"), otherwise whole days ("12d"). */
-export function timeLeft(at: number, now: number): { text: string; tone: 'closed' | 'hot' | 'warm' | 'calm' } {
+/** "Closed", hours once less than a day is left ("18h"), otherwise whole days ("12d"). */
+export function timeLeft(at: number, now: number): { text: string; tone: 'closed' | 'urgent' | 'hot' | 'warm' | 'calm' } {
   const ms = at - now
   if (ms <= 0) return { text: 'Closed', tone: 'closed' }
   const hours = ms / HOUR
-  if (hours < 48) return { text: `${Math.max(1, Math.floor(hours))}h`, tone: 'hot' }
+  if (hours < 24) return { text: `${Math.max(1, Math.floor(hours))}h`, tone: 'urgent' }
   const days = Math.floor(hours / 24)
   return { text: `${days}d`, tone: days <= 7 ? 'hot' : days <= 30 ? 'warm' : 'calm' }
 }
@@ -282,7 +284,7 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
   const rows: Row[] = []
   for (const d of deadlines) {
     const conf = confById.get(d.confId)
-    if (conf) rows.push({ ...d, conf, virtual: false, at: 0 })
+    if (conf) rows.push({ ...d, conf, virtual: false, at: 0, exact: false })
   }
 
   // 1) collected values
@@ -348,6 +350,7 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
               note: '',
               virtual: true,
               at: 0,
+              exact: false,
               sources: a.sources,
               evidence: a.evidence,
               time: a.time,
@@ -408,7 +411,7 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
       list.push(est)
     }
   }
-  for (const r of rows) r.at = closesAt(r.deadline, r.time, r.tz)
+  for (const r of rows) Object.assign(r, closesAt(r.deadline, r.time, r.tz))
   return rows.sort((a, b) => a.deadline.localeCompare(b.deadline) || a.conf.acronym.localeCompare(b.conf.acronym))
 }
 
