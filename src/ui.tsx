@@ -373,7 +373,7 @@ export interface FilterOption { value: string; label: string; group?: string }
  * A filter dropdown where several values can be ticked. Nothing ticked means "no filter".
  * Options may be grouped (e.g. KIISE / BK21); the caller decides how groups combine.
  */
-export function MultiFilter({ label, options, value, onChange }: { label: string; options: FilterOption[]; value: string[]; onChange: (v: string[]) => void }) {
+export function MultiFilter({ label, noun, options, value, onChange }: { label: string; noun: string; options: FilterOption[]; value: string[]; onChange: (v: string[]) => void }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -384,7 +384,8 @@ export function MultiFilter({ label, options, value, onChange }: { label: string
   }, [open])
   const toggle = (v: string) => onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v])
   const chosen = options.filter((o) => value.includes(o.value))
-  const summary = chosen.length === 0 ? label : chosen.length <= 2 ? chosen.map((o) => o.label).join(', ') : `${chosen.length} selected`
+  // Just the count: which values are ticked is spelled out in the chips above the table.
+  const summary = chosen.length === 0 ? label : `${noun} · ${chosen.length}`
   const groups = [...new Set(options.map((o) => o.group ?? ''))]
   return (
     <div className="mf" ref={ref} onKeyDown={(e) => { if (e.key === 'Escape' && open) { e.stopPropagation(); setOpen(false) } }}>

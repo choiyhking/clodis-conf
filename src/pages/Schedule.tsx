@@ -95,10 +95,10 @@ export default function Schedule() {
 
       <div className="filters">
         <input type="search" placeholder="Search conferences" value={q} onChange={(e) => setQ(e.target.value)} />
-        <MultiFilter label="All areas" value={area} onChange={setArea} options={areas.map((a) => ({ value: a, label: a }))} />
-        <MultiFilter label="Any rank" value={rank} onChange={setRank} options={RANK_OPTIONS} />
-        <MultiFilter label="Any owner" value={owner} onChange={setOwner} options={[...sortMembers(data.members).map((m) => ({ value: m.name, label: m.name })), { value: '', label: 'Unassigned' }]} />
-        <MultiFilter label="Any status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
+        <MultiFilter label="All areas" noun="Area" value={area} onChange={setArea} options={areas.map((a) => ({ value: a, label: a }))} />
+        <MultiFilter label="Any rank" noun="Rank" value={rank} onChange={setRank} options={RANK_OPTIONS} />
+        <MultiFilter label="Any owner" noun="Owner" value={owner} onChange={setOwner} options={[...sortMembers(data.members).map((m) => ({ value: m.name, label: m.name })), { value: '', label: 'Unassigned' }]} />
+        <MultiFilter label="Any status" noun="Status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
         <button className={'toggle' + (past ? ' on' : '')} onClick={() => setPast(!past)} aria-pressed={past} title="Also show deadlines that closed in the last 12 months">Show past year</button>
         <span className="grow" />
         <button className={'only-ours' + (onlyTarget ? ' on' : '')} onClick={() => setOnlyTarget(!onlyTarget)} aria-pressed={onlyTarget} title="Show only the deadlines our papers are aimed at or under review for">
