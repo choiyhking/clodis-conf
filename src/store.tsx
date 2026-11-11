@@ -19,6 +19,12 @@ const LS_ME = 'labconf:me'
 const EMPTY: Data = { conferences: [], deadlines: [], papers: [], members: [], log: [] }
 const COLLS = Object.keys(EMPTY) as Coll[]
 
+/** Local mode has no accounts; "?guest" in the address previews what a signed-out visitor sees. */
+const PREVIEW_GUEST = !supabase && new URLSearchParams(location.search).has('guest')
+/** What the public may see of a conference / deadline: no owner, no checker, no free-text note. */
+const publicConf = (c: Conf): Conf => ({ ...c, owner: '' })
+const publicDeadline = (d: Deadline): Deadline => ({ ...d, checkedBy: '', note: '' })
+
 const getJson = async <T,>(path: string): Promise<T> => (await fetch(`./data/${path}`, { cache: 'no-cache' })).json()
 
 export async function loadSeed(): Promise<Data> {
@@ -45,6 +51,8 @@ interface Ctx {
   me: string
   setMe: (name: string) => void
   session: string | null // signed-in email (supabase mode)
+  /** Not signed in: deadlines only, read-only, and no names. */
+  guest: boolean
   save: <K extends Coll>(coll: K, doc: Data[K][number]) => Promise<void>
   remove: (coll: Coll, id: string) => Promise<void>
   replaceAll: (data: Data) => Promise<void>
@@ -72,11 +80,25 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const raw = localStorage.getItem(LS_KEY)
         const d: Data = raw ? { ...EMPTY, ...JSON.parse(raw) } : await loadSeed()
         if (!raw) persistLocal(d)
-        setData(d)
+        setData(PREVIEW_GUEST ? { ...EMPTY, conferences: d.conferences.map(publicConf), deadlines: d.deadlines.map(publicDeadline) } : d)
       } else {
         const { data: s } = await supabase.auth.getSession()
         setSession(s.session?.user.email ?? null)
-        if (!s.session) return setData(EMPTY)
+        if (!s.session) {
+          // Signed out: only what the database hands to anyone — conferences and deadlines with the names removed.
+          // (Until that function is installed, fall back to the dates shipped with the site.)
+          const { data: pub, error } = await supabase.rpc('public_docs')
+          if (error || !pub) {
+            const seed = await loadSeed()
+            return setData({ ...EMPTY, conferences: seed.conferences.map(publicConf), deadlines: seed.deadlines.map(publicDeadline) })
+          }
+          const d: Data = { ...EMPTY, conferences: [], deadlines: [] }
+          for (const doc of pub as { coll: string; data: unknown }[]) {
+            if (doc.coll === 'conferences') d.conferences.push(publicConf(doc.data as Conf))
+            else if (doc.coll === 'deadlines') d.deadlines.push(publicDeadline(doc.data as Deadline))
+          }
+          return setData(d)
+        }
         const { data: docs, error } = await supabase.from('docs').select('coll,id,data').limit(10000)
         if (error) throw error
         const d: Data = { conferences: [], deadlines: [], papers: [], members: [], log: [] }
@@ -128,7 +150,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return text ? { id: uid(), at: new Date().toISOString(), by: me || session || 'unknown', text } : null
   }
 
+  const guest = supabase ? !session : PREVIEW_GUEST
+
   const save: Ctx['save'] = async (coll, doc) => {
+    if (guest) return
     const entry = logEntry(coll, (data[coll] as { id: string }[]).find((x) => x.id === doc.id), doc)
     setData((prev) => {
       const list = prev[coll] as { id: string }[]
@@ -147,6 +172,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }
 
   const remove: Ctx['remove'] = async (coll, id) => {
+    if (guest) return
     const entry = logEntry(coll, (data[coll] as { id: string }[]).find((x) => x.id === id), undefined)
     setData((prev) => {
       const d = { ...prev, [coll]: (prev[coll] as { id: string }[]).filter((x) => x.id !== id), ...(entry ? { log: [...prev.log, entry] } : {}) } as Data
@@ -161,6 +187,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }
 
   const replaceAll: Ctx['replaceAll'] = async (d) => {
+    if (guest) return
     const full = { ...EMPTY, ...d }
     if (!supabase) {
       persistLocal(full)
@@ -188,7 +215,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const rows = useMemo(() => buildRows(data.conferences, data.deadlines, auto, today), [data, auto, today])
 
   return (
-    <StoreCtx.Provider value={{ data, rows, auto, today, ready, error, me, setMe, session, save, remove, replaceAll, reload }}>
+    <StoreCtx.Provider value={{ data, rows, auto, today, ready, error, me, setMe, session, guest, save, remove, replaceAll, reload }}>
       {children}
     </StoreCtx.Provider>
   )

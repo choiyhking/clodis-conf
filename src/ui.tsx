@@ -134,7 +134,7 @@ export function Countdown({ deadline, today, at, assumed }: { deadline: string; 
 export function StatusBadge({ row, compact }: { row: Row; compact?: boolean }) {
   const title =
     row.status === 'verified'
-      ? `Verified by ${row.checkedBy || 'owner'} on ${fmt(row.checkedAt) || 'unknown date'}`
+      ? `Verified${row.checkedBy ? ` by ${row.checkedBy}` : ''} on ${fmt(row.checkedAt) || 'unknown date'}`
       : row.status === 'auto'
         ? `Collected automatically from ${(row.sources ?? [row.source]).join(' + ')} — not yet verified by the owner`
         : row.derivedFrom
@@ -688,7 +688,7 @@ export function TargetModal({ row, onClose }: { row: Row; onClose: () => void })
 
 // ---------- conference detail drawer ----------
 export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) {
-  const { rows, data, today } = useStore()
+  const { rows, data, today, guest } = useStore()
   const verify = useVerify()
   const [edit, setEdit] = useState(false)
   const [editConf, setEditConf] = useState(false)
@@ -749,15 +749,15 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
         <section className="trust">
           <div className="trust-head">
             <StatusBadge row={live} />
-            {isStale(live, today) && <span className="tag warn">Re-check</span>}
-            {live.autoDiff && <span className="tag warn">Changed</span>}
+            {!guest && isStale(live, today) && <span className="tag warn">Re-check</span>}
+            {!guest && live.autoDiff && <span className="tag warn">Changed</span>}
           </div>
           <p className="muted">
-            {live.status === 'verified' && <>Verified by {live.checkedBy || 'owner'} on {fmt(live.checkedAt) || 'an unknown date'}.</>}
+            {live.status === 'verified' && <>Verified{live.checkedBy ? ` by ${live.checkedBy}` : ''} on {fmt(live.checkedAt) || 'an unknown date'}.</>}
             {live.status === 'auto' && <>Collected on {fmt(live.checkedAt)} from {(live.sources ?? [live.source]).map((s) => (s === 'site' ? 'the conference site' : s)).join(' and ')}. Not verified by a person yet.</>}
             {live.status === 'estimated' && <>This edition's dates aren't out yet. Showing last year's{live.derivedFrom ? ` (${fmt(live.derivedFrom)})` : ''} shifted by a year; they'll be replaced automatically once announced.</>}
           </p>
-          {live.autoDiff && (
+          {!guest && live.autoDiff && (
             <p className="diff">
               {live.autoDiff.source === 'site' ? 'The conference site' : 'ccfddl'} now says deadline <b>{fmt(live.autoDiff.deadline)}</b>
               {live.autoDiff.abstract && <> (abstract {fmt(live.autoDiff.abstract)})</>}.
@@ -771,18 +771,18 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
           )}
           <div className="acts">
             {live.url && <a className="btn" href={live.url} target="_blank" rel="noreferrer">Open site <Icon name="link" size={13} /></a>}
-            {live.status !== 'verified' && live.status !== 'estimated' && <button className="primary" onClick={() => verify(live)}><Icon name="check" size={14} /> Looks right</button>}
-            <button onClick={() => setEdit(true)}><Icon name="edit" size={14} /> {live.status === 'estimated' ? 'Enter real dates' : 'Edit dates'}</button>
+            {!guest && live.status !== 'verified' && live.status !== 'estimated' && <button className="primary" onClick={() => verify(live)}><Icon name="check" size={14} /> Looks right</button>}
+            {!guest && <button onClick={() => setEdit(true)}><Icon name="edit" size={14} /> {live.status === 'estimated' ? 'Enter real dates' : 'Edit dates'}</button>}
           </div>
         </section>
 
-        <section>
+        {!guest && <section>
           <h3>Owner</h3>
           <p className="owner">{conf.owner ? <Avatar name={conf.owner} whole /> : <span className="muted">Unassigned</span>}
             <button className="ghost" onClick={() => setEditConf(true)}>Edit conference</button></p>
-        </section>
+        </section>}
 
-        <section>
+        {!guest && <section>
           <h3>Papers</h3>
           {papers.length === 0 && <p className="nobody">Nobody is targeting <b>{rowLabel(live)}</b> yet.</p>}
           {papers.map((p) => (
@@ -792,7 +792,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
             </button>
           ))}
           {live.deadline >= today && <button onClick={() => setPick(true)}><Icon name="plus" size={14} /> Target</button>}
-        </section>
+        </section>}
 
         {others.length > 0 && (
           <section>

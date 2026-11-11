@@ -7,7 +7,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "AI/aaai"
  },
  {
@@ -18,7 +18,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "AI/aamas"
  },
  {
@@ -40,7 +40,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/acsac"
  },
  {
@@ -51,7 +51,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "AI/aistats"
  },
  {
@@ -62,7 +62,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "SE/ase"
  },
  {
@@ -73,7 +73,7 @@
   "kiise": "A",
   "bk": 1,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "SC/asiaccs"
  },
  {
@@ -84,7 +84,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/asplos"
  },
  {
@@ -95,7 +95,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/ccs"
  },
  {
@@ -106,7 +106,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Single",
-  "owner": "안지우"
+  "owner": ""
  },
  {
   "id": "cikm",
@@ -116,7 +116,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DB/cikm"
  },
  {
@@ -127,7 +127,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "MX/cloud"
  },
  {
@@ -138,7 +138,7 @@
   "kiise": "A",
   "bk": 1,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/cluster"
  },
  {
@@ -149,7 +149,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "AI/coling"
  },
  {
@@ -160,7 +160,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "NW/conext"
  },
  {
@@ -171,7 +171,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/csfw"
  },
  {
@@ -182,7 +182,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "DB/dasfaa"
  },
  {
@@ -193,7 +193,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "최윤하"
+  "owner": ""
  },
  {
   "id": "dsn",
@@ -203,7 +203,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/dsn"
  },
  {
@@ -214,7 +214,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "AI/ecai"
  },
  {
@@ -225,7 +225,7 @@
   "kiise": "",
   "bk": 2,
   "blind": "Single",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DB/edbt"
  },
  {
@@ -236,7 +236,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "AI/emnlp"
  },
  {
@@ -247,7 +247,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Single",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/esorics"
  },
  {
@@ -258,7 +258,7 @@
   "kiise": "A",
   "bk": 1,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/europar"
  },
  {
@@ -269,7 +269,7 @@
   "kiise": "S",
   "bk": 2,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "DS/eurosys"
  },
  {
@@ -280,7 +280,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "박선우"
+  "owner": ""
  },
  {
   "id": "fast",
@@ -290,7 +290,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "DS/fast"
  },
  {
@@ -301,7 +301,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "SE/fse"
  },
  {
@@ -312,7 +312,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "AI/gecco"
  },
  {
@@ -323,7 +323,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "박선우"
+  "owner": ""
  },
  {
   "id": "hpca",
@@ -333,7 +333,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/hpca"
  },
  {
@@ -344,7 +344,7 @@
   "kiise": "S",
   "bk": 2,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/hpdc"
  },
  {
@@ -355,7 +355,7 @@
   "kiise": "",
   "bk": null,
   "blind": "Double",
-  "owner": "안지우"
+  "owner": ""
  },
  {
   "id": "icdcs",
@@ -365,7 +365,7 @@
   "kiise": "A",
   "bk": 3,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "DS/icdcs"
  },
  {
@@ -376,7 +376,7 @@
   "kiise": "A",
   "bk": 3,
   "blind": "Double",
-  "owner": "안지우"
+  "owner": ""
  },
  {
   "id": "icde",
@@ -386,7 +386,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Single",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DB/icde"
  },
  {
@@ -397,7 +397,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Triple",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DB/icdm"
  },
  {
@@ -408,7 +408,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "AI/icml"
  },
  {
@@ -419,7 +419,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/icpp"
  },
  {
@@ -430,7 +430,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/ics"
  },
  {
@@ -441,7 +441,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "SE/icse"
  },
  {
@@ -452,7 +452,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "SE/icsoc"
  },
  {
@@ -463,7 +463,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SE/icws"
  },
  {
@@ -474,7 +474,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Single",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/sec"
  },
  {
@@ -485,7 +485,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/iiswc"
  },
  {
@@ -496,7 +496,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "AI/ijcai"
  },
  {
@@ -507,7 +507,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "NW/imc"
  },
  {
@@ -518,7 +518,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "NW/infocom"
  },
  {
@@ -529,7 +529,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "CG/vis"
  },
  {
@@ -540,7 +540,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/ipdps"
  },
  {
@@ -551,7 +551,7 @@
   "kiise": "A",
   "bk": 1,
   "blind": "",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "SE/ispass"
  },
  {
@@ -562,7 +562,7 @@
   "kiise": "S",
   "bk": 2,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "SE/issta"
  },
  {
@@ -573,7 +573,7 @@
   "kiise": "S",
   "bk": 2,
   "blind": "Double",
-  "owner": "박선우"
+  "owner": ""
  },
  {
   "id": "kdd",
@@ -583,7 +583,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "DB/sigkdd"
  },
  {
@@ -594,7 +594,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Single",
-  "owner": "최윤하"
+  "owner": ""
  },
  {
   "id": "middleware",
@@ -604,7 +604,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SE/middleware"
  },
  {
@@ -615,7 +615,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "NW/mobicom"
  },
  {
@@ -626,7 +626,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Single",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "NW/mobisys"
  },
  {
@@ -637,7 +637,7 @@
   "kiise": "",
   "bk": null,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "SE/msr"
  },
  {
@@ -648,7 +648,7 @@
   "kiise": "S",
   "bk": 2,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/ndss"
  },
  {
@@ -659,7 +659,7 @@
   "kiise": "A",
   "bk": 1,
   "blind": "Single",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "SC/noms"
  },
  {
@@ -670,7 +670,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "NW/nsdi"
  },
  {
@@ -681,7 +681,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "SE/oopsla"
  },
  {
@@ -692,7 +692,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SE/osdi"
  },
  {
@@ -703,7 +703,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DB/pakdd"
  },
  {
@@ -714,7 +714,7 @@
   "kiise": "S",
   "bk": 2,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/performance"
  },
  {
@@ -725,7 +725,7 @@
   "kiise": "A",
   "bk": 3,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/podc"
  },
  {
@@ -736,7 +736,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DB/pods"
  },
  {
@@ -747,7 +747,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/ppopp"
  },
  {
@@ -758,7 +758,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/raid"
  },
  {
@@ -769,7 +769,7 @@
   "kiise": "S",
   "bk": 2,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/rtas"
  },
  {
@@ -780,7 +780,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "MX/rtss"
  },
  {
@@ -791,7 +791,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/sp"
  },
  {
@@ -802,7 +802,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "최윤하"
+  "owner": ""
  },
  {
   "id": "sacmat",
@@ -812,7 +812,7 @@
   "kiise": "",
   "bk": null,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/sacmat"
  },
  {
@@ -823,7 +823,7 @@
   "kiise": "",
   "bk": null,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "SE/saner"
  },
  {
@@ -834,7 +834,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/sc"
  },
  {
@@ -845,7 +845,7 @@
   "kiise": "A",
   "bk": 2,
   "blind": "Triple",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DB/sdm"
  },
  {
@@ -856,7 +856,7 @@
   "kiise": "",
   "bk": null,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/sec"
  },
  {
@@ -867,7 +867,7 @@
   "kiise": "A",
   "bk": 3,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "NW/sensys"
  },
  {
@@ -878,7 +878,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DB/sigir"
  },
  {
@@ -889,7 +889,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Double",
-  "owner": "박선우"
+  "owner": ""
  },
  {
   "id": "sigmetrics",
@@ -899,7 +899,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/sigmetrics"
  },
  {
@@ -910,7 +910,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DB/sigmod"
  },
  {
@@ -921,7 +921,7 @@
   "kiise": "",
   "bk": 1,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "DS/socc"
  },
  {
@@ -932,7 +932,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "SE/sosp"
  },
  {
@@ -943,7 +943,7 @@
   "kiise": "A",
   "bk": 1,
   "blind": "Double",
-  "owner": "최윤하",
+  "owner": "",
   "ccfddl": "SC/srds"
  },
  {
@@ -954,7 +954,7 @@
   "kiise": "A",
   "bk": null,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DS/systor"
  },
  {
@@ -965,7 +965,7 @@
   "kiise": "S",
   "bk": 3,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "SC/uss"
  },
  {
@@ -976,7 +976,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Single",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "DB/vldb"
  },
  {
@@ -987,7 +987,7 @@
   "kiise": "A",
   "bk": 3,
   "blind": "Double",
-  "owner": "안지우",
+  "owner": "",
   "ccfddl": "DB/wsdm"
  },
  {
@@ -998,7 +998,7 @@
   "kiise": "S",
   "bk": 4,
   "blind": "Double",
-  "owner": "박선우",
+  "owner": "",
   "ccfddl": "MX/www"
  }
 ]

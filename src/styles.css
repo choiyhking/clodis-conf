@@ -690,3 +690,11 @@ html { scrollbar-gutter: stable; }
 .tm-group.free h3 { color: var(--text); }
 .tm-group.free .mini { border-color: var(--line-strong); background: var(--surface); }
 .tm-group .mini:not(:disabled):hover { border-color: var(--accent); background: var(--accent-soft); }
+
+/* public (signed-out) view and account controls */
+.guest-box { display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius); }
+.guest-box p { margin: 0; font-size: 12px; }
+.account { display: flex; justify-content: space-between; margin: -4px 8px 0; font-size: 12px; }
+.account .link, .login .link { color: var(--muted); text-decoration: underline; font-size: 12.5px; }
+.login .link { align-self: flex-start; }
+.login .back { margin-top: 8px; }

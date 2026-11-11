@@ -58,9 +58,15 @@ With no environment variables it runs in **local mode**: data lives in that brow
 ## Sharing with the lab (Supabase, free tier)
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. Run `supabase/schema.sql` in the SQL editor, then the `insert` at the bottom with your members' emails.
-3. Put the project URL and anon key in `.env.local` (see `.env.example`).
-4. Sign in on the site, then Lab → **Import spreadsheet data** once.
+2. Run `supabase/schema.sql` in the SQL editor.
+3. Authentication → Sign In / Providers: turn **off** "Allow new users to sign up". Then run `supabase/public-view-and-accounts.sql`.
+4. Authentication → Users → **Add user** for each lab member (email + a first password, auto-confirmed). They can change the password from the sidebar.
+5. Put the project URL and anon key in `.env.local` (see `.env.example`).
+6. Sign in on the site, then Lab → **Import spreadsheet data** once.
+
+**Who sees what.** Without signing in, anyone with the address sees the Deadlines table, read-only, with no names
+(the database only hands out conferences and deadlines stripped of owner / checker / notes). Signed-in accounts — which
+only the admin can create — see and edit everything: targets, papers, timeline, members, activity.
 
 The free tier pauses a project after 7 days without requests; normal use keeps it awake.
 
@@ -71,9 +77,8 @@ The free tier pauses a project after 7 days without requests; normal use keeps i
 3. Settings → Secrets and variables → Actions → **Variables**: add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 4. In Supabase → Authentication → URL Configuration, add the deployed URL (needed for sign-in links).
 
-Free GitHub Pages requires a public repository, which makes `public/data/` — the conference list and **owner names** —
-readable by anyone. Papers, targets and results live in Supabase and are visible to signed-in members only. If names must
-stay private, keep the repository private and deploy with Cloudflare Pages instead.
+Free GitHub Pages requires a public repository, so `public/data/` (the conference list and collected dates) is readable by
+anyone; it carries no names. Papers, targets, results and members live in Supabase and are visible to signed-in members only.
 
 ## Data files
 
