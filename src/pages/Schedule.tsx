@@ -2,19 +2,32 @@ import { Fragment, useMemo, useState } from 'react'
 import { diffDays, fmt, rowTags, sortMembers, venueOf } from '../logic'
 import { useStore } from '../store'
 import type { Paper, Row } from '../types'
-import { AreaTag, Avatar, Avatars, Clock, ConfDrawer, ConfModal, Countdown, Icon, PaperModal, Place, Rank, StatusBadge, TargetModal } from '../ui'
+import { AreaTag, Avatar, Avatars, Clock, ConfDrawer, ConfModal, Countdown, Icon, MultiFilter, PaperModal, Place, Rank, StatusBadge, TargetModal, type FilterOption } from '../ui'
 import { isStale } from '../logic'
 
 const COLS = 10
+const RANK_OPTIONS: FilterOption[] = [
+  { group: 'KIISE', value: 'k:S', label: 'KIISE S' },
+  { group: 'KIISE', value: 'k:A', label: 'KIISE A' },
+  { group: 'KIISE', value: 'k:', label: 'Not on KIISE list' },
+  ...[4, 3, 2, 1].map((n) => ({ group: 'BK21', value: `b:${n}`, label: `BK21 IF ${n}` })),
+  { group: 'BK21', value: 'b:', label: 'Not on BK21 list' },
+]
+const STATUS_OPTIONS: FilterOption[] = [
+  { value: 'verified', label: 'Verified' },
+  { value: 'auto', label: 'Auto' },
+  { value: 'estimated', label: 'Estimated' },
+]
 const PAST_DAYS = 365 // "Show past" goes back one year; older rows stay in the data but off the table
 
 export default function Schedule() {
   const { rows, data, today } = useStore()
   const [q, setQ] = useState('')
-  const [area, setArea] = useState('')
-  const [rank, setRank] = useState('')
-  const [owner, setOwner] = useState('')
-  const [status, setStatus] = useState('')
+  // Each filter holds any number of values; an empty list means that filter is off.
+  const [area, setArea] = useState<string[]>([])
+  const [rank, setRank] = useState<string[]>([])
+  const [owner, setOwner] = useState<string[]>([])
+  const [status, setStatus] = useState<string[]>([])
   const [past, setPast] = useState(false)
   const [onlyTarget, setOnlyTarget] = useState(false)
   const [open, setOpen] = useState<Row | null>(null)
@@ -34,6 +47,7 @@ export default function Schedule() {
   }, [data.papers])
   const areas = useMemo(() => [...new Set(data.conferences.map((c) => c.area).filter(Boolean))].sort(), [data.conferences])
 
+  const kiise = rank.filter((v) => v.startsWith('k:')), bk = rank.filter((v) => v.startsWith('b:'))
   const now = Date.now()
   const shown = rows.filter((r) => {
     const c = r.conf
@@ -43,12 +57,12 @@ export default function Schedule() {
     // Closed is judged by the real closing moment, not the date: 17:00 PT on the 11th is still open on the morning of the 12th in Korea.
     const closedFor = (now - r.at) / 86400000
     if (closedFor > 0 && !reviewing && (!past || closedFor > PAST_DAYS)) return false
-    if (area && c.area !== area) return false
-    if (rank === 'S' && c.kiise !== 'S') return false
-    if (rank === 'SA' && !c.kiise) return false
-    if (rank === 'BK3' && (c.bk ?? 0) < 3) return false
-    if (owner && c.owner !== owner) return false
-    if (status && r.status !== status) return false
+    if (area.length && !area.includes(c.area)) return false
+    // Ticks within KIISE (or within BK21) widen the match; the two lists narrow each other.
+    if (kiise.length && !kiise.includes(`k:${c.kiise}`)) return false
+    if (bk.length && !bk.includes(`b:${c.bk ?? ''}`)) return false
+    if (owner.length && !owner.includes(c.owner)) return false
+    if (status.length && !status.includes(r.status)) return false
     if (onlyTarget && !tg) return false
     if (q && !`${c.acronym} ${c.name}`.toLowerCase().includes(q.toLowerCase())) return false
     return true
@@ -68,24 +82,10 @@ export default function Schedule() {
 
       <div className="filters">
         <input type="search" placeholder="Search conferences" value={q} onChange={(e) => setQ(e.target.value)} />
-        <select value={area} onChange={(e) => setArea(e.target.value)} aria-label="Area">
-          <option value="">All areas</option>{areas.map((a) => <option key={a}>{a}</option>)}
-        </select>
-        <select value={rank} onChange={(e) => setRank(e.target.value)} aria-label="Rank">
-          <option value="">Any rank</option>
-          <option value="S">KIISE S</option>
-          <option value="SA">KIISE S or A</option>
-          <option value="BK3">BK21 IF 3+</option>
-        </select>
-        <select value={owner} onChange={(e) => setOwner(e.target.value)} aria-label="Owner">
-          <option value="">Any owner</option>{sortMembers(data.members).map((m) => <option key={m.id}>{m.name}</option>)}
-        </select>
-        <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Status">
-          <option value="">Any status</option>
-          <option value="verified">Verified</option>
-          <option value="auto">Auto</option>
-          <option value="estimated">Estimated</option>
-        </select>
+        <MultiFilter label="All areas" value={area} onChange={setArea} options={areas.map((a) => ({ value: a, label: a }))} />
+        <MultiFilter label="Any rank" value={rank} onChange={setRank} options={RANK_OPTIONS} />
+        <MultiFilter label="Any owner" value={owner} onChange={setOwner} options={[...sortMembers(data.members).map((m) => ({ value: m.name, label: m.name })), { value: '', label: 'Unassigned' }]} />
+        <MultiFilter label="Any status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
         <button className={'toggle' + (past ? ' on' : '')} onClick={() => setPast(!past)} aria-pressed={past} title="Also show deadlines that closed in the last 12 months">Show past year</button>
         <span className="grow" />
         <button className={'only-ours' + (onlyTarget ? ' on' : '')} onClick={() => setOnlyTarget(!onlyTarget)} aria-pressed={onlyTarget} title="Show only the deadlines our papers are aimed at or under review for">
@@ -98,8 +98,8 @@ export default function Schedule() {
       <div className="table-note">
         <span className="muted">{shown.length} deadlines</span>
         <span className="grow" />
-        <span className="key-item"><i className="sw targeted" /> <b>Yellow</b> a paper of ours is aimed at this deadline</span>
-        <span className="key-item"><i className="sw reviewing" /> <b>Green</b> a paper of ours is under review here</span>
+        <span className="key-item"><i className="sw reviewing" /> Under review</span>
+        <span className="key-item"><i className="sw targeted" /> Targeted</span>
       </div>
 
       <div className="card tablewrap">
