@@ -100,7 +100,7 @@ export function eventStart(text: string): string {
 // ---------- labels ----------
 /** "2/4" → "R2/4". Anything else is a named track ("Short Paper") and is shown as written. */
 export const roundTag = (round: string) => (/^\d+\/\d+$/.test(round) ? `R${round}` : round)
-const TRACK_NAMES: [RegExp, string][] = [[/short/i, 'Short Paper'], [/poster/i, 'Poster'], [/demo/i, 'Demo'], [/workshop/i, 'Workshop'], [/industr/i, 'Industry'], [/journal/i, 'Journal Track']]
+const TRACK_NAMES: [RegExp, string][] = [[/short/i, 'Short Paper'], [/poster/i, 'Poster'], [/demo/i, 'Demo'], [/workshop/i, 'Workshop'], [/industr/i, 'Industry'], [/journal/i, 'Journal Track'], [/fast track|resubmission/i, 'Fast Track']]
 const trackName = (s: string) => TRACK_NAMES.find(([re]) => re.test(s))?.[1] ?? s
 /**
  * Splits a conference that is really a side track of another — "SIGIR (short)", "CCS Poster" — into the
@@ -117,7 +117,7 @@ export function rowTags(r: { conf: Conf; round: string }): string[] {
 }
 export const rowLabel = (r: { conf: Conf; round: string }) => [venueOf(r.conf.acronym).name, ...rowTags(r)].join(' ')
 /** Timeline entries that are a separate track rather than another round of the main one. */
-const SIDE_TRACK = /short|poster|workshop|demo|industr|tutorial|doctoral|journal|tool|artifact|optional abstract/i
+const SIDE_TRACK = /short|poster|workshop|demo|industr|tutorial|doctoral|journal|tool|artifact|optional abstract|fast track|resubmission/i
 /**
  * Entries that are not a deadline for submitting a paper at all: ACL-family "commitment" dates only apply
  * to papers that already went through ARR review. They are left out entirely.
@@ -328,6 +328,11 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
             if (upcoming && differs && best.autoSig !== autoSig(a)) best.autoDiff = { ...a, link: ed.link, source }
             best.sources = a.sources
             best.evidence = a.evidence
+            // A row saved without a round (e.g. imported from the sheet) takes the collected round's label,
+            // so it reads the same as its sibling rounds.
+            // Likewise a saved "2/2" gives way when the collector now knows this entry is a named side track.
+            const numbered = (x: string) => /^\d+\/\d+$/.test(x)
+            if (round && (!best.round || (numbered(best.round) && !numbered(round)))) best.round = round
             if (best.deadline === a.deadline) Object.assign(best, { time: a.time, tz: a.tz })
           } else if (best) {
             // An estimate from the sheet, and the real dates are now out: show the collected values.
