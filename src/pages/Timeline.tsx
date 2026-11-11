@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { MONTHS, PAPER_STATUS, countdown, fmt, fmtShort, fromMs, paperStatusLabel, rowLabel, sortMembers, toMs } from '../logic'
 import { useStore } from '../store'
 import type { Paper, PaperStatus, Row } from '../types'
-import { Avatar, Avatars, ConfDrawer, Icon, PaperModal } from '../ui'
+import { ConfDrawer, Icon, PaperModal } from '../ui'
 
 const LANE_H = 22
 const MAX_LANES = 6
@@ -66,7 +66,7 @@ export default function Timeline() {
     by === 'person'
       ? sortMembers(data.members).map((m) => ({
           key: m.id,
-          head: <><Avatar name={m.name} size={24} whole /> {m.role && <span className="tag">{m.role}</span>}</>,
+          head: <><b>{m.name}</b> {m.role && <span className="tag">{m.role}</span>}</>,
           papers: papers.filter((p) => p.members.includes(m.name) && visible(p)),
         }))
       : [...new Set(papers.map((p) => p.group || 'No topic'))].map((g) => ({
@@ -229,7 +229,7 @@ export default function Timeline() {
                 <div className="tl-row tl-paper" key={p.id} title={tip(p)} onClick={() => setPaper(p)} tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setPaper(p)}>
                   <div className="tl-left">
                     <span className="p-title">{p.title}</span>
-                    {by === 'topic' && <Avatars names={p.members} />}
+                    {by === 'topic' && <small className="muted">{p.members.join(', ')}</small>}
                   </div>
                   <div className="tl-track"><Grid />{bar(p)}</div>
                 </div>

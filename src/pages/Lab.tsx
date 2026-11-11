@@ -5,6 +5,8 @@ import { MODE, loadSeed, supabase, useStore } from '../store'
 import { ROLES, type Data, type Member, type Role } from '../types'
 import { Avatar, Icon } from '../ui'
 
+const ROLE_SHORT: Record<string, string> = { Professor: 'Prof', Postdoc: 'Postdoc', PhD: 'PhD', MS: 'MS', Undergrad: 'UG', Alumni: 'Alum' }
+
 export default function Lab() {
   const { data, rows, today, save, remove, replaceAll, session, me, setMe } = useStore()
   const [name, setName] = useState('')
@@ -101,7 +103,7 @@ export default function Lab() {
                 {members.filter((m) => m.role === g).map((m) => (
                   <tr key={m.id}>
                     <td className="m-name">
-                      <Avatar name={m.name} dot />
+                      <span className={'role-chip r-' + (m.role || 'none').toLowerCase()}>{ROLE_SHORT[m.role] ?? '–'}</span>
                       <input defaultValue={m.name} key={m.name} aria-label="Name" onBlur={(e) => rename(m, e.target.value)} onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()} />
                     </td>
                     <td>
