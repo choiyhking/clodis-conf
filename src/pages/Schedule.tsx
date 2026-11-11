@@ -71,7 +71,6 @@ export default function Schedule() {
   // Everything currently narrowing the table, as removable chips.
   const without = (list: string[], v: string) => list.filter((x) => x !== v)
   const active: { key: string; label: string; clear: () => void }[] = [
-    ...(q ? [{ key: 'q', label: `Search: ${q}`, clear: () => setQ('') }] : []),
     ...area.map((v) => ({ key: `a${v}`, label: v, clear: () => setArea(without(area, v)) })),
     ...rank.map((v) => ({ key: `r${v}`, label: RANK_OPTIONS.find((o) => o.value === v)!.label, clear: () => setRank(without(rank, v)) })),
     ...owner.map((v) => ({ key: `o${v}`, label: v ? `Owner: ${v}` : 'No owner', clear: () => setOwner(without(owner, v)) })),
@@ -79,7 +78,7 @@ export default function Schedule() {
     ...(onlyTarget ? [{ key: 'ours', label: 'Our targets only', clear: () => setOnlyTarget(false) }] : []),
     ...(past ? [{ key: 'past', label: 'Past year shown', clear: () => setPast(false) }] : []),
   ]
-  const clearAll = () => { setQ(''); setArea([]); setRank([]); setOwner([]); setStatus([]); setOnlyTarget(false); setPast(false) }
+  const clearAll = () => { setArea([]); setRank([]); setOwner([]); setStatus([]); setOnlyTarget(false); setPast(false) }
 
   const firstFuture = shown.findIndex((r) => r.at > now)
   return (
