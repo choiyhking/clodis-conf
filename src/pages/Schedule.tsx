@@ -2,7 +2,7 @@ import { Fragment, useMemo, useState } from 'react'
 import { diffDays, fmt, rowRound, rowTrack, sortMembers, venueOf } from '../logic'
 import { useStore } from '../store'
 import type { Paper, Row } from '../types'
-import { AreaTag, Avatar, Avatars, Clock, ConfDrawer, ConfModal, Countdown, Icon, MultiFilter, PaperModal, Place, Rank, StatusBadge, TargetModal, type FilterOption } from '../ui'
+import { AreaTag, Clock, ConfDrawer, ConfModal, Countdown, Icon, MultiFilter, PaperModal, Place, Rank, StatusBadge, TargetModal, type FilterOption } from '../ui'
 import { isStale } from '../logic'
 
 const COLS = 10
@@ -184,7 +184,7 @@ export default function Schedule() {
                         {/* One line only: the first paper, then how many more. The drawer lists them all. */}
                         {tg.slice(0, 1).map((p) => (
                           <button key={p.id} className="paper-chip" onClick={() => setPaper(p)} title={`${p.title} — ${p.members.join(', ')}`}>
-                            <Avatars names={p.members.slice(0, 2)} /> <span>{p.title}</span>
+                            <span title={p.members.join(', ')}>{p.title}</span>
                           </button>
                         ))}
                         {tg.length > 1 && (
@@ -199,7 +199,7 @@ export default function Schedule() {
                     </td>
                     <td>
                       <span className="owner-status">
-                        {r.conf.owner ? <Avatar name={r.conf.owner} size={20} /> : <span className="avatar none" title="No owner assigned" style={{ height: 20 }}>–</span>}
+                        <span className={'owner-name' + (r.conf.owner ? '' : ' none')} title={r.conf.owner ? `Owner: ${r.conf.owner}` : 'No owner assigned'}>{r.conf.owner || '–'}</span>
                         <StatusBadge row={r} compact />
                       </span>
                       {r.autoDiff && <span className="tag warn" title={`Collected value: ${fmt(r.autoDiff.deadline)}`}>Changed</span>}
