@@ -110,12 +110,19 @@ export function venueOf(acronym: string): { name: string; track: string } {
   const m = acronym.match(/^(.+?)\s*\((.+)\)$/) ?? acronym.match(/^(.+?)\s+(Poster|Demo|Workshop)$/i)
   return m ? { name: m[1], track: trackName(m[2]) } : { name: acronym, track: '' }
 }
-/** The chips after a venue name: its track, if any, then the round. */
-export function rowTags(r: { conf: Conf; round: string }): string[] {
-  const round = /^\d+\/\d+$/.test(r.round) ? roundTag(r.round) : r.round ? trackName(r.round) : ''
-  return [venueOf(r.conf.acronym).track, round].filter(Boolean)
+const NUMBERED = /^\d+\/\d+$/
+/** The side track a row belongs to ("Short Paper"), written in brackets after the venue; '' for the main track. */
+export function rowTrack(r: { conf: Conf; round: string }): string {
+  const named = r.round && !NUMBERED.test(r.round) ? trackName(r.round) : ''
+  return [...new Set([venueOf(r.conf.acronym).track, named].filter(Boolean))].join(', ')
 }
-export const rowLabel = (r: { conf: Conf; round: string }) => [venueOf(r.conf.acronym).name, ...rowTags(r)].join(' ')
+/** The numbered round of a row ("R2/4"), shown as a chip; '' when the venue has a single round. */
+export const rowRound = (r: { round: string }) => (NUMBERED.test(r.round) ? roundTag(r.round) : '')
+/** "WSDM (Short Paper)", "SIGMOD R2/4" */
+export const rowLabel = (r: { conf: Conf; round: string }) => {
+  const track = rowTrack(r), round = rowRound(r)
+  return venueOf(r.conf.acronym).name + (track ? ` (${track})` : '') + (round ? ` ${round}` : '')
+}
 /** Timeline entries that are a separate track rather than another round of the main one. */
 const SIDE_TRACK = /short|poster|workshop|demo|industr|tutorial|doctoral|journal|tool|artifact|optional abstract|fast track|resubmission/i
 /**

@@ -1,5 +1,5 @@
 import { Fragment, useMemo, useState } from 'react'
-import { diffDays, fmt, rowTags, sortMembers, venueOf } from '../logic'
+import { diffDays, fmt, rowRound, rowTrack, sortMembers, venueOf } from '../logic'
 import { useStore } from '../store'
 import type { Paper, Row } from '../types'
 import { AreaTag, Avatar, Avatars, Clock, ConfDrawer, ConfModal, Countdown, Icon, MultiFilter, PaperModal, Place, Rank, StatusBadge, TargetModal, type FilterOption } from '../ui'
@@ -164,7 +164,8 @@ export default function Schedule() {
                     <td className="conf">
                       <div className="conf-top">
                         <b>{venueOf(r.conf.acronym).name}</b>
-                        {rowTags(r).map((t) => <span key={t} className="round">{t}</span>)}
+                        {rowTrack(r) && <span className="track">({rowTrack(r)})</span>}
+                        {rowRound(r) && <span className="round">{rowRound(r)}</span>}
                         <AreaTag area={r.conf.area} />
                       </div>
                       <div className="conf-name" title={r.conf.name}>{r.conf.name}</div>

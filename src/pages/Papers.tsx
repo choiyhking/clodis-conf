@@ -62,9 +62,9 @@ export default function Papers() {
                     <span className="pc-target">
                       <b>{p.target.label}</b>
                       {/* the one date that matters at this stage, always with its label */}
-                      {s.key === 'writing' && <small><i>Deadline</i> {fmt(p.target.deadline)} <Countdown deadline={p.target.deadline} today={today} /></small>}
+                      {s.key === 'writing' && <small><i>Deadline</i> <Countdown deadline={p.target.deadline} today={today} /> <span className="when">({fmt(p.target.deadline)})</span></small>}
                       {s.key === 'submitted' && (
-                        <small><i>Result</i> {p.target.noti ? <>{fmt(p.target.noti)} <Countdown deadline={p.target.noti} today={today} /></> : 'TBD'}</small>
+                        <small><i>Result</i> {p.target.noti ? <><Countdown deadline={p.target.noti} today={today} /> <span className="when">({fmt(p.target.noti)})</span></> : 'TBD'}</small>
                       )}
                     </span>
                   )}
