@@ -9,7 +9,7 @@ export default function Lab() {
   const { data, rows, today, save, remove, replaceAll, session, me, setMe } = useStore()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [role, setRole] = useState<Role>('MS')
+  const [role, setRole] = useState<Role>('')
   const file = useRef<HTMLInputElement>(null)
 
   const add = async () => {
@@ -110,7 +110,6 @@ export default function Lab() {
                       </select>
                     </td>
                     <td><input defaultValue={m.email} placeholder="email (links their login)" aria-label="Email" onBlur={(e) => e.target.value.trim() !== m.email && save('members', { ...m, email: e.target.value.trim() })} /></td>
-                    <td className="muted">owns {data.conferences.filter((c) => c.owner === m.name).length} conferences · on {data.papers.filter((p) => p.members.includes(m.name)).length} papers</td>
                     <td>
                       <button className="ghost" aria-label={`Remove ${m.name}`} onClick={() => confirm(`Remove ${m.name}? Their conferences and papers keep the name.`) && remove('members', m.id)}><Icon name="close" size={14} /></button>
                     </td>
@@ -123,7 +122,7 @@ export default function Lab() {
       ))}
       <div className="filters add-member">
         <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} />
-        <select value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label="Role">{ROLES.map((r) => <option key={r}>{r}</option>)}</select>
+        <select value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label="Role"><option value="">Role</option>{ROLES.map((r) => <option key={r}>{r}</option>)}</select>
         <input placeholder="Email (optional)" value={email} onChange={(e) => setEmail(e.target.value)} />
         <button className="primary" onClick={add}><Icon name="plus" size={14} /> Add member</button>
       </div>

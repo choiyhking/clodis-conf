@@ -548,3 +548,28 @@ td.conf { max-width: 184px; }
 .key-item b { color: var(--text); font-weight: 600; }
 .key-item .sw { margin-left: 0; width: 14px; height: 14px; }
 .tablewrap { max-height: calc(100vh - 190px); }
+
+/* multi-select filter */
+.mf { position: relative; }
+.mf-btn { gap: 8px; font-weight: 400; max-width: 190px; }
+.mf-btn span { overflow: hidden; text-overflow: ellipsis; }
+.mf-btn .icon { color: var(--muted); }
+.mf-btn.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+.mf-pop { position: absolute; z-index: 6; top: calc(100% + 4px); left: 0; min-width: 190px; max-height: 340px; overflow: auto; background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16); padding: 6px; }
+.mf-pop h3 { margin: 6px 8px 2px; }
+.mf-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+.mf-item:hover { background: var(--sunken); }
+.mf-clear { margin: 4px 2px 0; }
+
+/* the switch and the primary button share one height and text size */
+.only-ours, .filters button.primary { height: 32px; font-size: 13.5px; }
+.key-item { color: var(--text); }
+
+/* Targeting is the column that absorbs spare width (on wide screens the slack used to pile up after Status) */
+.sched th:nth-child(9), .sched td:nth-child(9) { width: 100%; max-width: 0; min-width: 194px; }
+.sched td:nth-child(9) .targeting { max-width: none; }
+.sched th:nth-child(10), .sched td:nth-child(10) { width: 1%; }
+
+/* …and the conference name shares that spare width, so long names are cut less on wide screens */
+.sched th:nth-child(2), .sched td.conf { width: 45%; max-width: 0; min-width: 184px; }
+.sched th:nth-child(9), .sched td:nth-child(9) { width: 55%; }

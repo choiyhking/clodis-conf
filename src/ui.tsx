@@ -367,6 +367,49 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
   )
 }
 
+// ---------- multi-select filter ----------
+export interface FilterOption { value: string; label: string; group?: string }
+/**
+ * A filter dropdown where several values can be ticked. Nothing ticked means "no filter".
+ * Options may be grouped (e.g. KIISE / BK21); the caller decides how groups combine.
+ */
+export function MultiFilter({ label, options, value, onChange }: { label: string; options: FilterOption[]; value: string[]; onChange: (v: string[]) => void }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const away = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false)
+    document.addEventListener('mousedown', away)
+    return () => document.removeEventListener('mousedown', away)
+  }, [open])
+  const toggle = (v: string) => onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v])
+  const chosen = options.filter((o) => value.includes(o.value))
+  const summary = chosen.length === 0 ? label : chosen.length <= 2 ? chosen.map((o) => o.label).join(', ') : `${chosen.length} selected`
+  const groups = [...new Set(options.map((o) => o.group ?? ''))]
+  return (
+    <div className="mf" ref={ref} onKeyDown={(e) => { if (e.key === 'Escape' && open) { e.stopPropagation(); setOpen(false) } }}>
+      <button type="button" className={'mf-btn' + (chosen.length ? ' on' : '')} onClick={() => setOpen(!open)} aria-haspopup="listbox" aria-expanded={open} aria-label={label}>
+        <span>{summary}</span> <Icon name="down" size={14} />
+      </button>
+      {open && (
+        <div className="mf-pop" role="listbox" aria-multiselectable>
+          {groups.map((g) => (
+            <div key={g || 'all'}>
+              {g && <h3>{g}</h3>}
+              {options.filter((o) => (o.group ?? '') === g).map((o) => (
+                <label key={o.value} className="mf-item">
+                  <input type="checkbox" checked={value.includes(o.value)} onChange={() => toggle(o.value)} /> {o.label}
+                </label>
+              ))}
+            </div>
+          ))}
+          <button type="button" className="ghost mf-clear" onClick={() => onChange([])} disabled={!chosen.length}>Clear</button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ---------- target picker ----------
 /** Dropdown for a paper's target: venue, deadline and time left side by side, with a search box. */
 function TargetPicker({ value, rows, today, onPick }: { value: PaperTarget | null; rows: Row[]; today: string; onPick: (r: Row | null) => void }) {
