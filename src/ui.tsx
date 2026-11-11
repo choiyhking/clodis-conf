@@ -89,7 +89,7 @@ export function Place({ location }: { location: string }) {
   if (!location) return <span className="muted">TBD</span>
   const flag = flagOf(location)
   return (
-    <span className="place">
+    <span className="place" title={location}>
       {flag && <span className="flag">{flag}</span>}
       {location}
     </span>
