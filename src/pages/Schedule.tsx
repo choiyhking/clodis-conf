@@ -7,6 +7,7 @@ import { isStale } from '../logic'
 
 const COLS = 10
 const PAST_DAYS = 365 // "Show past" goes back one year; older rows stay in the data but off the table
+const RECENT_DAYS = 7 // just-closed deadlines stay above the Today line this long
 
 export default function Schedule() {
   const { rows, data, today } = useStore()
@@ -34,12 +35,15 @@ export default function Schedule() {
   }, [data.papers])
   const areas = useMemo(() => [...new Set(data.conferences.map((c) => c.area).filter(Boolean))].sort(), [data.conferences])
 
+  const now = Date.now()
   const shown = rows.filter((r) => {
     const c = r.conf
     const tg = targets.get(`${r.confId}|${r.deadline}`)
     // A closed deadline stays visible while one of our papers is still under review there.
     const reviewing = tg?.some((p) => p.status === 'submitted')
-    if (r.deadline < today && !reviewing && (!past || r.deadline < addDays(today, -PAST_DAYS))) return false
+    // Closed is judged by the real closing moment, not the date: 17:00 PT on the 11th is still open on the morning of the 12th in Korea.
+    const closedFor = (now - r.at) / 86400000
+    if (closedFor > 0 && !reviewing && closedFor > (past ? PAST_DAYS : RECENT_DAYS)) return false
     if (area && c.area !== area) return false
     if (rank === 'S' && c.kiise !== 'S') return false
     if (rank === 'SA' && !c.kiise) return false
@@ -62,7 +66,7 @@ export default function Schedule() {
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, 4)
 
-  const firstFuture = shown.findIndex((r) => r.deadline >= today)
+  const firstFuture = shown.findIndex((r) => r.at > now)
   return (
     <section>
       <header className="page-head">
@@ -112,7 +116,7 @@ export default function Schedule() {
           <option value="estimated">Estimated</option>
         </select>
         <button className={'toggle' + (onlyTarget ? ' on' : '')} onClick={() => setOnlyTarget(!onlyTarget)} aria-pressed={onlyTarget}>Our targets</button>
-        <button className={'toggle' + (past ? ' on' : '')} onClick={() => setPast(!past)} aria-pressed={past} title="Also show deadlines from the last 12 months">Show past year</button>
+        <button className={'toggle' + (past ? ' on' : '')} onClick={() => setPast(!past)} aria-pressed={past} title="Deadlines closed in the last week are always shown above the Today line; this goes back 12 months">Show past year</button>
         <span className="grow" />
         <span className="legend"><i className="sw targeted" /> Targeted <i className="sw reviewing" /> Under review</span>
         <span className="muted">{shown.length} deadlines</span>
@@ -146,7 +150,7 @@ export default function Schedule() {
                       <td colSpan={COLS}><span>Today · {today}</span></td>
                     </tr>
                   )}
-                  <tr className={[tone, r.deadline < today ? 'past' : ''].join(' ')} onClick={() => setOpen(r)} tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpen(r)}>
+                  <tr className={[tone, r.at <= now ? 'past' : ''].join(' ')} onClick={() => setOpen(r)} tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpen(r)}>
                     <td><Rank conf={r.conf} /></td>
                     <td className="conf">
                       <div className="conf-top">
@@ -158,7 +162,7 @@ export default function Schedule() {
                     </td>
                     <td className={'date c' + est}>{fmt(r.abstract) || <span className="faint">–</span>}</td>
                     <td className={'date strong c' + est}>{fmt(r.deadline)}</td>
-                    <td className="c"><Countdown deadline={r.deadline} today={today} /></td>
+                    <td className="c"><Countdown deadline={r.deadline} today={today} at={r.at} /></td>
                     <td className={'date c emph' + (est || r.notiEstimated ? ' est' : '')}
                       title={r.noti && (est || r.notiEstimated) ? 'Estimated: the notification date has not been announced, so this is projected from the previous edition' : undefined}>{fmt(r.noti) || <span className="faint">TBD</span>}</td>
                     <td className="date c emph days">{r.noti ? `${diffDays(r.noti, r.deadline)}d` : <span className="faint">–</span>}</td>
@@ -178,7 +182,7 @@ export default function Schedule() {
                             <Avatars names={p.members} /> {p.title}
                           </button>
                         ))}
-                        {r.deadline >= today && (
+                        {r.at > now && (
                           <button className="ghost add" title="Target this deadline with one of our papers" onClick={() => setPick(r)}><Icon name="plus" size={14} /></button>
                         )}
                       </span>
