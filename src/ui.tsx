@@ -638,7 +638,8 @@ export function TargetModal({ row, onClose }: { row: Row; onClose: () => void })
   const [fresh, setFresh] = useState<Paper | null>(null)
   const target = { confId: row.confId, label: rowLabel(row), deadline: row.deadline, noti: row.noti }
   // Anything not currently under review or accepted can be pointed at this deadline.
-  const candidates = data.papers.filter((p) => p.status === 'research' || p.status === 'writing' || p.status === 'rejected')
+  // Papers already aimed at this very deadline are left out: there is nothing to choose for them.
+  const candidates = data.papers.filter((p) => (p.status === 'research' || p.status === 'writing' || p.status === 'rejected') && !(p.target?.confId === row.confId && p.target.deadline === row.deadline))
   const assign = async (p: Paper) => {
     const failed = p.status === 'rejected' && p.target && !p.history.some((h) => h.label === p.target!.label && h.deadline === p.target!.deadline)
     await save('papers', {
@@ -650,7 +651,6 @@ export function TargetModal({ row, onClose }: { row: Row; onClose: () => void })
     onClose()
   }
   if (fresh) return <PaperModal paper={fresh} isNew onClose={onClose} />
-  const here = (p: Paper) => p.target?.confId === row.confId && p.target.deadline === row.deadline
   const groups = [
     { title: 'No target yet', hint: 'Free to take this deadline', tone: 'free', papers: candidates.filter((p) => !p.target && p.status !== 'rejected') },
     { title: 'Rejected — needs a new venue', hint: '', tone: 'free', papers: candidates.filter((p) => p.status === 'rejected') },
@@ -669,14 +669,14 @@ export function TargetModal({ row, onClose }: { row: Row; onClose: () => void })
         <div key={g.title} className={`tm-group ${g.tone}`}>
           <h3>{g.title} <span>{g.papers.length}</span>{g.hint && <small>{g.hint}</small>}</h3>
           {g.papers.map((p) => (
-            <button key={p.id} className="mini" onClick={() => assign(p)} disabled={here(p)}>
+            <button key={p.id} className="mini" onClick={() => assign(p)}>
               <b title={p.members.join(', ')}>{p.title}</b>
-              {p.target && <span className="muted">{here(p) ? 'already here' : p.status === 'rejected' ? `was ${p.target.label}` : <>now <b>{p.target.label}</b> · {fmt(p.target.deadline)}</>}</span>}
+              {p.target && <span className="muted">{p.status === 'rejected' ? `was ${p.target.label}` : <>now <b>{p.target.label}</b> · {fmt(p.target.deadline)}</>}</span>}
             </button>
           ))}
         </div>
       ))}
-      {candidates.length === 0 && <p className="muted">No papers yet. Add ongoing work on the Papers page, or start one here.</p>}
+      {candidates.length === 0 && <p className="muted">No other papers to choose from. Add ongoing work on the Papers page, or start one here.</p>}
       <footer>
         <button onClick={() => setFresh(newPaper(me, today, row))}><Icon name="plus" size={14} /> New paper</button>
         <span className="grow" />
