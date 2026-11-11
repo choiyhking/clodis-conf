@@ -675,11 +675,14 @@ html { scrollbar-gutter: stable; }
 .tl-paper .p-title { font-weight: 500; }
 /* owner in the normal text colour; Changed / Re-check sit on their own line under the status so they are never cut off */
 .owner-name { color: var(--text); }
-.sched td:nth-child(10) > .tag { display: flex; width: fit-content; margin: 3px 0 0; height: 17px; font-size: 10.5px; }
-.sched td:nth-child(10) > .tag + .tag { display: inline-flex; }
 /* Changed / Re-check go back beside the status; the column is just wide enough to hold owner + status + one tag */
-.sched td:nth-child(10) { white-space: nowrap; }
-.sched td:nth-child(10) > .tag, .sched td:nth-child(10) > .tag + .tag { display: inline-flex; width: auto; margin: 0 0 0 5px; vertical-align: middle; padding: 0 5px; }
 .owner-name { width: 40px; }
 .sched col.c-status { width: 212px; }
 .sched col.c-status { width: 198px; }
+
+/* owner and status are separate columns: owner centred (a dash when nobody owns it), status with its tags */
+.sched col.c-owner { width: 64px; } .sched col.c-status { width: 156px; }
+.owner-name { display: block; width: auto; text-align: center; color: var(--text); }
+.owner-name.none { color: var(--faint); }
+.sched td.st-cell { white-space: nowrap; }
+.sched td.st-cell > .tag { display: inline-flex; margin-left: 5px; vertical-align: middle; padding: 0 5px; height: 17px; font-size: 10.5px; }
