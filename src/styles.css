@@ -614,3 +614,10 @@ td.conf { max-width: 184px; }
 /* keep the scrollbar's space reserved, so a short (filtered) list is laid out exactly like the full one */
 .tablewrap { scrollbar-gutter: stable; }
 html { scrollbar-gutter: stable; }
+
+/* Targeting holds one chip and a +N, so it gets a set width; names and locations share what is left */
+.sched col.c-target { width: 172px; }
+.sched col.c-conf { width: 56%; } .sched col.c-loc { width: 44%; }
+.targeting.none { justify-content: flex-start; }
+.sched col.c-target { width: 140px; }
+.sched col.c-conf { width: 52%; } .sched col.c-loc { width: 48%; }
