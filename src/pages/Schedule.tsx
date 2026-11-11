@@ -171,7 +171,10 @@ export default function Schedule() {
                       </span>
                     </td>
                     <td>
-                      <span className="owner-status"><Avatar name={r.conf.owner} size={20} /> <StatusBadge row={r} compact /></span>
+                      <span className="owner-status">
+                        {r.conf.owner ? <Avatar name={r.conf.owner} size={20} /> : <span className="avatar none" title="No owner assigned" style={{ width: 20, height: 20 }} />}
+                        <StatusBadge row={r} compact />
+                      </span>
                       {r.autoDiff && <span className="tag warn" title={`Collected value: ${fmt(r.autoDiff.deadline)}`}>Changed</span>}
                       {isStale(r, today) && <span className="tag" title={`Last checked ${fmt(r.checkedAt) || 'never'}`}>Re-check</span>}
                     </td>
