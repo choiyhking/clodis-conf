@@ -1,13 +1,33 @@
 import { addDays, rowLabel } from './logic'
-import type { Member, Paper, PaperHistory, PaperTarget, Row } from './types'
+import type { Deadline, Member, Paper, PaperHistory, PaperTarget, Role, Row } from './types'
 
 export const DEMO_PREFIX = 'demo-'
+export const isDemo = (x: { id: string }) => x.id.startsWith(DEMO_PREFIX)
+
+export interface DemoData {
+  members: Member[]
+  papers: Paper[]
+  deadlines: Deadline[]
+}
 
 /**
- * Sample papers covering every status, built from the real deadlines so dates line up with the other pages.
- * Ids start with "demo-" so they can be removed again without touching real data.
+ * Sample data that exercises every feature: extra members in different roles, papers in every status
+ * (with links, notes and rejection history), and deadlines in every trust state (freshly verified,
+ * due for a re-check, and disagreeing with the collector).
+ *
+ * Everything is built from the real deadlines so the dates line up across pages, and every id starts
+ * with "demo-" so it can all be removed again without touching real data.
  */
-export function demoPapers(rows: Row[], members: Member[], today: string): Paper[] {
+export function demoData(rows: Row[], members: Member[], today: string): DemoData {
+  const extra: Member[] = [
+    { id: `${DEMO_PREFIX}m1`, name: '김하늘', email: '', role: 'Postdoc' },
+    { id: `${DEMO_PREFIX}m2`, name: '이서준', email: '', role: 'PhD' },
+    { id: `${DEMO_PREFIX}m3`, name: '정다은', email: '', role: 'MS' },
+    { id: `${DEMO_PREFIX}m4`, name: '한지호', email: '', role: 'Undergrad' },
+  ].filter((m) => !members.some((x) => x.name === m.name)) as Member[]
+  const all = [...members, ...extra]
+
+  // ---------- papers ----------
   const target = (r: Row): PaperTarget => ({ confId: r.confId, label: rowLabel(r), deadline: r.deadline, noti: r.noti })
   const used = new Set<string>()
   const pick = (ok: (r: Row) => boolean, prefer: string[] = []) => {
@@ -18,35 +38,84 @@ export function demoPapers(rows: Row[], members: Member[], today: string): Paper
   }
   const upcoming = (min: number, max: number) => (r: Row) => r.deadline >= addDays(today, min) && r.deadline <= addDays(today, max)
   const inReview = (r: Row) => r.deadline < today && !!r.noti && r.noti > today
-  const decided = (r: Row) => !!r.noti && r.noti < today && r.noti > addDays(today, -150)
-  const past = (r: Row, h: 'accepted' | 'rejected'): PaperHistory => ({ label: rowLabel(r), deadline: r.deadline, result: h, date: r.noti || r.deadline })
+  const decided = (r: Row) => !!r.noti && r.noti < today && r.noti > addDays(today, -200)
+  const longAgo = (r: Row) => !!r.noti && r.noti < addDays(today, -60) && r.deadline > addDays(today, -360)
+  const past = (r: Row | undefined, result: 'accepted' | 'rejected'): PaperHistory[] =>
+    r ? [{ label: rowLabel(r), deadline: r.deadline, result, date: r.noti || r.deadline }] : []
 
-  const students = members.filter((m) => m.role !== 'Professor').map((m) => m.name)
-  const prof = members.find((m) => m.role === 'Professor')?.name
-  const who = (i: number, withProf = false) => [students[i % Math.max(1, students.length)], ...(withProf && prof ? [prof] : [])].filter(Boolean) as string[]
+  const prof = all.find((m) => m.role === 'Professor')?.name
+  const people = all.filter((m) => m.role !== 'Professor').map((m) => m.name)
+  const who = (...idx: number[]) => [...new Set(idx.map((i) => people[i % Math.max(1, people.length)]))].filter(Boolean)
+  const withProf = (names: string[]) => (prof ? [...names, prof] : names)
+  const link = (kind: string, slug: string) => `https://example.com/${kind}/${slug}`
 
-  const soon = pick(upcoming(10, 60), ['mobisys', 'osdi', 'dsn'])
-  const later = pick(upcoming(60, 150), ['ndss', 'sigmod', 'nsdi'])
-  const far = pick(upcoming(150, 260), ['sosp', 'ccs', 'eurosys'])
-  const review1 = pick(inReview, ['conext', 'eurosys', 'asplos'])
-  const review2 = pick(inReview, ['fast', 'nsdi', 'www'])
-  const won = pick(decided, ['socc', 'sigmetrics', 'ccs'])
-  const lost = pick(decided, ['usenix-security', 'ndss', 'imc'])
-  const lostEarlier = pick((r) => !!r.noti && r.noti < addDays(today, -60) && r.deadline > addDays(today, -330), ['snp', 'sosp', 'sigmod'])
+  const soon = pick(upcoming(5, 30), ['mobisys', 'osdi', 'dsn'])
+  const month = pick(upcoming(30, 75), ['ndss', 'sigmod', 'nsdi'])
+  const quarter = pick(upcoming(75, 150), ['sosp', 'eurosys', 'atc'])
+  const far = pick((r) => upcoming(150, 300)(r) && r.status === 'estimated', ['ccs', 'usenix-security', 'socc'])
+  const rev1 = pick(inReview, ['eurosys', 'conext', 'asplos'])
+  const rev2 = pick(inReview, ['fast', 'nsdi', 'www'])
+  const rev3 = pick(inReview, ['sigmetrics', 'icde', 'infocom'])
+  const won1 = pick(decided, ['socc', 'ccs', 'imc'])
+  const won2 = pick(decided, ['icdcs', 'middleware', 'cluster'])
+  const lost1 = pick(decided, ['usenix-security', 'ndss', 'sensys'])
+  const lost2 = pick(decided, ['sc', 'hpdc', 'icpp'])
+  const old1 = pick(longAgo, ['sosp', 'snp', 'sigmod'])
+  const old2 = pick(longAgo, ['osdi', 'vldb', 'kdd'])
 
-  const papers: (Omit<Paper, 'id' | 'note' | 'link'> & { note?: string })[] = [
-    { title: 'LLM-seccomp', group: 'Container security', members: who(0, true), start: addDays(today, -95), status: 'writing', target: soon ? target(soon) : null, history: [], note: 'Evaluation section still missing the Firecracker baseline.' },
-    {
-      title: 'Namespace escape audit', group: 'Container security', members: who(1), start: addDays(today, -300), status: 'writing', target: later ? target(later) : null,
-      history: [lostEarlier && past(lostEarlier, 'rejected'), lost && past(lost, 'rejected')].filter(Boolean) as PaperHistory[],
-      note: 'Third attempt. Reviewers asked for a larger corpus both times.',
-    },
-    { title: 'eBPF database tracing', group: 'Systems performance', members: [...who(2), ...who(0)].filter((v, i, a) => a.indexOf(v) === i), start: addDays(today, -30), status: 'writing', target: far ? target(far) : null, history: [] },
-    { title: 'LogNER', group: 'Systems performance', members: who(2), start: addDays(today, -20), status: 'research', target: null, history: [], note: 'Need to decide between a systems venue and an NLP one.' },
-    { title: 'MicroVM for IoT gateways', group: 'IoT', members: who(1, true), start: addDays(today, -210), status: 'submitted', target: review1 ? target(review1) : null, history: [] },
-    { title: 'Web crawling at the edge', group: 'IoT', members: who(0), start: addDays(today, -160), status: 'submitted', target: review2 ? target(review2) : null, history: [] },
-    { title: 'Sandbox policy synthesis', group: 'Container security', members: who(2, true), start: addDays(today, -260), status: 'accepted', target: won ? target(won) : null, history: won ? [past(won, 'accepted')] : [] },
-    { title: 'Sensor firmware diffing', group: 'IoT', members: who(1), start: addDays(today, -240), status: 'rejected', target: lost ? target(lost) : null, history: lost ? [past(lost, 'rejected')] : [], note: 'Just came back. Pick the next venue.' },
+  type Draft = Omit<Paper, 'id' | 'link' | 'note' | 'links'> & { note?: string; links?: string[] }
+  const drafts: Draft[] = [
+    // Researching: no venue yet
+    { title: 'LogNER', group: 'Log analysis', members: who(2), start: addDays(today, -25), status: 'research', target: null, history: [],
+      note: 'Named-entity recognition on raw system logs. Deciding between a systems venue and an NLP one.', links: [link('overleaf', 'logner')] },
+    { title: 'Edge cache placement', group: 'IoT & edge', members: who(4, 6), start: addDays(today, -12), status: 'research', target: null, history: [] },
+    { title: 'Cgroup accounting drift', group: 'Resource monitoring', members: withProf(who(5)), start: addDays(today, -60), status: 'research', target: null, history: [],
+      note: 'Measurement study. Needs two more clusters before it is a paper.' },
+
+    // In progress: aimed at a deadline
+    { title: 'LLM-seccomp', group: 'Container security', members: withProf(who(0)), start: addDays(today, -95), status: 'writing', target: soon ? target(soon) : null, history: [],
+      note: 'Evaluation still missing the Firecracker baseline.', links: [link('overleaf', 'llm-seccomp'), link('github', 'llm-seccomp'), link('slides', 'llm-seccomp-labmeeting')] },
+    { title: 'Namespace escape audit', group: 'Container security', members: who(1, 3), start: addDays(today, -320), status: 'writing', target: month ? target(month) : null,
+      history: [...past(old1, 'rejected'), ...past(lost1, 'rejected')], note: 'Third attempt. Reviewers asked for a larger corpus both times.', links: [link('overleaf', 'ns-audit')] },
+    { title: 'eBPF database tracing', group: 'Resource monitoring', members: who(2, 0), start: addDays(today, -40), status: 'writing', target: quarter ? target(quarter) : null, history: [] },
+    { title: 'Anomaly triage with small LMs', group: 'Log analysis', members: who(4), start: addDays(today, -15), status: 'writing', target: far ? target(far) : null, history: [],
+      note: 'Target date is still an estimate from last year.' },
+
+    // Under review
+    { title: 'MicroVM for IoT gateways', group: 'IoT & edge', members: withProf(who(1)), start: addDays(today, -230), status: 'submitted', target: rev1 ? target(rev1) : null, history: [], links: [link('overleaf', 'microvm')] },
+    { title: 'Web crawling at the edge', group: 'IoT & edge', members: who(0, 6), start: addDays(today, -170), status: 'submitted', target: rev2 ? target(rev2) : null, history: past(old2, 'rejected') },
+    { title: 'Burst-aware autoscaling', group: 'Resource monitoring', members: who(3, 5), start: addDays(today, -140), status: 'submitted', target: rev3 ? target(rev3) : null, history: [] },
+
+    // Decided
+    { title: 'Sandbox policy synthesis', group: 'Container security', members: withProf(who(2)), start: addDays(today, -280), status: 'accepted', target: won1 ? target(won1) : null, history: past(won1, 'accepted'),
+      links: [link('overleaf', 'sandbox-policy'), link('github', 'sandbox-policy')] },
+    { title: 'Log template drift', group: 'Log analysis', members: who(3, 4), start: addDays(today, -400), status: 'accepted', target: won2 ? target(won2) : null, history: [...past(old1, 'rejected'), ...past(won2, 'accepted')] },
+    { title: 'Sensor firmware diffing', group: 'IoT & edge', members: who(1), start: addDays(today, -250), status: 'rejected', target: lost1 ? target(lost1) : null, history: past(lost1, 'rejected'),
+      note: 'Just came back. Pick the next venue.' },
+    { title: 'GPU sharing fairness', group: 'Resource monitoring', members: who(5, 6), start: addDays(today, -210), status: 'rejected', target: lost2 ? target(lost2) : null, history: past(lost2, 'rejected') },
   ]
-  return papers.map((p, i) => ({ note: '', link: '', ...p, id: `${DEMO_PREFIX}${i + 1}` }))
+  const papers: Paper[] = drafts.map((p, i) => ({ note: '', links: [], ...p, link: '', id: `${DEMO_PREFIX}p${i + 1}` }))
+
+  // ---------- deadlines in each trust state ----------
+  // Only collected-but-unsaved rows are used, so removing the samples simply reveals the collected values again.
+  const candidates = rows.filter((r) => r.virtual && r.status === 'auto' && r.deadline > addDays(today, 20))
+  const owners = (r: Row) => r.conf.owner || people[0] || ''
+  const asDoc = (r: Row, patch: Partial<Deadline>): Deadline => ({
+    id: `${DEMO_PREFIX}d-${r.id}`, confId: r.confId, year: r.year, round: r.round, abstract: r.abstract, deadline: r.deadline, noti: r.noti,
+    event: r.event, location: r.location, url: r.url, status: 'verified', checkedAt: today, checkedBy: owners(r), source: 'manual', note: '', ...patch,
+  })
+  const deadlines: Deadline[] = [
+    ...candidates.slice(0, 3).map((r, i) => asDoc(r, { checkedAt: addDays(today, -1 - i) })), // freshly verified
+    ...candidates.slice(3, 6).map((r, i) => asDoc(r, { checkedAt: addDays(today, -60 - i * 9) })), // verified long ago → Re-check
+    // verified with the old date, then the collector found a later one → Changed (a deadline extension)
+    ...candidates.slice(6, 8).map((r) => asDoc(r, { deadline: addDays(r.deadline, -7), abstract: r.abstract ? addDays(r.abstract, -7) : '', checkedAt: addDays(today, -12) })),
+  ]
+
+  return { members: extra, papers, deadlines }
+}
+
+/** Members whose role is unset get one, so the sample groups sensibly on the Timeline. */
+export function withSampleRoles(members: Member[]): Member[] {
+  const fill: Role[] = ['PhD', 'MS']
+  return members.map((m, i) => (m.role ? m : { ...m, role: fill[i % 2] }))
 }

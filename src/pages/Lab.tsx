@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
-import { DEMO_PREFIX, demoPapers } from '../demo'
-import { ICON_CHOICES, ROLE_ICON, roleRank, sortMembers, uid } from '../logic'
+import { demoData, isDemo, withSampleRoles } from '../demo'
+import { roleRank, sortMembers, uid } from '../logic'
 import { MODE, loadSeed, supabase, useStore } from '../store'
 import { ROLES, type Data, type Member, type Role } from '../types'
 import { Avatar, Icon } from '../ui'
@@ -33,7 +33,7 @@ export default function Lab() {
   const exportJson = () => {
     const a = document.createElement('a')
     a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }))
-    a.download = `camera-ready-backup-${new Date().toISOString().slice(0, 10)}.json`
+    a.download = `clodis-conf-backup-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(a.href)
   }
@@ -55,15 +55,21 @@ export default function Lab() {
     await replaceAll(MODE === 'local' ? s : { ...s, papers: data.papers, members: data.members.length ? data.members : s.members })
   }
 
-  const hasDemo = data.papers.some((p) => p.id.startsWith(DEMO_PREFIX))
+  const hasDemo = [...data.papers, ...data.members, ...data.deadlines].some(isDemo)
+  /** Fill the site with removable examples of every feature (see demo.ts). */
   const loadDemo = async () => {
-    // Roles drive the grouping on the Timeline, so give unset members one to make the sample readable.
-    const withRoles = data.members.map((m, i) => (m.role ? m : { ...m, role: (i % 2 ? 'PhD' : 'MS') as Role }))
-    for (const m of withRoles) if (m.role !== data.members.find((x) => x.id === m.id)!.role) await save('members', m)
-    for (const p of demoPapers(rows, withRoles, today)) await save('papers', p)
+    const roled = withSampleRoles(data.members)
+    for (const m of roled) if (m.role !== data.members.find((x) => x.id === m.id)!.role) await save('members', m)
+    const demo = demoData(rows, roled, today)
+    for (const m of demo.members) await save('members', m)
+    for (const d of demo.deadlines) await save('deadlines', d)
+    for (const p of demo.papers) await save('papers', p)
   }
   const clearDemo = async () => {
-    for (const p of data.papers.filter((p) => p.id.startsWith(DEMO_PREFIX))) await remove('papers', p.id)
+    if (!confirm('Remove all sample members, papers and deadlines? Real data is not touched.')) return
+    for (const p of data.papers.filter(isDemo)) await remove('papers', p.id)
+    for (const d of data.deadlines.filter(isDemo)) await remove('deadlines', d.id)
+    for (const m of data.members.filter(isDemo)) await remove('members', m.id)
   }
 
   const members = sortMembers(data.members)
@@ -90,12 +96,6 @@ export default function Lab() {
                     <td className="m-name">
                       <Avatar name={m.name} size={26} />
                       <input defaultValue={m.name} key={m.name} aria-label="Name" onBlur={(e) => rename(m, e.target.value)} onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()} />
-                    </td>
-                    <td className="m-icon">
-                      <select value={m.icon ?? ''} onChange={(e) => save('members', { ...m, icon: e.target.value })} aria-label="Icon" title="Icon shown for this person">
-                        <option value="">{ROLE_ICON[m.role] ? `${ROLE_ICON[m.role]} default` : 'Initials'}</option>
-                        {ICON_CHOICES.map((i) => <option key={i} value={i}>{i}</option>)}
-                      </select>
                     </td>
                     <td>
                       <select value={m.role} onChange={(e) => save('members', { ...m, role: e.target.value as Role })} aria-label="Role">
@@ -153,7 +153,7 @@ export default function Lab() {
           <button onClick={() => file.current?.click()}>Restore backup</button>
           <input ref={file} type="file" accept="application/json" hidden onChange={(e) => e.target.files?.[0] && importJson(e.target.files[0])} />
           <button onClick={seed}>{MODE === 'local' ? 'Reset to spreadsheet data' : 'Import spreadsheet data'}</button>
-          {hasDemo ? <button onClick={clearDemo}>Remove sample papers</button> : <button onClick={loadDemo}>Load sample papers</button>}
+          {hasDemo ? <button onClick={clearDemo}>Remove sample data</button> : <button onClick={loadDemo}>Load sample data</button>}
           {supabase && session && <button onClick={() => supabase!.auth.signOut()}>Sign out</button>}
         </div>
       </div>

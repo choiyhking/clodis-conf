@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { APP_NAME, isStale, newSites, sortMembers } from './logic'
+import { APP_NAME, LAB_NAME, isStale, newSites, sortMembers } from './logic'
 import Inbox from './pages/Inbox'
 import Lab from './pages/Lab'
 import Papers from './pages/Papers'
@@ -21,8 +21,9 @@ const isTab = (h: string): h is Tab => TABS.some((t) => t.key === h)
 const Logo = () => (
   <svg className="logo" viewBox="0 0 32 32" aria-hidden>
     <rect width="32" height="32" rx="8" />
-    <path d="M9 21V11h9l5 5v5z" fill="none" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
-    <path d="m12.5 17 2.5 2.5 5-5.5" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M10.5 22h11.8a4.2 4.2 0 0 0 .6-8.36A6.3 6.3 0 0 0 10.9 14.6 3.75 3.75 0 0 0 10.5 22Z" fill="none" stroke="#fff" strokeWidth="1.9" strokeLinejoin="round" />
+    <path d="M12.6 18.2h6.8M16 18.2v-3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="12.6" cy="18.2" r="1.35" fill="#fff" /><circle cx="19.4" cy="18.2" r="1.35" fill="#fff" /><circle cx="16" cy="15" r="1.35" fill="#fff" />
   </svg>
 )
 
@@ -70,7 +71,7 @@ export default function App() {
   return (
     <div className="app">
       <aside className="side">
-        <div className="brand"><Logo /> <b>{APP_NAME}</b></div>
+        <div className="brand" title={LAB_NAME}><Logo /> <span><b>{APP_NAME}</b><small className="muted">Deadlines &amp; papers</small></span></div>
         <nav>
           {TABS.map((t) => (
             <button key={t.key} className={tab === t.key ? 'on' : ''} onClick={() => setTab(t.key)} aria-current={tab === t.key ? 'page' : undefined}>

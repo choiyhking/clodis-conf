@@ -238,7 +238,10 @@ td.conf { max-width: 208px; }
 .drawer h2 small { font-weight: 500; color: var(--muted); font-size: 15px; }
 .fullname { color: var(--muted); margin-top: 4px; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 18px; align-items: center; }
-.tags .tag { height: 24px; }
+/* Drawer facts read as one row of equal chips: same size, full-strength text. */
+.tags .tag, .tags .pill { height: 26px; font-size: 12.5px; font-weight: 500; }
+.tags .tag { padding: 0 10px; color: var(--text); background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); }
+.tags .pill { min-width: 26px; font-weight: 700; }
 .steps { list-style: none; margin: 0 0 18px; padding: 0; border-left: 2px solid var(--line); margin-left: 5px; }
 .steps li { position: relative; padding: 0 0 14px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; }
 .steps li:last-child { padding-bottom: 0; }
@@ -389,8 +392,6 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
 .activity .who { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* role icons, paper links, backup plan */
-.avatar.emoji { color: inherit; letter-spacing: 0; line-height: 1; font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif; }
-.m-icon { width: 150px; }
 .links { display: flex; flex-direction: column; gap: 6px; }
 .links .btn { padding: 0 9px; }
 .add-link { align-self: flex-start; }
@@ -400,3 +401,7 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
 .fallback li button { height: 26px; font-size: 12px; }
 .nobody { color: var(--muted); margin-bottom: 8px; }
 .nobody b { color: var(--text); font-weight: 700; }
+
+.brand > span { display: flex; flex-direction: column; line-height: 1.2; }
+.brand small { font-size: 11px; }
+.nobody { margin-bottom: 8px; }

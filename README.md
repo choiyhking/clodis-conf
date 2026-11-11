@@ -1,6 +1,6 @@
-# Camera Ready
+# CLODIS Conf
 
-A small lab tool for conference deadlines and paper planning: which conferences we care about, when they're due,
+The CLODIS (Cloud & Distributed Systems Lab, KNU) tool for conference deadlines and paper planning: which conferences we care about, when they're due,
 who is aiming at which one, and how past submissions went.
 
 ## Pages

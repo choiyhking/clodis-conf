@@ -111,7 +111,6 @@ export interface Member {
   name: string
   email: string
   role: Role
-  icon?: string // emoji shown as this person's avatar; empty = the default for their role
 }
 
 /** One line of the activity log: who changed what, and when. */
