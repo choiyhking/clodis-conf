@@ -39,7 +39,9 @@ export function demoData(rows: Row[], members: Member[], today: string): DemoDat
   const upcoming = (min: number, max: number) => (r: Row) => r.deadline >= addDays(today, min) && r.deadline <= addDays(today, max)
   const inReview = (r: Row) => r.deadline < today && !!r.noti && r.noti > today
   const decided = (r: Row) => !!r.noti && r.noti < today && r.noti > addDays(today, -200)
-  const longAgo = (r: Row) => !!r.noti && r.noti < addDays(today, -60) && r.deadline > addDays(today, -360)
+  /** A decided deadline whose result arrived comfortably before `next` was due: a believable earlier attempt. */
+  const before = (next: Row | undefined, prefer: string[] = []) =>
+    next ? pick((r) => !!r.noti && r.noti < today && r.noti < addDays(next.deadline, -20) && r.deadline > addDays(next.deadline, -400), prefer) : undefined
   const past = (r: Row | undefined, result: 'accepted' | 'rejected'): PaperHistory[] =>
     r ? [{ label: rowLabel(r), deadline: r.deadline, result, date: r.noti || r.deadline }] : []
 
@@ -60,8 +62,10 @@ export function demoData(rows: Row[], members: Member[], today: string): DemoDat
   const won2 = pick(decided, ['icdcs', 'middleware', 'cluster'])
   const lost1 = pick(decided, ['usenix-security', 'ndss', 'sensys'])
   const lost2 = pick(decided, ['sc', 'hpdc', 'icpp'])
-  const old1 = pick(longAgo, ['sosp', 'snp', 'sigmod'])
-  const old2 = pick(longAgo, ['osdi', 'vldb', 'kdd'])
+  const auditTry2 = before(month, ['usenix-security', 'ccs', 'ndss']) // Namespace escape audit: second rejection
+  const auditTry1 = before(auditTry2, ['sosp', 'snp', 'osdi']) // …and the first
+  const crawlTry = before(rev2, ['eurosys', 'atc', 'sosp'])
+  const driftTry = before(won2, ['kdd', 'vldb', 'sigmod'])
 
   type Draft = Omit<Paper, 'id' | 'link' | 'note' | 'links'> & { note?: string; links?: string[] }
   const drafts: Draft[] = [
@@ -75,21 +79,21 @@ export function demoData(rows: Row[], members: Member[], today: string): DemoDat
     // In progress: aimed at a deadline
     { title: 'LLM-seccomp', group: 'Container security', members: withProf(who(0)), start: addDays(today, -95), status: 'writing', target: soon ? target(soon) : null, history: [],
       note: 'Evaluation still missing the Firecracker baseline.', links: [link('overleaf', 'llm-seccomp'), link('github', 'llm-seccomp'), link('slides', 'llm-seccomp-labmeeting')] },
-    { title: 'Namespace escape audit', group: 'Container security', members: who(1, 3), start: addDays(today, -320), status: 'writing', target: month ? target(month) : null,
-      history: [...past(old1, 'rejected'), ...past(lost1, 'rejected')], note: 'Third attempt. Reviewers asked for a larger corpus both times.', links: [link('overleaf', 'ns-audit')] },
+    { title: 'Namespace escape audit', group: 'Container security', members: who(1, 3), start: addDays(today, -520), status: 'writing', target: month ? target(month) : null,
+      history: [...past(auditTry1, 'rejected'), ...past(auditTry2, 'rejected')], note: 'Third attempt. Reviewers asked for a larger corpus both times.', links: [link('overleaf', 'ns-audit')] },
     { title: 'eBPF database tracing', group: 'Resource monitoring', members: who(2, 0), start: addDays(today, -40), status: 'writing', target: quarter ? target(quarter) : null, history: [] },
     { title: 'Anomaly triage with small LMs', group: 'Log analysis', members: who(4), start: addDays(today, -15), status: 'writing', target: far ? target(far) : null, history: [],
       note: 'Target date is still an estimate from last year.' },
 
     // Under review
     { title: 'MicroVM for IoT gateways', group: 'IoT & edge', members: withProf(who(1)), start: addDays(today, -230), status: 'submitted', target: rev1 ? target(rev1) : null, history: [], links: [link('overleaf', 'microvm')] },
-    { title: 'Web crawling at the edge', group: 'IoT & edge', members: who(0, 6), start: addDays(today, -170), status: 'submitted', target: rev2 ? target(rev2) : null, history: past(old2, 'rejected') },
+    { title: 'Web crawling at the edge', group: 'IoT & edge', members: who(0, 6), start: addDays(today, -420), status: 'submitted', target: rev2 ? target(rev2) : null, history: past(crawlTry, 'rejected') },
     { title: 'Burst-aware autoscaling', group: 'Resource monitoring', members: who(3, 5), start: addDays(today, -140), status: 'submitted', target: rev3 ? target(rev3) : null, history: [] },
 
     // Decided
     { title: 'Sandbox policy synthesis', group: 'Container security', members: withProf(who(2)), start: addDays(today, -280), status: 'accepted', target: won1 ? target(won1) : null, history: past(won1, 'accepted'),
       links: [link('overleaf', 'sandbox-policy'), link('github', 'sandbox-policy')] },
-    { title: 'Log template drift', group: 'Log analysis', members: who(3, 4), start: addDays(today, -400), status: 'accepted', target: won2 ? target(won2) : null, history: [...past(old1, 'rejected'), ...past(won2, 'accepted')] },
+    { title: 'Log template drift', group: 'Log analysis', members: who(3, 4), start: addDays(today, -400), status: 'accepted', target: won2 ? target(won2) : null, history: [...past(driftTry, 'rejected'), ...past(won2, 'accepted')] },
     { title: 'Sensor firmware diffing', group: 'IoT & edge', members: who(1), start: addDays(today, -250), status: 'rejected', target: lost1 ? target(lost1) : null, history: past(lost1, 'rejected'),
       note: 'Just came back. Pick the next venue.' },
     { title: 'GPU sharing fairness', group: 'Resource monitoring', members: who(5, 6), start: addDays(today, -210), status: 'rejected', target: lost2 ? target(lost2) : null, history: past(lost2, 'rejected') },

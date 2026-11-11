@@ -425,3 +425,14 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
 .fallback .when-date { font-variant-numeric: tabular-nums; }
 .fallback li { grid-template-columns: minmax(0, 1.1fr) 96px minmax(0, 1fr) auto; }
 .lg.todo { position: static; display: inline-block; box-shadow: none; padding: 0; border-radius: 3px; border-left: 1.5px dashed var(--writing); }
+
+/* timeline: earlier attempts are part of the bar, and their results are as visible as the current one */
+.bar.try { background: color-mix(in srgb, var(--rejected) 26%, var(--surface)); box-shadow: inset -3px 0 0 color-mix(in srgb, var(--rejected) 70%, var(--surface)); }
+.bar.try span { color: color-mix(in srgb, var(--rejected) 75%, var(--text)); }
+.bar.try.res-accepted { background: color-mix(in srgb, var(--accepted) 30%, var(--surface)); box-shadow: inset -3px 0 0 var(--accepted); }
+.bar.try.res-accepted span { color: var(--ok); }
+.rev.faded { opacity: 0.4; }
+.result.res-rejected { background: var(--rejected); border-color: var(--rejected); }
+.result.res-accepted { background: var(--accepted); border-color: var(--accepted); }
+.result.res-withdrawn { background: var(--faint); border-color: var(--faint); }
+.lg.try { background: color-mix(in srgb, var(--rejected) 26%, var(--surface)); box-shadow: inset -3px 0 0 color-mix(in srgb, var(--rejected) 70%, var(--surface)); }

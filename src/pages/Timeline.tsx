@@ -59,7 +59,7 @@ export default function Timeline() {
   const lanes = Math.max(1, ...keys.map((k) => k.lane + 1))
 
   const visible = (p: Paper) => {
-    const last = p.target?.noti || p.target?.deadline || today
+    const last = [p.target?.noti, p.target?.deadline, ...p.history.map((h) => h.date)].filter(Boolean).sort().pop() || today
     return p.status === 'research' || p.status === 'writing' || p.status === 'submitted' || last >= start
   }
   const groups: { key: string; head: ReactNode; papers: Paper[] }[] =
@@ -89,7 +89,24 @@ export default function Timeline() {
   const bar = (p: Paper) => {
     const t = p.target
     const working = p.status === 'research' || p.status === 'writing'
-    const from = p.start && p.start > start ? p.start : start
+    const fits = (pct: number, label: string) => (pct / 100) * width > label.length * 6.5 + 20
+
+    // Earlier attempts, oldest first. Each one runs from where the previous ended to its own submission,
+    // then waits for its result; the current attempt only starts once the last result came back. (The
+    // current target's own history entry, written when it is decided, is drawn as the current bar.)
+    const prior = p.history
+      .filter((h) => !(t && h.label === t.label && h.deadline === t.deadline))
+      .sort((a, b) => a.deadline.localeCompare(b.deadline))
+    // A recorded start later than the first submission can't be right; assume work began a few months before it.
+    const firstTry = prior[0] ? fromMs(toMs(prior[0].deadline) - 120 * 86400000) : ''
+    let cursor = p.start && (!firstTry || p.start < firstTry) ? p.start : firstTry || start
+    const tries = prior.map((h) => {
+      const seg = { h, from: cursor, back: h.date > h.deadline ? h.date : h.deadline }
+      cursor = seg.back
+      return seg
+    })
+
+    const from = cursor > start ? cursor : start
     const to = t?.deadline ?? today
     const show = to > start && from < end && from < to
     const w = x(to) - x(from)
@@ -97,24 +114,42 @@ export default function Timeline() {
     // While a paper is being written, only the time already spent is filled in; the stretch from today to the
     // deadline is drawn as an outline, so the bar reads as "this far, this much to go".
     const split = working && !!t && today > from && today < to
-    const fits = (pct: number) => !!t && (pct / 100) * width > t.label.length * 6.5 + 20
     const restW = x(to) - x(today)
     return (
       <>
+        {tries.map(({ h, from: f, back }, i) => {
+          const a = f > start ? f : start
+          const wide = x(h.deadline) - x(a)
+          return (
+            <span key={i}>
+              {h.deadline > start && a < end && a < h.deadline && (
+                <div className={`bar try res-${h.result}`} style={{ left: `${x(a)}%`, width: `${wide}%` }} title={`Earlier attempt: ${h.label}, submitted ${fmt(h.deadline)}`}>
+                  {fits(wide, h.label) && <span>{h.label}</span>}
+                </div>
+              )}
+              {back > h.deadline && back > start && h.deadline < end && <div className="rev faded" style={{ left: `${x(h.deadline)}%`, width: `${x(back) - x(h.deadline)}%` }} />}
+              {inWin(back) && (
+                <i className={`result res-${h.result}`} style={{ left: `${x(back)}%` }} title={`${h.result === 'accepted' ? 'Accepted' : h.result === 'rejected' ? 'Rejected' : 'Withdrawn'} at ${h.label} · ${fmt(back)}`}>
+                  {h.result === 'accepted' ? '✓' : '✕'}
+                </i>
+              )}
+            </span>
+          )
+        })}
         {show && !split && (
           <div className={`bar ps-${p.status}` + (t ? '' : ' open')} style={{ left: `${x(from)}%`, width: `${w}%` }}>
-            {fits(w) && <span>{t!.label}</span>}
+            {t && fits(w, t.label) && <span>{t.label}</span>}
           </div>
         )}
         {show && split && (
           <>
             <div className={`bar sofar ps-${p.status}`} style={{ left: `${x(from)}%`, width: `${x(today) - x(from)}%` }} />
             <div className="todo" style={{ left: `${x(today)}%`, width: `${restW}%` }} title={`${countdown(to, today)} until ${t!.label}`}>
-              {fits(restW) && <span>{t!.label}</span>}
+              {fits(restW, t!.label) && <span>{t!.label}</span>}
             </div>
           </>
         )}
-        {t && show && working && !fits(split ? restW : w) && <span className="bar-out" style={{ left: `calc(${x(to)}% + 8px)` }}>{t.label}</span>}
+        {t && show && working && !fits(split ? restW : w, t.label) && <span className="bar-out" style={{ left: `calc(${x(to)}% + 8px)` }}>{t.label}</span>}
         {reviewing && (
           <div className="rev" style={{ left: `${x(t.deadline)}%`, width: `${x(t.noti) - x(t.deadline)}%` }} title={`Under review until ${fmt(t.noti)}`} />
         )}
@@ -123,11 +158,6 @@ export default function Timeline() {
             {p.status === 'accepted' ? '✓' : p.status === 'rejected' ? '✕' : ''}
           </i>
         )}
-        {p.history.filter((h) => inWin(h.deadline) && h.deadline !== t?.deadline).map((h, i) => (
-          <i key={i} className={`attempt res-${h.result}`} style={{ left: `${x(h.deadline)}%` }} title={`${h.label}: ${h.result} (submitted ${fmt(h.deadline)})`}>
-            {h.result === 'accepted' ? '✓' : '✕'}
-          </i>
-        ))}
       </>
     )
   }
@@ -159,7 +189,7 @@ export default function Timeline() {
         </select>
         <span className="grow" />
         <span className="legend">
-          <i className="lg ps-research" /> Researching <i className="lg ps-writing" /> Writing <i className="lg todo" /> Left to do <i className="lg rev" /> Under review <i className="lg ps-accepted" /> Accepted <i className="lg ps-rejected" /> Rejected <i className="lgx">✕</i> Earlier rejection
+          <i className="lg ps-research" /> Researching <i className="lg ps-writing" /> Writing <i className="lg todo" /> Left to do <i className="lg rev" /> Under review <i className="lg ps-accepted" /> Accepted <i className="lg ps-rejected" /> Rejected <i className="lg try" /> Earlier attempt
         </span>
       </div>
 
