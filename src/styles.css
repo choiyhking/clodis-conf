@@ -541,3 +541,10 @@ td.conf { max-width: 184px; }
 .targeting { flex-wrap: nowrap; }
 .paper-chip { flex: 0 1 auto; min-width: 0; }
 .more-chip { flex: none; height: 26px; padding: 0 8px; border-radius: 13px; font-size: 12px; font-weight: 700; color: var(--accent-ink); background: var(--accent-soft); border-color: transparent; }
+
+/* line between the filters and the table: how many rows, and what the row colours mean */
+.table-note { display: flex; align-items: center; gap: 18px; margin: -2px 2px 8px; font-size: 12.5px; }
+.key-item { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.key-item b { color: var(--text); font-weight: 600; }
+.key-item .sw { margin-left: 0; width: 14px; height: 14px; }
+.tablewrap { max-height: calc(100vh - 190px); }
