@@ -117,9 +117,11 @@ export default function Schedule() {
               const tone = tg.some((p) => p.status === 'submitted') ? 'reviewing' : tg.length ? 'targeted' : ''
               return (
                 <Fragment key={r.id}>
-                  {past && i === firstFuture && i > 0 && (
-                    <tr className="todayrow">
-                      <td colSpan={COLS}><span>Today · {today}</span></td>
+                  {i === firstFuture && (
+                    <tr className="todayrow" aria-label={`Today, ${today}`}>
+                      <td colSpan={4} />
+                      <td><span title={today}>Today</span></td>
+                      <td colSpan={COLS - 5} />
                     </tr>
                   )}
                   <tr className={[tone, r.at <= now ? 'past' : ''].join(' ')} onClick={() => setOpen(r)} tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpen(r)}>

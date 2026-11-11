@@ -106,7 +106,7 @@ const SIDE_TRACK = /short|poster|workshop|demo|industr|tutorial|doctoral|journal
 export const STATUS_LABEL: Record<Row['status'], string> = { verified: 'Verified', auto: 'Auto', estimated: 'Estimated' }
 export const PAPER_STATUS: { key: PaperStatus; label: string }[] = [
   { key: 'research', label: 'Researching' },
-  { key: 'writing', label: 'In progress' },
+  { key: 'writing', label: 'Writing' },
   { key: 'submitted', label: 'Under review' },
   { key: 'accepted', label: 'Accepted' },
   { key: 'rejected', label: 'Rejected' },
