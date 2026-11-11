@@ -106,8 +106,8 @@ export default function Schedule() {
               <th className="c">Notification</th>
               <th className="c" title="Days from submission to notification">Review</th>
               <th>Location</th>
-              <th title="Who keeps this conference's dates correct, and how far the dates can be trusted">Owner · Status</th>
               <th>Targeting</th>
+              <th title="Who keeps this conference's dates correct, and how far the dates can be trusted">Owner · Status</th>
             </tr>
           </thead>
           <tbody>
@@ -144,11 +144,6 @@ export default function Schedule() {
                       <Place location={r.location} />
                       <small>Starts {fmt(r.event) || 'TBD'}</small>
                     </td>
-                    <td>
-                      <span className="owner-status"><Avatar name={r.conf.owner} size={20} /> <StatusBadge row={r} /></span>
-                      {r.autoDiff && <span className="tag warn" title={`Collected value: ${fmt(r.autoDiff.deadline)}`}>Changed</span>}
-                      {isStale(r, today) && <span className="tag" title={`Last checked ${fmt(r.checkedAt) || 'never'}`}>Re-check</span>}
-                    </td>
                     <td onClick={(e) => e.stopPropagation()}>
                       <span className="targeting">
                         {tg.map((p) => (
@@ -160,6 +155,11 @@ export default function Schedule() {
                           <button className="ghost add" title="Target this deadline with one of our papers" onClick={() => setPick(r)}><Icon name="plus" size={14} /></button>
                         )}
                       </span>
+                    </td>
+                    <td>
+                      <span className="owner-status"><Avatar name={r.conf.owner} size={20} /> <StatusBadge row={r} compact /></span>
+                      {r.autoDiff && <span className="tag warn" title={`Collected value: ${fmt(r.autoDiff.deadline)}`}>Changed</span>}
+                      {isStale(r, today) && <span className="tag" title={`Last checked ${fmt(r.checkedAt) || 'never'}`}>Re-check</span>}
                     </td>
                   </tr>
                 </Fragment>
