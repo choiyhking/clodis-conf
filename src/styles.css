@@ -576,3 +576,12 @@ td.conf { max-width: 184px; }
 
 /* a conference nobody owns still gets an (empty) avatar slot so the status column lines up */
 .avatar.none { background: none; box-shadow: inset 0 0 0 1.5px var(--line-strong); }
+
+/* spare width is shared three ways: conference name, location, targeting */
+.sched th:nth-child(2), .sched td.conf { width: 38%; }
+.sched th:nth-child(8), .sched td:nth-child(8) { width: 30%; max-width: 0; min-width: 132px; }
+.sched th:nth-child(9), .sched td:nth-child(9) { width: 32%; min-width: 180px; }
+.sched th:nth-child(8), .sched td:nth-child(8) { min-width: 164px; }
+.sched th:nth-child(9), .sched td:nth-child(9) { min-width: 148px; }
+.sched th:nth-child(8), .sched td:nth-child(8) { min-width: 180px; }
+.sched th:nth-child(9), .sched td:nth-child(9) { min-width: 134px; }
