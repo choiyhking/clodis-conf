@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, hue, initials, isDate, isStale, paperLinks, rowLabel,
-  settleStatus, sortMembers, toKST, uid,
+  settleStatus, sortMembers, timeLeft, toKST, uid,
 } from './logic'
 import { useStore } from './store'
 import type { Conf, Deadline, Paper, PaperStatus, Row } from './types'
@@ -95,7 +95,12 @@ export function Place({ location }: { location: string }) {
   )
 }
 
-export function Countdown({ deadline, today }: { deadline: string; today: string }) {
+/** Time left. Pass `at` (a row's exact closing moment) when there is one; plain dates fall back to whole days. */
+export function Countdown({ deadline, today, at }: { deadline: string; today: string; at?: number }) {
+  if (at) {
+    const t = timeLeft(at, Date.now())
+    return <span className={`cd ${t.tone}`} title={`Closes ${new Date(at).toLocaleString('sv-SE').slice(0, 16)} your time`}>{t.text}</span>
+  }
   const n = diffDays(deadline, today)
   const tone = n < 0 ? 'closed' : n <= 7 ? 'hot' : n <= 30 ? 'warm' : 'calm'
   return <span className={`cd ${tone}`}>{countdown(deadline, today)}</span>
@@ -148,7 +153,7 @@ export function Field({ label, children, span }: { label: string; children: Reac
 }
 
 export function toDeadline(r: Row): Deadline {
-  const { conf: _c, virtual: _v, derivedFrom: _d, autoDiff: _a, sources: _s, evidence: _e, time: _t, tz: _z, ...d } = r
+  const { conf: _c, virtual: _v, derivedFrom: _d, autoDiff: _a, sources: _s, evidence: _e, time: _t, tz: _z, at: _at, ...d } = r
   return d
 }
 
@@ -557,7 +562,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
             <li key={s.label} className={s === nextStep ? 'upnext' : s.date && s.date < today ? 'done' : ''} title={s === nextStep ? 'Next date coming up' : s.date && s.date < today ? 'Passed' : ''}>
               <span>{s.label}</span>
               <b className={live.status === 'estimated' || s.soft ? 'est' : ''}>{fmt(s.date) || 'TBD'}</b>
-              {s.main && <Countdown deadline={live.deadline} today={today} />}
+              {s.main && <Countdown deadline={live.deadline} today={today} at={live.at} />}
               {s.main && live.time && live.tz && (
                 <small className="muted when">{live.time} {/^UTC-12$/i.test(live.tz) ? 'AoE' : live.tz}{toKST(live.deadline, live.time, live.tz) && <> = <b>{toKST(live.deadline, live.time, live.tz)} KST</b></>}</small>
               )}
