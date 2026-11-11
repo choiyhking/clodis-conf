@@ -593,18 +593,33 @@ export function TargetModal({ row, onClose }: { row: Row; onClose: () => void })
     onClose()
   }
   if (fresh) return <PaperModal paper={fresh} isNew onClose={onClose} />
+  const here = (p: Paper) => p.target?.confId === row.confId && p.target.deadline === row.deadline
+  const groups = [
+    { title: 'No target yet', hint: 'Free to take this deadline', tone: 'free', papers: candidates.filter((p) => !p.target && p.status !== 'rejected') },
+    { title: 'Rejected — needs a new venue', hint: '', tone: 'free', papers: candidates.filter((p) => p.status === 'rejected') },
+    { title: 'Aimed at another deadline', hint: 'Choosing one moves it here', tone: 'busy', papers: candidates.filter((p) => !!p.target && p.status !== 'rejected') },
+  ].filter((g) => g.papers.length)
   return (
     <Modal title={`Target ${target.label}`} onClose={onClose}>
-      <p className="muted">Deadline {fmt(row.deadline)} · {countdown(row.deadline, today)}. Which paper is going here?</p>
-      <div className="pick-list">
-        {candidates.map((p) => (
-          <button key={p.id} className="mini" onClick={() => assign(p)} disabled={p.target?.confId === row.confId && p.target.deadline === row.deadline}>
-            <i className={`sdot ps-${p.status}`} /> <b>{p.title}</b> <Avatars names={p.members} />
-            <span className="muted">{p.target ? (p.status === 'rejected' ? `rejected at ${p.target.label}` : `now ${p.target.label}`) : 'no target yet'}</span>
-          </button>
-        ))}
-        {candidates.length === 0 && <p className="muted">No papers yet. Add ongoing work on the Papers page, or start one here.</p>}
+      <div className="tm-when">
+        <span>Deadline</span>
+        <b className={row.status === 'estimated' ? 'est' : ''}>{fmt(row.deadline)}</b>
+        <Countdown deadline={row.deadline} today={today} at={row.at} />
+        {row.noti && <span className="muted">result {fmt(row.noti)}</span>}
       </div>
+      <p className="muted">Which paper is going here?</p>
+      {groups.map((g) => (
+        <div key={g.title} className={`tm-group ${g.tone}`}>
+          <h3>{g.title} <span>{g.papers.length}</span>{g.hint && <small>{g.hint}</small>}</h3>
+          {g.papers.map((p) => (
+            <button key={p.id} className="mini" onClick={() => assign(p)} disabled={here(p)}>
+              <b>{p.title}</b> <Avatars names={p.members} />
+              {p.target && <span className="muted">{here(p) ? 'already here' : p.status === 'rejected' ? `was ${p.target.label}` : <>now <b>{p.target.label}</b> · {fmt(p.target.deadline)}</>}</span>}
+            </button>
+          ))}
+        </div>
+      ))}
+      {candidates.length === 0 && <p className="muted">No papers yet. Add ongoing work on the Papers page, or start one here.</p>}
       <footer>
         <button onClick={() => setFresh(newPaper(me, today, row))}><Icon name="plus" size={14} /> New paper</button>
         <span className="grow" />
