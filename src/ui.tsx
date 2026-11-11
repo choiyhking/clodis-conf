@@ -42,7 +42,10 @@ export function Avatar({ name, size = 22, whole = false, dot = false }: { name: 
   if (!name) return null
   const unknown = name === '?'
   const role = data.members.find((x) => x.name === name)?.role
-  const bg = unknown ? 'var(--faint)' : `hsl(${hue(name)} 55% 42%)`
+  // Members take colours a golden angle apart in the order they joined, so no two neighbours look alike;
+  // a name that is not a member falls back to a colour derived from the name.
+  const idx = [...data.members].sort((a, b) => a.id.localeCompare(b.id)).findIndex((x) => x.name === name)
+  const bg = unknown ? 'var(--faint)' : `hsl(${idx >= 0 ? Math.round((210 + idx * 137.508) % 360) : hue(name)} 52% 42%)`
   const title = unknown ? 'Not selected' : role ? `${name} · ${role}` : name
   if (dot) return <i className="who-dot" title={title} style={{ background: bg }} />
   const n = name.trim()
@@ -784,7 +787,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
           {papers.length === 0 && <p className="nobody">Nobody is targeting <b>{rowLabel(live)}</b> yet.</p>}
           {papers.map((p) => (
             <button key={p.id} className="mini" onClick={() => setPaper(p)}>
-              <i className={`sdot ps-${p.status}`} /> <b>{p.title}</b> <Avatars names={p.members} />
+              <i className={`sdot ps-${p.status}`} /> <b title={p.members.join(', ')}>{p.title}</b>
               <span className="muted">{p.target?.confId === conf.id ? p.target.label : 'Earlier attempt'}</span>
             </button>
           ))}
