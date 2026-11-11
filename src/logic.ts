@@ -34,15 +34,33 @@ export function countdown(deadline: string, today: string) {
 
 // ---------- timezones ----------
 /** Hours from UTC for the zone names deadline sources use: "AoE", "UTC-12", "UTC+8", "UTC". null if unknown. */
-export function tzOffset(tz: string): number | null {
+const NAMED_ZONES: Record<string, string> = {
+  PT: 'America/Los_Angeles', ET: 'America/New_York', CT: 'America/Chicago', MT: 'America/Denver',
+  CET: 'Europe/Paris', CEST: 'Europe/Paris', BST: 'Europe/London', JST: 'Asia/Tokyo', KST: 'Asia/Seoul',
+}
+const FIXED_ZONES: Record<string, number> = { AOE: -12, PST: -8, PDT: -7, MST: -7, MDT: -6, EST: -5, EDT: -4, HST: -10 }
+
+/**
+ * Hours from UTC for the zone names deadline sources use: "AoE", "UTC-12", "UTC+8", "PT", "EST"…
+ * Zones with daylight saving (PT, ET…) depend on the date, so it has to be passed. null if unknown.
+ */
+export function tzOffset(tz: string, date: string): number | null {
   const t = tz.trim().toUpperCase()
-  if (t === 'AOE') return -12
+  if (t in FIXED_ZONES) return FIXED_ZONES[t]
   const m = t.match(/^(?:UTC|GMT)\s*([+-]\d{1,2})?$/)
-  return m ? Number(m[1] ?? 0) : null
+  if (m) return Number(m[1] ?? 0)
+  const zone = NAMED_ZONES[t]
+  if (!zone || !isDate(date)) return null
+  // Ask the browser what that zone's offset is on that day, e.g. "GMT-8" in winter and "GMT-7" in summer.
+  const part = new Intl.DateTimeFormat('en-US', { timeZone: zone, timeZoneName: 'shortOffset' })
+    .formatToParts(new Date(date + 'T12:00:00Z'))
+    .find((p) => p.type === 'timeZoneName')?.value
+  const off = part?.match(/GMT([+-]\d{1,2})?/)
+  return off ? Number(off[1] ?? 0) : null
 }
 /** A deadline given as date + time in some zone, expressed in Korean time: "2026-11-18 20:59". */
 export function toKST(date: string, time: string, tz: string): string {
-  const off = tzOffset(tz)
+  const off = tzOffset(tz, date)
   if (off === null || !isDate(date) || !/^\d{2}:\d{2}$/.test(time)) return ''
   const ms = Date.parse(`${date}T${time}:00Z`) - off * 3600000 + 9 * 3600000
   return new Date(ms).toISOString().slice(0, 16).replace('T', ' ')
