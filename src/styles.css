@@ -677,3 +677,9 @@ html { scrollbar-gutter: stable; }
 .owner-name { color: var(--text); }
 .sched td:nth-child(10) > .tag { display: flex; width: fit-content; margin: 3px 0 0; height: 17px; font-size: 10.5px; }
 .sched td:nth-child(10) > .tag + .tag { display: inline-flex; }
+/* Changed / Re-check go back beside the status; the column is just wide enough to hold owner + status + one tag */
+.sched td:nth-child(10) { white-space: nowrap; }
+.sched td:nth-child(10) > .tag, .sched td:nth-child(10) > .tag + .tag { display: inline-flex; width: auto; margin: 0 0 0 5px; vertical-align: middle; padding: 0 5px; }
+.owner-name { width: 40px; }
+.sched col.c-status { width: 212px; }
+.sched col.c-status { width: 198px; }
