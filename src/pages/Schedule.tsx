@@ -50,7 +50,7 @@ export default function Schedule() {
     if (owner && c.owner !== owner) return false
     if (status && r.status !== status) return false
     if (onlyTarget && !tg) return false
-    if (q && !`${c.acronym} ${c.name} ${r.location}`.toLowerCase().includes(q.toLowerCase())) return false
+    if (q && !`${c.acronym} ${c.name}`.toLowerCase().includes(q.toLowerCase())) return false
     return true
   })
 
@@ -62,13 +62,12 @@ export default function Schedule() {
           <h1>Deadlines</h1>
           <p className="muted">{data.conferences.length} conferences tracked · dates refresh every morning from ccfddl and conference sites</p>
         </div>
-        <button className="primary" onClick={() => setAddConf(true)}><Icon name="plus" size={14} /> Track a conference</button>
       </header>
 
       <Clock />
 
       <div className="filters">
-        <input type="search" placeholder="Search conference or city" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input type="search" placeholder="Search conferences" value={q} onChange={(e) => setQ(e.target.value)} />
         <select value={area} onChange={(e) => setArea(e.target.value)} aria-label="Area">
           <option value="">All areas</option>{areas.map((a) => <option key={a}>{a}</option>)}
         </select>
@@ -89,10 +88,18 @@ export default function Schedule() {
         </select>
         <button className={'toggle' + (past ? ' on' : '')} onClick={() => setPast(!past)} aria-pressed={past} title="Also show deadlines that closed in the last 12 months">Show past year</button>
         <span className="grow" />
-        <span className="muted">{shown.length} deadlines</span>
         <button className={'only-ours' + (onlyTarget ? ' on' : '')} onClick={() => setOnlyTarget(!onlyTarget)} aria-pressed={onlyTarget} title="Show only the deadlines our papers are aimed at or under review for">
           <i className="switch" /> Our targets only
         </button>
+        <button className="primary" onClick={() => setAddConf(true)}><Icon name="plus" size={14} /> Track a conference</button>
+      </div>
+
+      {/* what the row colours mean, right above the rows they describe */}
+      <div className="table-note">
+        <span className="muted">{shown.length} deadlines</span>
+        <span className="grow" />
+        <span className="key-item"><i className="sw targeted" /> <b>Yellow</b> a paper of ours is aimed at this deadline</span>
+        <span className="key-item"><i className="sw reviewing" /> <b>Green</b> a paper of ours is under review here</span>
       </div>
 
       <div className="card tablewrap">
@@ -176,8 +183,6 @@ export default function Schedule() {
           </tbody>
         </table>
       </div>
-
-      <p className="legend below"><i className="sw targeted" /> One of our papers is aimed at this deadline <i className="sw reviewing" /> One of our papers is under review here</p>
 
       {open && <ConfDrawer row={open} onClose={() => setOpen(null)} />}
       {addConf && <ConfModal conf={null} onClose={() => setAddConf(false)} />}
