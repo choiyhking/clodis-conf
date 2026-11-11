@@ -1,6 +1,7 @@
 import { ROLES, type AutoData, type Coll, type Conf, type Data, type Deadline, type Member, type Paper, type PaperStatus, type Round, type Row } from './types'
 
-export const APP_NAME = 'Camera Ready'
+export const APP_NAME = 'CLODIS Conf'
+export const LAB_NAME = 'Cloud & Distributed Systems Lab'
 
 // ---------- dates ----------
 const DAY = 86400000
@@ -51,8 +52,11 @@ export function eventStart(text: string): string {
 }
 
 // ---------- labels ----------
-export const roundTag = (round: string) => (round ? `R${round}` : '')
-export const rowLabel = (r: { conf: Conf; round: string }) => r.conf.acronym + (r.round ? ` R${r.round}` : '')
+/** "2/4" → "R2/4". Anything else is a named track ("Short Paper") and is shown as written. */
+export const roundTag = (round: string) => (/^\d+\/\d+$/.test(round) ? `R${round}` : round)
+export const rowLabel = (r: { conf: Conf; round: string }) => r.conf.acronym + (r.round ? ` ${roundTag(r.round)}` : '')
+/** Timeline entries that are a separate track rather than another round of the main one. */
+const SIDE_TRACK = /short|poster|workshop|demo|industr|tutorial|doctoral|journal|tool|artifact|commitment|optional abstract/i
 export const STATUS_LABEL: Record<Row['status'], string> = { verified: 'Verified', auto: 'Auto', estimated: 'Estimated' }
 export const PAPER_STATUS: { key: PaperStatus; label: string }[] = [
   { key: 'research', label: 'Researching' },
@@ -79,7 +83,7 @@ export function describeChange(coll: Coll, prev: unknown, next: unknown, data: D
   if (coll === 'deadlines') {
     const a = prev as Deadline | undefined, b = next as Deadline | undefined
     const d = (b ?? a)!
-    const label = `${acr(d.confId)}${d.round ? ` R${d.round}` : ''} ${d.year}`
+    const label = `${acr(d.confId)}${d.round ? ` ${roundTag(d.round)}` : ''} ${d.year}`
     if (!b) return `Deleted ${label} deadline (${a!.deadline})`
     if (!a) return `${b.status === 'verified' ? 'Verified' : 'Added'} ${label}: deadline ${b.deadline}`
     const keys = changed(a, b, ['abstract', 'deadline', 'noti', 'event', 'location', 'url', 'round', 'year', 'note'])
@@ -110,7 +114,7 @@ export function describeChange(coll: Coll, prev: unknown, next: unknown, data: D
     const a = prev as Member | undefined, b = next as Member | undefined
     if (!b) return `Removed member ${a!.name}`
     if (!a) return `Added member ${b.name}${b.role ? ` (${b.role})` : ''}`
-    const keys = changed(a, b, ['name', 'role', 'email', 'icon'])
+    const keys = changed(a, b, ['name', 'role', 'email'])
     return keys.length ? `Changed member ${a.name}: ${keys.map((k) => `${k} ${arrow(a[k], b[k])}`).join(', ')}` : ''
   }
   return ''
@@ -124,10 +128,6 @@ export const roleRank = (role: string) => {
   return i < 0 ? ROLES.length : i
 }
 export const sortMembers = (ms: Member[]) => [...ms].sort((a, b) => roleRank(a.role) - roleRank(b.role) || a.name.localeCompare(b.name))
-export const ROLE_ICON: Record<string, string> = { Professor: '🧑‍🏫', Postdoc: '🔬', PhD: '🎓', MS: '📘', Undergrad: '🌱', Alumni: '🕊️' }
-export const ICON_CHOICES = ['🧑‍🏫', '🎓', '📘', '🔬', '🌱', '🕊️', '🦊', '🐻', '🐼', '🐯', '🦉', '🐧', '🐙', '🐳', '🚀', '⚡', '🔥', '🍀', '☕', '🎧']
-/** The emoji for a member: their own choice, else their role's. '' when neither is set. */
-export const memberIcon = (m: Member) => m.icon || ROLE_ICON[m.role] || ''
 /** A paper's links, including the single link older data stored. */
 export const paperLinks = (p: Paper): string[] => p.links ?? (p.link ? [p.link] : [])
 
@@ -224,6 +224,14 @@ export function collected(conf: Conf, auto: AutoData): Collected[] {
   return out
 }
 
+/** Round label for the i-th collected entry: side tracks keep their own name and don't count as rounds. */
+function roundOf(rounds: Round[], i: number): string {
+  const comment = (rounds[i].comment ?? '').trim()
+  if (SIDE_TRACK.test(comment)) return comment.length > 22 ? comment.slice(0, 21).trimEnd() + '…' : comment
+  const main = rounds.filter((r) => !SIDE_TRACK.test(r.comment ?? ''))
+  return main.length > 1 ? `${main.indexOf(rounds[i]) + 1}/${main.length}` : ''
+}
+
 /** Stored deadlines + collected data + last-year estimates → rows for display. */
 export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData | null, today: string): Row[] {
   const confById = new Map(confs.map((c) => [c.id, c]))
@@ -239,7 +247,7 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
       const mine = rows.filter((r) => r.confId === conf.id)
       for (const ed of collected(conf, auto)) {
         ed.rounds.forEach((a, i) => {
-          const round = ed.rounds.length > 1 ? `${i + 1}/${ed.rounds.length}` : ''
+          const round = roundOf(ed.rounds, i)
           const source = a.sources[0]
           let best: Row | undefined
           for (const r of mine) {
@@ -293,7 +301,7 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
               checkedAt: auto.generatedAt.slice(0, 10),
               checkedBy: '',
               source,
-              note: [ed.date, a.comment].filter(Boolean).join(' · '),
+              note: '',
               virtual: true,
               sources: a.sources,
               evidence: a.evidence,

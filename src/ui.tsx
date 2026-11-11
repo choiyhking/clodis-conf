@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
-  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, hue, initials, isDate, isStale, memberIcon, paperLinks, rowLabel,
+  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, hue, initials, isDate, isStale, paperLinks, rowLabel,
   settleStatus, sortMembers, toKST, uid,
 } from './logic'
 import { useStore } from './store'
@@ -29,20 +29,16 @@ export function Icon({ name, size = 16 }: { name: keyof typeof ICONS | string; s
   )
 }
 
-/** A person shown as their icon (their own pick, else the one for their role) on a per-person tint. */
+/** A person shown as their name (given name for Korean names, initials otherwise) on their own colour. */
 export function Avatar({ name, size = 22 }: { name: string; size?: number }) {
   const { data } = useStore()
   if (!name) return null
-  const m = data.members.find((x) => x.name === name)
-  const icon = m ? memberIcon(m) : ''
   const unknown = name === '?'
+  const role = data.members.find((x) => x.name === name)?.role
   return (
-    <span
-      className={'avatar' + (icon ? ' emoji' : '')}
-      title={unknown ? 'Not selected' : m?.role ? `${name} · ${m.role}` : name}
-      style={{ width: size, height: size, fontSize: size * (icon ? 0.58 : 0.42), background: unknown ? 'var(--faint)' : icon ? `hsl(${hue(name)} 60% 88%)` : `hsl(${hue(name)} 55% 42%)` }}
-    >
-      {unknown ? '?' : icon || initials(name)}
+    <span className="avatar" title={unknown ? 'Not selected' : role ? `${name} · ${role}` : name}
+      style={{ width: size, height: size, fontSize: size * 0.42, background: unknown ? 'var(--faint)' : `hsl(${hue(name)} 55% 42%)` }}>
+      {unknown ? '?' : initials(name)}
     </span>
   )
 }
@@ -80,11 +76,10 @@ export function Clock() {
   }, [])
   const at = (zone: string) => new Intl.DateTimeFormat('en-GB', { timeZone: zone, weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).format(now)
   return (
-    <div className="clock" title="A deadline of 23:59 AoE is 20:59 KST on the following day">
+    <div className="clock">
       {ZONES.map((z) => (
         <span key={z.label} title={z.hint}><i>{z.label}</i> {at(z.zone)}</span>
       ))}
-      <small className="muted">23:59 AoE = 20:59 KST next day</small>
     </div>
   )
 }
@@ -552,7 +547,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
 
         <div className="tags">
           <Rank conf={conf} />
-          <AreaTag area={conf.area} />
+          {conf.area && <span className="tag">{conf.area}</span>}
           {conf.blind && <span className="tag">{conf.blind}-blind</span>}
           <span className="tag"><Place location={live.location} /></span>
         </div>
@@ -616,7 +611,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
               <span className="muted">{p.target?.confId === conf.id ? p.target.label : 'Earlier attempt'}</span>
             </button>
           ))}
-          {live.deadline >= today && <button onClick={() => setPick(true)}><Icon name="plus" size={14} /> Target {rowLabel(live)}</button>}
+          {live.deadline >= today && <button onClick={() => setPick(true)}><Icon name="plus" size={14} /> Target</button>}
         </section>
 
         {others.length > 0 && (

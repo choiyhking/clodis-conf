@@ -1,4 +1,4 @@
--- Camera Ready: Supabase setup. Paste into the SQL editor and run once.
+-- CLODIS Conf: Supabase setup. Paste into the SQL editor and run once.
 
 -- All data (conferences, deadlines, papers, members) is stored as "collection + id + JSON document".
 create table if not exists public.docs (
