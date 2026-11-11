@@ -670,7 +670,7 @@ export function TargetModal({ row, onClose }: { row: Row; onClose: () => void })
           <h3>{g.title} <span>{g.papers.length}</span>{g.hint && <small>{g.hint}</small>}</h3>
           {g.papers.map((p) => (
             <button key={p.id} className="mini" onClick={() => assign(p)} disabled={here(p)}>
-              <b>{p.title}</b> <Avatars names={p.members} />
+              <b title={p.members.join(', ')}>{p.title}</b>
               {p.target && <span className="muted">{here(p) ? 'already here' : p.status === 'rejected' ? `was ${p.target.label}` : <>now <b>{p.target.label}</b> · {fmt(p.target.deadline)}</>}</span>}
             </button>
           ))}
