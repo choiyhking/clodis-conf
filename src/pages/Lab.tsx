@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { demoData, isDemo, withSampleRoles } from '../demo'
-import { roleRank, sortMembers, uid } from '../logic'
+import { obsoleteDeadlines, roleRank, sortMembers, uid } from '../logic'
 import { MODE, loadSeed, supabase, useStore } from '../store'
 import { ROLES, type Data, type Member, type Role } from '../types'
 import { Avatar, Icon } from '../ui'
@@ -53,6 +53,13 @@ export default function Lab() {
     if (!confirm(msg)) return
     const s = await loadSeed()
     await replaceAll(MODE === 'local' ? s : { ...s, papers: data.papers, members: data.members.length ? data.members : s.members })
+  }
+
+  // Old deadlines are never deleted behind anyone's back; this lists the ones that are safe to drop.
+  const obsolete = obsoleteDeadlines(data.deadlines, today)
+  const cleanUp = async () => {
+    if (!confirm(`Delete ${obsolete.length} deadlines that closed over a year ago and have a newer edition on record? This cannot be undone.`)) return
+    for (const d of obsolete) await remove('deadlines', d.id)
   }
 
   const hasDemo = [...data.papers, ...data.members, ...data.deadlines].some(isDemo)
@@ -153,6 +160,9 @@ export default function Lab() {
           <button onClick={() => file.current?.click()}>Restore backup</button>
           <input ref={file} type="file" accept="application/json" hidden onChange={(e) => e.target.files?.[0] && importJson(e.target.files[0])} />
           <button onClick={seed}>{MODE === 'local' ? 'Reset to spreadsheet data' : 'Import spreadsheet data'}</button>
+          <button onClick={cleanUp} disabled={obsolete.length === 0} title="Deadlines that closed over a year ago and have a newer edition on record. The latest closed edition of each conference is always kept: estimates are based on it.">
+            Clean up old deadlines ({obsolete.length})
+          </button>
           {hasDemo ? <button onClick={clearDemo}>Remove sample data</button> : <button onClick={loadDemo}>Load sample data</button>}
           {supabase && session && <button onClick={() => supabase!.auth.signOut()}>Sign out</button>}
         </div>

@@ -8,6 +8,12 @@ const DAY = 86400000
 export const toMs = (d: string) => Date.parse(d + 'T00:00:00Z')
 export const fromMs = (ms: number) => new Date(ms).toISOString().slice(0, 10)
 export const addDays = (d: string, n: number) => fromMs(toMs(d) + n * DAY)
+/** Same calendar date n years later (Feb 29 falls back to Feb 28). */
+export function addYears(d: string, n: number) {
+  const y = Number(d.slice(0, 4)) + n
+  const rest = d.slice(4) === '-02-29' && !(y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? '-02-28' : d.slice(4)
+  return `${y}${rest}`
+}
 export const diffDays = (a: string, b: string) => Math.round((toMs(a) - toMs(b)) / DAY)
 export function todayStr() {
   const n = new Date()
@@ -316,7 +322,7 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
     }
   }
 
-  // 2) no dates for the next edition yet → project last year's dates forward 364 days (same weekday)
+  // 2) no dates for the next edition yet → show last year's dates one year on (same calendar date)
   const byConf = new Map<string, Row[]>()
   for (const r of rows) byConf.set(r.confId, [...(byConf.get(r.confId) ?? []), r])
   for (const list of byConf.values()) {
@@ -330,8 +336,8 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
       // Usually one year ahead; if a conference has gone more than a year with no news, keep projecting
       // (up to three years) rather than letting it drop off the list.
       let years = 1
-      while (years < 3 && addDays(r.deadline, 364 * years) < today) years++
-      const shift = (d: string) => (d ? addDays(d, 364 * years) : '')
+      while (years < 3 && addYears(r.deadline, years) < today) years++
+      const shift = (d: string) => (d ? addYears(d, years) : '')
       const dl = shift(r.deadline)
       if (dl < today) continue
       if (list.some((o) => Math.abs(diffDays(o.deadline, dl)) < 60)) continue // something real or projected is already there
@@ -364,6 +370,16 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
     }
   }
   return rows.sort((a, b) => a.deadline.localeCompare(b.deadline) || a.conf.acronym.localeCompare(b.conf.acronym))
+}
+
+/**
+ * Stored deadlines that no longer serve a purpose: closed more than a year ago AND superseded by a newer
+ * stored deadline of the same conference. The most recent closed edition is always kept, because next
+ * year's estimate is projected from it.
+ */
+export function obsoleteDeadlines(deadlines: Deadline[], today: string): Deadline[] {
+  const cutoff = addYears(today, -1)
+  return deadlines.filter((d) => d.deadline < cutoff && deadlines.some((o) => o.confId === d.confId && diffDays(o.deadline, d.deadline) > 300))
 }
 
 export const isStale = (r: Row, today: string) =>
