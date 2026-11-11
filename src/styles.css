@@ -673,3 +673,7 @@ html { scrollbar-gutter: stable; }
 .tl-ghead .tl-track { height: 34px; }
 .tl-ghead .tl-left b { font-size: 14px; font-weight: 700; }
 .tl-paper .p-title { font-weight: 500; }
+/* owner in the normal text colour; Changed / Re-check sit on their own line under the status so they are never cut off */
+.owner-name { color: var(--text); }
+.sched td:nth-child(10) > .tag { display: flex; width: fit-content; margin: 3px 0 0; height: 17px; font-size: 10.5px; }
+.sched td:nth-child(10) > .tag + .tag { display: inline-flex; }
