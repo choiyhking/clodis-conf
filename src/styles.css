@@ -699,6 +699,9 @@ html { scrollbar-gutter: stable; }
 .login .link { align-self: flex-start; }
 .login .back { margin-top: 8px; }
 
-/* hovering a plain row frames it instead of filling it grey, so the grey countdown chip stays readable */
-.sched tbody tr:not(.todayrow):not(.targeted):not(.reviewing):hover td { background: var(--surface); box-shadow: inset 0 1px 0 var(--muted), inset 0 -1px 0 var(--muted); }
-.sched tbody tr:not(.todayrow):not(.targeted):not(.reviewing):hover td:first-child { box-shadow: inset 0 1px 0 var(--muted), inset 0 -1px 0 var(--muted), inset 3px 0 0 var(--text); }
+/* hovering a row frames it on all four sides and leaves its own colour alone, so the grey countdown chip stays readable */
+.sched tbody tr:not(.todayrow):hover td { box-shadow: inset 0 1px 0 var(--muted), inset 0 -1px 0 var(--muted); }
+.sched tbody tr:not(.todayrow):hover td:first-child { box-shadow: inset 0 1px 0 var(--muted), inset 0 -1px 0 var(--muted), inset 3px 0 0 var(--text); }
+.sched tbody tr:not(.todayrow):hover td:last-child { box-shadow: inset 0 1px 0 var(--muted), inset 0 -1px 0 var(--muted), inset -1px 0 0 var(--muted); }
+.sched tbody tr:not(.todayrow):not(.targeted):not(.reviewing):hover td { background: var(--surface); }
+.sched tbody tr.targeted:hover td { background: var(--row-target); } .sched tbody tr.reviewing:hover td { background: var(--row-review); }
