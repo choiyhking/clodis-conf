@@ -701,3 +701,4 @@ html { scrollbar-gutter: stable; }
 
 /* the plain countdown chip is a step darker than the grey a hovered row turns, so it never blends into it */
 .sched .cd:not(.hot):not(.warm):not(.urgent):not(.closed) { background: var(--line); color: color-mix(in srgb, var(--muted) 65%, var(--text)); }
+.sched .area { background: var(--line); }
