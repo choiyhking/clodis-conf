@@ -698,3 +698,6 @@ html { scrollbar-gutter: stable; }
 .account .link, .login .link { color: var(--muted); text-decoration: underline; font-size: 12.5px; }
 .login .link { align-self: flex-start; }
 .login .back { margin-top: 8px; }
+
+/* the plain grey countdown would vanish into a hovered row (also grey), so it turns into a light chip there */
+.sched tbody tr:hover .cd:not(.hot):not(.warm):not(.urgent):not(.closed) { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-strong); }
