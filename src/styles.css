@@ -699,5 +699,6 @@ html { scrollbar-gutter: stable; }
 .login .link { align-self: flex-start; }
 .login .back { margin-top: 8px; }
 
-/* the plain grey countdown would vanish into a hovered row (also grey), so it turns into a light chip there */
-.sched tbody tr:hover .cd:not(.hot):not(.warm):not(.urgent):not(.closed) { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-strong); }
+/* hovering a plain row frames it instead of filling it grey, so the grey countdown chip stays readable */
+.sched tbody tr:not(.todayrow):not(.targeted):not(.reviewing):hover td { background: var(--surface); box-shadow: inset 0 1px 0 var(--muted), inset 0 -1px 0 var(--muted); }
+.sched tbody tr:not(.todayrow):not(.targeted):not(.reviewing):hover td:first-child { box-shadow: inset 0 1px 0 var(--muted), inset 0 -1px 0 var(--muted), inset 3px 0 0 var(--text); }
