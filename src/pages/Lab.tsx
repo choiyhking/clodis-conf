@@ -1,12 +1,28 @@
 import { useRef, useState } from 'react'
 import { demoData, isDemo, withSampleRoles } from '../demo'
 import { obsoleteDeadlines, roleRank, sortMembers, uid } from '../logic'
-import { MODE, loadSeed, supabase, useStore } from '../store'
+import { MODE, inviteUrl, loadSeed, supabase, useStore } from '../store'
 import { ROLES, type Data, type Member, type Role } from '../types'
 import { Avatar, Icon } from '../ui'
 
 export default function Lab() {
-  const { data, rows, today, save, remove, replaceAll, session, me, setMe } = useStore()
+  const { data, rows, today, save, remove, replaceAll, session, access, me, setMe } = useStore()
+  const [invite, setInvite] = useState('')
+  const [inviteMsg, setInviteMsg] = useState('')
+  /** Fetch the current link (or replace it) and put it on the clipboard. */
+  const getInvite = async (replace: boolean) => {
+    if (replace && !confirm('Replace the invite link? The old link stops working, and everyone who joined with it must open the new one.')) return
+    const { data: code, error } = await supabase!.rpc(replace ? 'rotate_invite' : 'invite_code')
+    if (error || !code) return setInviteMsg(error?.message ?? 'Could not get the link.')
+    const url = inviteUrl(code as string)
+    setInvite(url)
+    try {
+      await navigator.clipboard.writeText(url)
+      setInviteMsg(replace ? 'New link copied. The old one no longer works.' : 'Copied.')
+    } catch {
+      setInviteMsg('Copy the link below.')
+    }
+  }
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<Role>('')
@@ -126,6 +142,21 @@ export default function Lab() {
         <button className="primary" onClick={add}><Icon name="plus" size={14} /> Add member</button>
       </div>
 
+      {access === 'admin' && (
+        <>
+          <h2>Invite link</h2>
+          <div className="card pad">
+            <p className="muted">Anyone who opens this link sees and edits everything, with no sign-in. Share it with lab members only.</p>
+            <div className="filters">
+              <button className="primary" onClick={() => getInvite(false)}>Copy invite link</button>
+              <button onClick={() => getInvite(true)}>Replace link…</button>
+              {inviteMsg && <span className="muted" role="status">{inviteMsg}</span>}
+            </div>
+            {invite && <input className="invite-url" readOnly value={invite} onFocus={(e) => e.target.select()} aria-label="Invite link" />}
+          </div>
+        </>
+      )}
+
       <h2>Activity</h2>
       <div className="card activity">
         {data.log.length === 0 ? (
@@ -150,7 +181,7 @@ export default function Lab() {
           <span className="muted">
             {MODE === 'local'
               ? '— everything is stored in this browser only. Connect Supabase (see README) to share it with the lab.'
-              : `— signed in as ${session ?? 'nobody'}`}
+              : session ? `— signed in as ${session}` : '— joined with the invite link'}
           </span>
         </p>
         <div className="filters">

@@ -27,7 +27,7 @@ const Logo = () => (
   </svg>
 )
 
-/** Accounts are created by the lab's admin; there is no sign-up. */
+/** Lab members come in by invite link; this form is for the admin (and anyone the admin made an account for). */
 function Login({ onBack }: { onBack: () => void }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -46,12 +46,12 @@ function Login({ onBack }: { onBack: () => void }) {
     setBusy(true)
     const { error } = await supabase!.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: location.href.split('#')[0] } })
     setBusy(false)
-    setMsg(error ? 'Could not send the link. Ask the lab admin whether your account exists.' : 'Check your inbox for a sign-in link.')
+    setMsg(error ? 'Could not send the link. Only accounts the admin created can sign in.' : 'Check your inbox for a sign-in link.')
   }
   return (
     <form className="login" onSubmit={(e) => { e.preventDefault(); void signIn() }}>
       <div className="brand"><Logo /> <b>{APP_NAME}</b></div>
-      <p className="muted">Lab members sign in with the account the lab admin created for them.</p>
+      <p className="muted">For the lab admin. Lab members do not sign in: open the invite link you were given.</p>
       <input type="email" placeholder="Email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
       <input type="password" placeholder="Password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
       <button className="primary" disabled={busy}>Sign in</button>
@@ -90,8 +90,23 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
   )
 }
 
+/** Shown once after joining by invite link: the name is remembered by this browser and can be changed in the sidebar. */
+function NameModal({ onClose }: { onClose: () => void }) {
+  const { data, setMe } = useStore()
+  return (
+    <Modal title="Who are you?" onClose={onClose}>
+      <p className="muted">Pick your name so your changes show up under it. This browser remembers it.</p>
+      <div className="name-pick">
+        {sortMembers(data.members).map((m) => <button key={m.id} onClick={() => { setMe(m.name); onClose() }}>{m.name}</button>)}
+      </div>
+      <footer><span className="grow" /><button onClick={onClose}>Not now</button></footer>
+    </Modal>
+  )
+}
+
 export default function App() {
-  const { ready, error, rows, data, today, me, setMe, session, guest, auto } = useStore()
+  const { ready, error, rows, data, today, me, setMe, session, guest, joined, auto } = useStore()
+  const [askedName, setAskedName] = useState(false)
   const [signingIn, setSigningIn] = useState(false)
   const [changePw, setChangePw] = useState(false)
   useEffect(() => { if (session) setSigningIn(false) }, [session])
@@ -108,7 +123,7 @@ export default function App() {
   }, [])
 
   if (!ready) return <p className="loading">Loading…</p>
-  if (MODE === 'supabase' && guest && signingIn) return <Login onBack={() => setSigningIn(false)} />
+  if (MODE === 'supabase' && !session && signingIn) return <Login onBack={() => setSigningIn(false)} />
   // A guest sees the deadlines and nothing else, whatever the address bar says.
   const tabs = guest ? TABS.filter((t) => t.key === 'deadlines') : TABS
   const shownTab: Tab = guest ? 'deadlines' : tab
@@ -135,13 +150,16 @@ export default function App() {
           {guest && (
             <div className="guest-box">
               <p className="muted">Public view — conference deadlines only.</p>
-              {MODE === 'supabase' && <button onClick={() => setSigningIn(true)}>Lab member sign in</button>}
+              {MODE === 'supabase' && <>
+                <p className="muted">Lab members: open your invite link.</p>
+                <button className="link" onClick={() => setSigningIn(true)}>Admin sign in</button>
+              </>}
             </div>
           )}
           {!guest && <label className="me">
             <Avatar name={me || '?'} dot />
             <span title={session ? `Signed in as ${session}` : undefined}>
-              {MODE === 'supabase' && me ? (
+              {session && me ? (
                 // Shared mode: identity follows the login. To change it, move the email in Lab → Members.
                 <b className="me-name">
                   {me}
@@ -153,7 +171,7 @@ export default function App() {
                   aria-label="Who are you?"
                   onChange={(e) => {
                     const name = e.target.value
-                    if (MODE === 'supabase' && name && !confirm(`Link ${session} to ${name}? You will act as ${name} from now on.`)) return
+                    if (session && name && !confirm(`Link ${session} to ${name}? You will act as ${name} from now on.`)) return
                     setMe(name)
                   }}
                 >
@@ -161,15 +179,17 @@ export default function App() {
                   {sortMembers(data.members).map((m) => <option key={m.id}>{m.name}</option>)}
                 </select>
               )}
-              <small className="muted">{meRole || (me ? 'Role not set' : MODE === 'supabase' ? 'Pick your name once' : 'Pick your name')}</small>
+              <small className="muted">{meRole || (me ? 'Role not set' : session ? 'Pick your name once' : 'Pick your name')}</small>
             </span>
           </label>}
-          {!guest && MODE === 'supabase' && (
+          {!guest && MODE === 'supabase' && (session ? (
             <p className="account">
               <button className="link" onClick={() => setChangePw(true)}>Change password</button>
               <button className="link" onClick={() => confirm('Sign out?') && supabase!.auth.signOut()}>Sign out</button>
             </p>
-          )}
+          ) : (
+            <p className="account"><button className="link" onClick={() => setSigningIn(true)}>Admin sign in</button></p>
+          ))}
           <p className="sync muted">
             <i className={'dot' + (auto ? ' ok' : '')} /> {auto ? `Dates collected ${auto.generatedAt.slice(0, 10)}` : 'Collector has not run'}
             {MODE === 'local' && <><br /><i className="dot warn" /> Local mode — not shared</>}
@@ -178,6 +198,7 @@ export default function App() {
       </aside>
       <main>
         {error && <p className="error">Something went wrong: {error}</p>}
+        {joined === 'bad' && guest && <p className="error">That invite link does not work any more. Ask the lab admin for the current one.</p>}
         {shownTab === 'deadlines' && <Schedule />}
         {shownTab === 'timeline' && <Timeline />}
         {shownTab === 'papers' && <Papers />}
@@ -185,6 +206,7 @@ export default function App() {
         {shownTab === 'lab' && <Lab />}
       </main>
       {changePw && <PasswordModal onClose={() => setChangePw(false)} />}
+      {joined === 'ok' && !guest && !session && !me && !askedName && data.members.length > 0 && <NameModal onClose={() => setAskedName(true)} />}
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { buildRows, describeChange, todayStr, uid } from './logic'
 import type { AutoData, Coll, Conf, Data, Deadline, LogEntry, Member, Row } from './types'
 
@@ -21,6 +21,18 @@ const COLLS = Object.keys(EMPTY) as Coll[]
 
 /** Local mode has no accounts; "?guest" in the address previews what a signed-out visitor sees. */
 const PREVIEW_GUEST = !supabase && new URLSearchParams(location.search).has('guest')
+/**
+ * A lab member's invite link ends in "#join=<code>". The code is taken out of the address bar straight away
+ * (so it is not left in a screenshot or a shared screen) and spent on the first load below.
+ */
+const INVITE = /^#join=([\w-]{16,})$/.exec(location.hash)?.[1] ?? ''
+if (INVITE) history.replaceState(null, '', location.pathname + location.search + '#deadlines')
+let pendingInvite = supabase ? INVITE : ''
+// An invite link pasted into a tab that already has the site open only changes the hash: start over with it.
+window.addEventListener('hashchange', () => { if (/^#join=/.test(location.hash)) location.reload() })
+export const inviteUrl = (code: string) => `${location.origin}${location.pathname}#join=${code}`
+export type Access = 'admin' | 'member' | null
+
 /** What the public may see of a conference / deadline: no owner, no checker, no free-text note. */
 const publicConf = (c: Conf): Conf => ({ ...c, owner: '' })
 const publicDeadline = (d: Deadline): Deadline => ({ ...d, checkedBy: '', note: '' })
@@ -50,9 +62,13 @@ interface Ctx {
   error: string
   me: string
   setMe: (name: string) => void
-  session: string | null // signed-in email (supabase mode)
-  /** Not signed in: deadlines only, read-only, and no names. */
+  session: string | null // signed-in email (supabase mode); null for a browser that joined by invite link
+  /** Shared mode: 'admin' (may issue the invite link), 'member' (joined by link or has an account), or null. */
+  access: Access
+  /** No access: deadlines only, read-only, and no names. */
   guest: boolean
+  /** This page load used an invite link: 'ok' or 'bad' (wrong or replaced link). */
+  joined: '' | 'ok' | 'bad'
   save: <K extends Coll>(coll: K, doc: Data[K][number]) => Promise<void>
   remove: (coll: Coll, id: string) => Promise<void>
   replaceAll: (data: Data) => Promise<void>
@@ -68,11 +84,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState('')
   const [localMe, setLocalMe] = useState(() => localStorage.getItem(LS_ME) ?? '')
   const [session, setSession] = useState<string | null>(null)
+  const [access, setAccess] = useState<Access>(null)
+  const [joined, setJoined] = useState<Ctx['joined']>('')
+  const queue = useRef<Promise<void>>(Promise.resolve())
   const today = todayStr()
 
   const persistLocal = (d: Data) => localStorage.setItem(LS_KEY, JSON.stringify(d))
 
-  const reload = useCallback(async () => {
+  const load = useCallback(async () => {
     try {
       setError('')
       getJson<AutoData>('auto.json').then(setAuto).catch(() => setAuto(null))
@@ -82,10 +101,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (!raw) persistLocal(d)
         setData(PREVIEW_GUEST ? { ...EMPTY, conferences: d.conferences.map(publicConf), deadlines: d.deadlines.map(publicDeadline) } : d)
       } else {
-        const { data: s } = await supabase.auth.getSession()
-        setSession(s.session?.user.email ?? null)
-        if (!s.session) {
-          // Signed out: only what the database hands to anyone — conferences and deadlines with the names removed.
+        let user = (await supabase.auth.getSession()).data.session?.user ?? null
+        if (pendingInvite) {
+          // Opened by invite link: this browser gets a nameless session of its own, and the database
+          // lets it in if the code is the current one.
+          const code = pendingInvite
+          pendingInvite = ''
+          if (!user) user = (await supabase.auth.signInAnonymously()).data.user
+          const ok = user ? (await supabase.rpc('join_lab', { p_code: code })).data === true : false
+          setJoined(ok ? 'ok' : 'bad')
+        }
+        let role: Access = null
+        if (user) {
+          const { data: r, error } = await supabase.rpc('my_access')
+          // Before invite-link.sql is installed there is no such function: every account is a member, as before.
+          role = error ? (user.is_anonymous ? null : 'member') : ((r as Access) ?? null)
+        }
+        setSession(user?.email || null)
+        setAccess(role)
+        if (!role) {
+          // No access: only what the database hands to anyone — conferences and deadlines with the names removed.
           // (Until that function is installed, fall back to the dates shipped with the site.)
           const { data: pub, error } = await supabase.rpc('public_docs')
           if (error || !pub) {
@@ -111,11 +146,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setReady(true)
     }
   }, [])
+  // One load at a time: signing in fires a reload of its own, which must not overtake the load that joined.
+  const reload = useCallback(() => (queue.current = queue.current.then(load)), [load])
 
   useEffect(() => {
     reload()
     if (!supabase) return
-    const { data: sub } = supabase.auth.onAuthStateChange(() => reload())
+    // Deferred: the auth client must not be called back into from inside its own event.
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => { if (event !== 'INITIAL_SESSION' && event !== 'TOKEN_REFRESHED') setTimeout(reload, 0) })
     const onFocus = () => reload() // pick up changes made by others
     window.addEventListener('focus', onFocus)
     return () => {
@@ -125,14 +163,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [reload])
 
   // Who "me" is.
-  //  - shared mode: whoever's member entry carries the signed-in email. It is not a free choice, so
+  //  - an account (email): whoever's member entry carries the signed-in email. It is not a free choice, so
   //    nobody ends up acting as someone else by accident; picking a name once links the account to it.
-  //  - local mode: a plain per-browser choice.
+  //  - joined by invite link, or local mode: a plain choice remembered by this browser.
   const sameEmail = (a: string) => !!session && a.trim().toLowerCase() === session.toLowerCase()
-  const me = supabase ? (data.members.find((m) => sameEmail(m.email))?.name ?? '') : localMe
+  const byEmail = !!supabase && !!session
+  const me = byEmail ? (data.members.find((m) => sameEmail(m.email))?.name ?? '') : data.members.some((m) => m.name === localMe) || !supabase ? localMe : ''
 
   const setMe = (name: string) => {
-    if (!supabase) {
+    if (!byEmail) {
       localStorage.setItem(LS_ME, name)
       return setLocalMe(name)
     }
@@ -150,7 +189,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return text ? { id: uid(), at: new Date().toISOString(), by: me || session || 'unknown', text } : null
   }
 
-  const guest = supabase ? !session : PREVIEW_GUEST
+  const guest = supabase ? !access : PREVIEW_GUEST
 
   const save: Ctx['save'] = async (coll, doc) => {
     if (guest) return
@@ -215,7 +254,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const rows = useMemo(() => buildRows(data.conferences, data.deadlines, auto, today), [data, auto, today])
 
   return (
-    <StoreCtx.Provider value={{ data, rows, auto, today, ready, error, me, setMe, session, guest, save, remove, replaceAll, reload }}>
+    <StoreCtx.Provider value={{ data, rows, auto, today, ready, error, me, setMe, session, access, guest, joined, save, remove, replaceAll, reload }}>
       {children}
     </StoreCtx.Provider>
   )
