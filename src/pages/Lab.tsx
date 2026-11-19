@@ -194,6 +194,7 @@ export default function Lab() {
           </button>
           {hasDemo ? <button onClick={clearDemo}>Remove sample data</button> : <button onClick={loadDemo}>Load sample data</button>}
           {supabase && session && <button onClick={() => supabase!.auth.signOut()}>Sign out</button>}
+          {supabase && !session && <button onClick={() => (location.hash = 'admin')}>Admin sign in</button>}
         </div>
       </div>
     </section>

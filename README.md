@@ -7,7 +7,7 @@ Conference deadlines and paper planning for the CLODIS lab (Cloud & Distributed 
 ## What you see
 
 - **Without signing in** — the Deadlines table, read-only: rank, abstract / submission / notification dates, days left, location, and how far each date can be trusted.
-- **Lab members** — also who is targeting what, plus Timeline, Papers, Inbox and Lab. They open the invite link once per browser; there is no sign-in. The admin copies or replaces the link in the Lab tab.
+- **Lab members** — also who is targeting what, plus Timeline, Papers, Inbox and Lab. They open the invite link once per browser; there is no sign-in. The admin copies or replaces the link in the Lab tab, and signs in at `#admin` (or from the bottom of the Lab page).
 
 ## Date status
 

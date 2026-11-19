@@ -107,17 +107,21 @@ function NameModal({ onClose }: { onClose: () => void }) {
 export default function App() {
   const { ready, error, rows, data, today, me, setMe, session, guest, joined, auto } = useStore()
   const [askedName, setAskedName] = useState(false)
-  const [signingIn, setSigningIn] = useState(false)
+  // The admin's sign-in is out of the way: the "#admin" address, or the button at the bottom of the Lab page.
+  const [signingIn, setSigningIn] = useState(() => MODE === 'supabase' && location.hash === '#admin')
   const [changePw, setChangePw] = useState(false)
   useEffect(() => { if (session) setSigningIn(false) }, [session])
   const [tab, setTab] = useState<Tab>(() => (isTab(location.hash.slice(1)) ? (location.hash.slice(1) as Tab) : 'deadlines'))
   useEffect(() => {
-    location.hash = tab
+    if (!signingIn) location.hash = tab
     document.title = `${guest ? 'Deadlines' : TABS.find((t) => t.key === tab)!.label} · ${APP_NAME}`
-  }, [tab, guest])
+  }, [tab, guest, signingIn])
   useEffect(() => {
     // Follow the back button and hand-edited #tab URLs.
-    const onHash = () => isTab(location.hash.slice(1)) && setTab(location.hash.slice(1) as Tab)
+    const onHash = () => {
+      if (location.hash === '#admin') setSigningIn(MODE === 'supabase')
+      else if (isTab(location.hash.slice(1))) setTab(location.hash.slice(1) as Tab)
+    }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
@@ -150,10 +154,7 @@ export default function App() {
           {guest && (
             <div className="guest-box">
               <p className="muted">Public view — conference deadlines only.</p>
-              {MODE === 'supabase' && <>
-                <p className="muted">Lab members: open your invite link.</p>
-                <button className="link" onClick={() => setSigningIn(true)}>Admin sign in</button>
-              </>}
+              {MODE === 'supabase' && <p className="muted">Lab members: open your invite link.</p>}
             </div>
           )}
           {!guest && <label className="me">
@@ -182,14 +183,12 @@ export default function App() {
               <small className="muted">{meRole || (me ? 'Role not set' : session ? 'Pick your name once' : 'Pick your name')}</small>
             </span>
           </label>}
-          {!guest && MODE === 'supabase' && (session ? (
+          {!guest && MODE === 'supabase' && session && (
             <p className="account">
               <button className="link" onClick={() => setChangePw(true)}>Change password</button>
               <button className="link" onClick={() => confirm('Sign out?') && supabase!.auth.signOut()}>Sign out</button>
             </p>
-          ) : (
-            <p className="account"><button className="link" onClick={() => setSigningIn(true)}>Admin sign in</button></p>
-          ))}
+          )}
           <p className="sync muted">
             <i className={'dot' + (auto ? ' ok' : '')} /> {auto ? `Dates collected ${auto.generatedAt.slice(0, 10)}` : 'Collector has not run'}
             {MODE === 'local' && <><br /><i className="dot warn" /> Local mode — not shared</>}
