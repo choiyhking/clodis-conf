@@ -86,7 +86,6 @@ export default function Schedule() {
       <header className="page-head">
         <div>
           <h1>Deadlines</h1>
-          <p className="muted">{data.conferences.length} conferences tracked</p>
         </div>
         <span className="collected" title="Dates are collected automatically every morning">
           <i className={'dot' + (auto ? ' ok' : '')} />
@@ -112,7 +111,7 @@ export default function Schedule() {
 
       {/* what the row colours mean, right above the rows they describe */}
       <div className="table-note">
-        <span className="muted">{shown.length} deadlines</span>
+        <span className="muted">{shown.length} deadlines · {new Set(shown.map((r) => r.confId)).size} conferences</span>
         {active.length > 0 && (
           <span className="active-filters">
             <b>{active.length} {active.length === 1 ? 'filter' : 'filters'}</b>
