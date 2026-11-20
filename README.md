@@ -17,15 +17,6 @@ Conference deadlines and paper planning for the CLODIS lab (Cloud & Distributed 
 
 Verified wins over Auto, Auto over Estimated.
 
-## Running locally
-
-```bash
-npm install
-npm run dev
-```
-
-With no environment variables, data stays in that browser only. To connect to Supabase, copy `.env.example` to `.env.local` and fill it in.
-
 ## Setup
 
 - **Supabase** — run `supabase/schema.sql`, turn off "Allow new users to sign up", run `supabase/public-view-and-accounts.sql`, and create the admin account under Authentication → Users. Then put the admin email into `supabase/invite-link.sql`, run it, and turn on "Allow new users to sign up" and "Allow anonymous sign-ins".
