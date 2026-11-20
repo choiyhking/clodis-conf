@@ -459,13 +459,3 @@ export function obsoleteDeadlines(deadlines: Deadline[], today: string): Deadlin
 
 export const isStale = (r: Row, today: string) =>
   r.status === 'verified' && r.deadline >= today && (!r.checkedAt || diffDays(today, r.checkedAt) > STALE_DAYS)
-
-/** Next year's site exists but we have no dates for that edition yet. */
-export function newSites(confs: Conf[], deadlines: Deadline[], auto: AutoData | null) {
-  if (!auto?.crawl) return []
-  const maxYear = new Map<string, number>()
-  for (const d of deadlines) maxYear.set(d.confId, Math.max(maxYear.get(d.confId) ?? 0, d.year))
-  return confs.flatMap((conf) =>
-    (auto.crawl[conf.id] ?? []).filter((e) => e.firstSeen && e.year > (maxYear.get(conf.id) ?? 0)).map((site) => ({ conf, site })),
-  )
-}

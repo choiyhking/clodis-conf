@@ -1,12 +1,12 @@
 import { useState, type ReactNode } from 'react'
-import { fmt, isStale, newSites, rowLabel } from '../logic'
+import { fmt, isStale, rowLabel } from '../logic'
 import { useStore } from '../store'
 import type { Row } from '../types'
 import { Avatar, ConfDrawer, Countdown, DeadlineModal, Icon, StatusBadge, useVerify } from '../ui'
 
-/** Everything a person should look at: collected dates, changes, new sites, and checks that have gone stale. */
+/** What waits for a person: collected dates to confirm, verified dates that changed, and checks that have gone stale. */
 export default function Inbox() {
-  const { rows, auto, data, today, me } = useStore()
+  const { rows, auto, today, me } = useStore()
   const verify = useVerify()
   const [mine, setMine] = useState(!!me)
   const [edit, setEdit] = useState<Row | null>(null)
@@ -17,8 +17,6 @@ export default function Inbox() {
   const changed = rows.filter((r) => r.autoDiff && ok(r.conf.owner))
   const autos = future.filter((r) => r.status === 'auto')
   const stale = future.filter((r) => isStale(r, today) && !r.autoDiff)
-  const estimated = future.filter((r) => r.status === 'estimated')
-  const sites = newSites(data.conferences, data.deadlines, auto).filter((s) => ok(s.conf.owner))
 
   const item = (r: Row, actions: ReactNode, extra?: ReactNode) => (
     <li key={r.id}>
@@ -53,7 +51,7 @@ export default function Inbox() {
         <div>
           <h1>Inbox</h1>
           <p className="muted">
-            Dates the collector found or couldn't find — a person confirms them here.
+            Dates the collector found — a person confirms them here.
             {auto ? ` Last collected ${auto.generatedAt.replace('T', ' ').slice(0, 16)} UTC.` : ' The collector has not run yet.'}
           </p>
         </div>
@@ -78,28 +76,11 @@ export default function Inbox() {
         </>))}
       </Section>
 
-      <Section title="Next year's site is up" n={sites.length} hint="Found by trying last year's URL with the year bumped. Dates may not be posted yet.">
-        {sites.map(({ conf, site }) => (
-          <li key={conf.id}>
-            <div className="it-main">
-              <a className="it-title" href={site.url} target="_blank" rel="noreferrer">{conf.acronym} {site.year} <Icon name="link" size={13} /></a>
-              <div className="it-dates"><span className="kv"><i>First seen</i> {fmt(site.firstSeen ?? '')}</span></div>
-              {site.evidence.length > 0 && <ul className="evidence">{site.evidence.slice(0, 6).map((h, i) => <li key={i}>{h}</li>)}</ul>}
-            </div>
-            <Avatar name={conf.owner} />
-          </li>
-        ))}
-      </Section>
-
       <Section title="Due for a re-check" n={stale.length} hint="Verified more than 45 days ago and the deadline is still ahead.">
         {stale.map((r) => item(r, <>
           <button className="primary" onClick={() => verify(r)}>Still correct</button>
           <button onClick={() => setEdit(r)}>Edit</button>
         </>, <small className="muted">Last checked {fmt(r.checkedAt) || 'never'} by {r.checkedBy || '—'}</small>))}
-      </Section>
-
-      <Section title="Still estimated" n={estimated.length} hint="Not announced yet, so last year's dates are shown. They update on their own; enter real dates if you learn them first.">
-        {estimated.slice(0, 40).map((r) => item(r, <button onClick={() => setEdit(r)}>Enter dates</button>))}
       </Section>
 
       {edit && <DeadlineModal row={edit} onClose={() => setEdit(null)} />}

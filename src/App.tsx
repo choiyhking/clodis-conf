@@ -11,7 +11,7 @@ import { Avatar, Icon, Modal } from './ui'
 const TABS = [
   { key: 'deadlines', label: 'Deadlines', icon: 'calendar' },
   { key: 'timeline', label: 'Timeline', icon: 'timeline' },
-  { key: 'papers', label: 'Papers', icon: 'papers' },
+  { key: 'papers', label: 'Research', icon: 'papers' },
   { key: 'inbox', label: 'Inbox', icon: 'inbox' },
   { key: 'lab', label: 'Lab', icon: 'lab' },
 ] as const

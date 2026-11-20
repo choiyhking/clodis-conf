@@ -86,10 +86,12 @@ export default function Schedule() {
       <header className="page-head">
         <div>
           <h1>Deadlines</h1>
-          <p className="muted">
-            {data.conferences.length} conferences tracked · {auto ? `dates collected ${auto.generatedAt.slice(0, 10)}` : 'dates not collected yet'} from ccfddl and conference sites
-          </p>
+          <p className="muted">{data.conferences.length} conferences tracked</p>
         </div>
+        <span className="collected" title="Dates are collected automatically every morning">
+          <i className={'dot' + (auto ? ' ok' : '')} />
+          {auto ? <>Dates collected <b>{auto.generatedAt.slice(0, 10)}</b></> : 'Dates not collected yet'}
+        </span>
       </header>
 
       <Clock />

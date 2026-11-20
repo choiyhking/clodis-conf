@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
-  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, hue, initials, isDate, isStale, paperLinks, rowLabel,
+  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, initials, isDate, isStale, paperLinks, rowLabel,
   settleStatus, sortMembers, timeLeft, toKST, uid,
 } from './logic'
 import { useStore } from './store'
@@ -38,20 +38,18 @@ export function Icon({ name, size = 16 }: { name: keyof typeof ICONS | string; s
  *  - dot:     just the person's colour, for places where the name is typed or written right beside it
  */
 export function Avatar({ name, size = 22, whole = false, dot = false }: { name: string; size?: number; whole?: boolean; dot?: boolean }) {
-  const { data } = useStore()
+  const { data, me } = useStore()
   if (!name) return null
   const unknown = name === '?'
   const role = data.members.find((x) => x.name === name)?.role
-  // Members take colours a golden angle apart in the order they joined, so no two neighbours look alike;
-  // a name that is not a member falls back to a colour derived from the name.
-  const idx = [...data.members].sort((a, b) => a.id.localeCompare(b.id)).findIndex((x) => x.name === name)
-  const bg = unknown ? 'var(--faint)' : `hsl(${idx >= 0 ? Math.round((210 + idx * 137.508) % 360) : hue(name)} 52% 42%)`
+  // Everyone is the same quiet grey; only your own name carries the accent colour, so "mine" stands out.
+  const cls = unknown ? ' none' : name === me ? ' me' : ''
   const title = unknown ? 'Not selected' : role ? `${name} · ${role}` : name
-  if (dot) return <i className="who-dot" title={title} style={{ background: bg }} />
+  if (dot) return <i className={'who-dot' + cls} title={title} />
   const n = name.trim()
   const fits = /[가-힣]/.test(n) ? n.length <= 4 : n.length <= 8
   return (
-    <span className="avatar" title={title} style={{ height: size, fontSize: Math.min(13, Math.max(10.5, size * 0.5)), background: bg }}>
+    <span className={'avatar' + cls} title={title} style={{ height: size, fontSize: Math.min(13, Math.max(10.5, size * 0.5)) }}>
       {unknown ? '?' : whole || fits ? n : initials(n)}
     </span>
   )
