@@ -6,7 +6,7 @@ import Papers from './pages/Papers'
 import Schedule from './pages/Schedule'
 import Timeline from './pages/Timeline'
 import { MODE, supabase, useStore } from './store'
-import { Avatar, Field, Icon, Modal } from './ui'
+import { Avatar, Icon, Modal } from './ui'
 
 const TABS = [
   { key: 'deadlines', label: 'Deadlines', icon: 'calendar' },
@@ -62,54 +62,28 @@ function Login({ onBack }: { onBack: () => void }) {
   )
 }
 
-function PasswordModal({ onClose }: { onClose: () => void }) {
-  const [a, setA] = useState('')
-  const [b, setB] = useState('')
-  const [msg, setMsg] = useState('')
-  const submit = async () => {
-    if (a.length < 8) return setMsg('Use at least 8 characters.')
-    if (a !== b) return setMsg('The two passwords do not match.')
-    const { error } = await supabase!.auth.updateUser({ password: a })
-    if (error) return setMsg(error.message)
-    alert('Password changed.')
-    onClose()
-  }
-  return (
-    <Modal title="Change password" onClose={onClose}>
-      <form className="grid" onSubmit={(e) => { e.preventDefault(); void submit() }}>
-        <Field label="New password" span><input type="password" autoComplete="new-password" value={a} onChange={(e) => setA(e.target.value)} autoFocus /></Field>
-        <Field label="Again" span><input type="password" autoComplete="new-password" value={b} onChange={(e) => setB(e.target.value)} /></Field>
-        {msg && <p className="span" role="status">{msg}</p>}
-        <footer className="span">
-          <span className="grow" />
-          <button type="button" onClick={onClose}>Cancel</button>
-          <button className="primary">Save</button>
-        </footer>
-      </form>
-    </Modal>
-  )
-}
-
-/** Shown once after joining by invite link: the name is remembered by this browser and can be changed in the sidebar. */
+/** Picks who this browser acts as. Shown once when nobody is picked yet, and from the sidebar to switch. */
 function NameModal({ onClose }: { onClose: () => void }) {
-  const { data, setMe } = useStore()
+  const { data, me, setMe } = useStore()
   return (
     <Modal title="Who are you?" onClose={onClose}>
       <p className="muted">Pick your name so your changes show up under it. This browser remembers it.</p>
       <div className="name-pick">
-        {sortMembers(data.members).map((m) => <button key={m.id} onClick={() => { setMe(m.name); onClose() }}>{m.name}</button>)}
+        {sortMembers(data.members).map((m) => (
+          <button key={m.id} className={m.name === me ? 'on' : ''} aria-pressed={m.name === me} onClick={() => { setMe(m.name); onClose() }}>{m.name}</button>
+        ))}
       </div>
-      <footer><span className="grow" /><button onClick={onClose}>Not now</button></footer>
+      <footer><span className="grow" /><button onClick={onClose}>{me ? 'Cancel' : 'Not now'}</button></footer>
     </Modal>
   )
 }
 
 export default function App() {
-  const { ready, error, rows, data, today, me, setMe, session, guest, joined, auto } = useStore()
+  const { ready, error, rows, data, today, me, session, guest, joined, auto } = useStore()
   const [askedName, setAskedName] = useState(false)
+  const [pickName, setPickName] = useState(false)
   // The admin's sign-in is out of the way: the "#admin" address, or the button at the bottom of the Lab page.
   const [signingIn, setSigningIn] = useState(() => MODE === 'supabase' && location.hash === '#admin')
-  const [changePw, setChangePw] = useState(false)
   useEffect(() => { if (session) setSigningIn(false) }, [session])
   const [tab, setTab] = useState<Tab>(() => (isTab(location.hash.slice(1)) ? (location.hash.slice(1) as Tab) : 'deadlines'))
   useEffect(() => {
@@ -157,37 +131,15 @@ export default function App() {
               {MODE === 'supabase' && <p className="muted">Lab members: open your invite link.</p>}
             </div>
           )}
-          {!guest && <label className="me">
-            <Avatar name={me || '?'} dot />
-            <span title={session ? `Signed in as ${session}` : undefined}>
-              {session && me ? (
-                // Shared mode: identity follows the login. To change it, move the email in Lab → Members.
-                <b className="me-name">
-                  {me}
-                  <button className="link" onClick={() => confirm(`Unlink ${session} from ${me}?`) && setMe('')}>Not you?</button>
-                </b>
-              ) : (
-                <select
-                  value={me}
-                  aria-label="Who are you?"
-                  onChange={(e) => {
-                    const name = e.target.value
-                    if (session && name && !confirm(`Link ${session} to ${name}? You will act as ${name} from now on.`)) return
-                    setMe(name)
-                  }}
-                >
-                  <option value="">Who are you?</option>
-                  {sortMembers(data.members).map((m) => <option key={m.id}>{m.name}</option>)}
-                </select>
-              )}
-              <small className="muted">{meRole || (me ? 'Role not set' : session ? 'Pick your name once' : 'Pick your name')}</small>
-            </span>
-          </label>}
-          {!guest && MODE === 'supabase' && session && (
-            <p className="account">
-              <button className="link" onClick={() => setChangePw(true)}>Change password</button>
-              <button className="link" onClick={() => confirm('Sign out?') && supabase!.auth.signOut()}>Sign out</button>
-            </p>
+          {!guest && (
+            <button className="me" onClick={() => setPickName(true)} title={me ? 'Switch to another name' : 'Pick your name'}>
+              <Avatar name={me || '?'} dot />
+              <span className="me-text">
+                <b>{me || 'Pick your name'}</b>
+                <small className="muted">{me ? meRole || 'Role not set' : 'Not picked yet'}</small>
+              </span>
+              <Icon name="down" size={14} />
+            </button>
           )}
           <p className="sync muted">
             <i className={'dot' + (auto ? ' ok' : '')} /> {auto ? `Dates collected ${auto.generatedAt.slice(0, 10)}` : 'Collector has not run'}
@@ -204,8 +156,8 @@ export default function App() {
         {shownTab === 'inbox' && <Inbox />}
         {shownTab === 'lab' && <Lab />}
       </main>
-      {changePw && <PasswordModal onClose={() => setChangePw(false)} />}
-      {joined === 'ok' && !guest && !session && !me && !askedName && data.members.length > 0 && <NameModal onClose={() => setAskedName(true)} />}
+      {/* Nobody picked yet (first visit by invite link, or the admin on a new browser): ask once per page load. */}
+      {!guest && data.members.length > 0 && (pickName || (MODE === 'supabase' && !me && !askedName)) && <NameModal onClose={() => { setPickName(false); setAskedName(true) }} />}
     </div>
   )
 }

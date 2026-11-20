@@ -91,7 +91,6 @@ input[type='checkbox'] { height: auto; accent-color: var(--accent); }
 .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
 .me { display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid var(--line); border-radius: var(--radius); }
 .me > span:not(.avatar) { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-.me select { border: none; background: none; padding: 0; height: 20px; font-weight: 600; width: 100%; }
 .sync { font-size: 12px; padding: 0 8px; line-height: 1.7; }
 .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--faint); margin-right: 4px; }
 .dot.ok { background: var(--ok); } .dot.warn { background: var(--auto); }
@@ -331,15 +330,6 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
 .it-dates { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 2px; font-variant-numeric: tabular-nums; }
 
 /* lab */
-.lab { max-width: 980px; }
-.role-group { margin-bottom: 14px; }
-.members td { padding: 7px 12px; }
-.members tr:first-child td { border-top: none; }
-.members input, .members select { border-color: transparent; background: none; width: 100%; }
-.members input:hover, .members select:hover, .members input:focus { border-color: var(--line-strong); background: var(--surface); }
-.m-name { display: flex; align-items: center; gap: 8px; min-width: 190px; }
-.m-name input { font-weight: 600; }
-.add-member { margin-top: 12px; }
 
 .login { max-width: 340px; margin: 16vh auto; display: flex; flex-direction: column; gap: 12px; padding: 0 16px; }
 .login .brand { padding: 0; font-size: 18px; }
@@ -355,8 +345,6 @@ details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); fon
   .grid, .two { grid-template-columns: 1fr; }
   .ilist > li { flex-wrap: wrap; }
 }
-.me-name { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
-.me-name .link { font-size: 11px; font-weight: 400; color: var(--muted); text-decoration: underline; }
 
 /* research stage, pickers, activity log */
 .sdot.ps-research, .lg.ps-research { background: var(--idea); }
@@ -693,8 +681,7 @@ html { scrollbar-gutter: stable; }
 /* public (signed-out) view and account controls */
 .guest-box { display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius); }
 .guest-box p { margin: 0; font-size: 12px; }
-.account { display: flex; justify-content: space-between; margin: -4px 8px 0; font-size: 12px; }
-.account .link, .login .link { color: var(--muted); text-decoration: underline; font-size: 12.5px; }
+.login .link { color: var(--muted); text-decoration: underline; font-size: 12.5px; }
 .login .link { align-self: flex-start; }
 .login .back { margin-top: 8px; }
 
@@ -706,3 +693,44 @@ html { scrollbar-gutter: stable; }
 .invite-url { width: 100%; margin-top: 10px; font-family: ui-monospace, monospace; font-size: 12px; }
 .name-pick { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
 .guest-box .link { padding: 0; }
+
+/* lab page: full width; members beside the activity log; data and admin as rows of settings */
+.lab-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 0 24px; align-items: start; }
+.lab-cols h2 { margin-top: 6px; }
+.lab h2 > .muted { font-weight: 400; margin-left: 4px; }
+.mlist { overflow: hidden; }
+.mgroup h3 { display: flex; justify-content: space-between; margin: 0; padding: 7px 14px; background: var(--sunken); border-top: 1px solid var(--line); }
+.mgroup:first-child h3 { border-top: none; }
+.mgroup h3 span { font-weight: 500; }
+.mrow { display: grid; grid-template-columns: 12px minmax(0, 1fr) 150px 30px; gap: 8px; align-items: center; padding: 5px 10px 5px 14px; border-top: 1px solid var(--line); }
+.mrow input, .mrow select { width: 100%; min-width: 0; border-color: transparent; background: none; }
+.mrow input:hover, .mrow select:hover, .mrow input:focus { border-color: var(--line-strong); background: var(--surface); }
+.mrow .m-name { font-weight: 600; }
+.mrow.new { grid-template-columns: 12px minmax(0, 1fr) 150px auto; padding: 9px 10px 9px 14px; color: var(--muted); }
+.mrow.new input, .mrow.new select { border-color: var(--line-strong); background: var(--surface); }
+.mrow.new .m-name { font-weight: 400; }
+.lab .activity { max-height: 560px; }
+.settings .set-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; padding: 14px 16px; border-top: 1px solid var(--line); }
+.settings .set-row:first-child { border-top: none; }
+.set-text { flex: 1 1 340px; min-width: 0; }
+.set-text p { margin: 2px 0 0; font-size: 13px; }
+.set-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.set-msg { color: var(--accent-ink); font-weight: 500; }
+.settings .invite-url { margin: 0; }
+.settings.admin { border-color: color-mix(in srgb, var(--hot) 35%, var(--line)); }
+button.danger-btn { color: var(--hot); border-color: color-mix(in srgb, var(--hot) 45%, var(--line)); }
+button.danger-btn:hover { background: var(--hot-soft); color: var(--hot); }
+.lab-foot { margin-top: 20px; }
+.lab-foot .link { color: var(--muted); text-decoration: underline; font-size: 12.5px; }
+@media (max-width: 1100px) { .lab-cols { grid-template-columns: 1fr; } }
+
+/* sidebar: who you are, as one button that opens the name picker */
+button.me { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; height: auto; padding: 9px 10px; text-align: left; font-weight: 400; background: var(--surface); }
+button.me:hover { background: var(--sunken); border-color: var(--line-strong); }
+.me-text { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.35; }
+.me-text b, .me-text small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.me-text b { font-weight: 600; }
+.me-text small { font-size: 12px; }
+button.me svg { flex: none; color: var(--faint); }
+.name-pick button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.side .sync { margin: 0; padding: 0 4px; font-size: 12px; line-height: 1.5; }

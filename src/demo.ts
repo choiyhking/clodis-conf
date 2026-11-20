@@ -20,10 +20,10 @@ export interface DemoData {
  */
 export function demoData(rows: Row[], members: Member[], today: string): DemoData {
   const extra: Member[] = [
-    { id: `${DEMO_PREFIX}m1`, name: '김하늘', email: '', role: 'Postdoc' },
-    { id: `${DEMO_PREFIX}m2`, name: '이서준', email: '', role: 'PhD' },
-    { id: `${DEMO_PREFIX}m3`, name: '정다은', email: '', role: 'MS' },
-    { id: `${DEMO_PREFIX}m4`, name: '한지호', email: '', role: 'Undergrad' },
+    { id: `${DEMO_PREFIX}m1`, name: '김하늘', role: 'Postdoc' },
+    { id: `${DEMO_PREFIX}m2`, name: '이서준', role: 'PhD' },
+    { id: `${DEMO_PREFIX}m3`, name: '정다은', role: 'MS' },
+    { id: `${DEMO_PREFIX}m4`, name: '한지호', role: 'Undergrad' },
   ].filter((m) => !members.some((x) => x.name === m.name)) as Member[]
   const all = [...members, ...extra]
 

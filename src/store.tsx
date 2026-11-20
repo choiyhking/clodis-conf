@@ -47,8 +47,8 @@ export async function loadSeed(): Promise<Data> {
   const names = [...new Set(conferences.map((c) => c.owner).filter(Boolean))]
   // Roles are unknown at import time; the professor entry is a placeholder to rename in Lab settings.
   const members: Member[] = [
-    { id: 'professor', name: '교수님', email: '', role: 'Professor' },
-    ...names.map((name) => ({ id: name, name, email: '', role: '' as const })),
+    { id: 'professor', name: '교수님', role: 'Professor' },
+    ...names.map((name) => ({ id: name, name, role: '' as const })),
   ]
   return { conferences, deadlines, papers: [], members, log: [] }
 }
@@ -162,24 +162,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [reload])
 
-  // Who "me" is.
-  //  - an account (email): whoever's member entry carries the signed-in email. It is not a free choice, so
-  //    nobody ends up acting as someone else by accident; picking a name once links the account to it.
-  //  - joined by invite link, or local mode: a plain choice remembered by this browser.
-  const sameEmail = (a: string) => !!session && a.trim().toLowerCase() === session.toLowerCase()
-  const byEmail = !!supabase && !!session
-  const me = byEmail ? (data.members.find((m) => sameEmail(m.email))?.name ?? '') : data.members.some((m) => m.name === localMe) || !supabase ? localMe : ''
+  // Who "me" is: a name picked from the member list and remembered by this browser, for everyone
+  // (invite link, admin, local mode). A name that is no longer on the list counts as not picked.
+  const me = data.members.some((m) => m.name === localMe) || !supabase ? localMe : ''
 
   const setMe = (name: string) => {
-    if (!byEmail) {
-      localStorage.setItem(LS_ME, name)
-      return setLocalMe(name)
-    }
-    if (!session) return
-    for (const m of data.members) {
-      if (m.name === name && !sameEmail(m.email)) void save('members', { ...m, email: session })
-      else if (m.name !== name && sameEmail(m.email)) void save('members', { ...m, email: '' })
-    }
+    localStorage.setItem(LS_ME, name)
+    setLocalMe(name)
   }
 
   /** Activity-log entry for a change, or null when it isn't worth a line. */

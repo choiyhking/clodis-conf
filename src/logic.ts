@@ -187,7 +187,7 @@ export function describeChange(coll: Coll, prev: unknown, next: unknown, data: D
     const a = prev as Member | undefined, b = next as Member | undefined
     if (!b) return `Removed member ${a!.name}`
     if (!a) return `Added member ${b.name}${b.role ? ` (${b.role})` : ''}`
-    const keys = changed(a, b, ['name', 'role', 'email'])
+    const keys = changed(a, b, ['name', 'role'])
     return keys.length ? `Changed member ${a.name}: ${keys.map((k) => `${k} ${arrow(a[k], b[k])}`).join(', ')}` : ''
   }
   return ''

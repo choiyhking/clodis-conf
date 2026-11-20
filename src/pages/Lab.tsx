@@ -1,9 +1,45 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { demoData, isDemo, withSampleRoles } from '../demo'
 import { obsoleteDeadlines, roleRank, sortMembers, uid } from '../logic'
 import { MODE, inviteUrl, loadSeed, supabase, useStore } from '../store'
 import { ROLES, type Data, type Member, type Role } from '../types'
-import { Avatar, Icon } from '../ui'
+import { Avatar, Field, Icon, Modal } from '../ui'
+
+function PasswordModal({ onClose }: { onClose: () => void }) {
+  const [a, setA] = useState('')
+  const [b, setB] = useState('')
+  const [msg, setMsg] = useState('')
+  const submit = async () => {
+    if (a.length < 8) return setMsg('Use at least 8 characters.')
+    if (a !== b) return setMsg('The two passwords do not match.')
+    const { error } = await supabase!.auth.updateUser({ password: a })
+    if (error) return setMsg(error.message)
+    alert('Password changed.')
+    onClose()
+  }
+  return (
+    <Modal title="Change password" onClose={onClose}>
+      <form className="grid" onSubmit={(e) => { e.preventDefault(); void submit() }}>
+        <Field label="New password" span><input type="password" autoComplete="new-password" value={a} onChange={(e) => setA(e.target.value)} autoFocus /></Field>
+        <Field label="Again" span><input type="password" autoComplete="new-password" value={b} onChange={(e) => setB(e.target.value)} /></Field>
+        {msg && <p className="span" role="status">{msg}</p>}
+        <footer className="span">
+          <span className="grow" />
+          <button type="button" onClick={onClose}>Cancel</button>
+          <button className="primary">Save</button>
+        </footer>
+      </form>
+    </Modal>
+  )
+}
+
+/** One line of a settings card: what it is on the left, what you can do on the right. */
+const Row = ({ title, children, actions }: { title: string; children: ReactNode; actions?: ReactNode }) => (
+  <div className="set-row">
+    <div className="set-text"><b>{title}</b><p className="muted">{children}</p></div>
+    {actions && <div className="set-acts">{actions}</div>}
+  </div>
+)
 
 export default function Lab() {
   const { data, rows, today, save, remove, replaceAll, session, access, me, setMe } = useStore()
@@ -24,16 +60,15 @@ export default function Lab() {
     }
   }
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [changePw, setChangePw] = useState(false)
   const [role, setRole] = useState<Role>('')
   const file = useRef<HTMLInputElement>(null)
 
   const add = async () => {
     if (!name.trim()) return
     if (data.members.some((m) => m.name === name.trim())) return alert('Someone with that name already exists.')
-    await save('members', { id: uid(), name: name.trim(), email: email.trim(), role })
+    await save('members', { id: uid(), name: name.trim(), role })
     setName('')
-    setEmail('')
   }
   /** Names are how conferences and papers refer to people, so a rename has to follow them everywhere. */
   const rename = async (m: Member, next: string) => {
@@ -103,100 +138,110 @@ export default function Lab() {
       <header className="page-head">
         <div>
           <h1>Lab</h1>
-          <p className="muted">Members, roles and data</p>
+          <p className="muted">Members, activity and data</p>
         </div>
       </header>
 
-      <h2>Members</h2>
-      {groups.map((g) => (
-        <div key={g || 'none'} className="role-group">
-          <h3>{g || 'Role not set'} <span className="muted">{members.filter((m) => m.role === g).length}</span></h3>
-          <div className="card">
-            <table className="plain members">
-              <tbody>
+      <div className="lab-cols">
+        <div>
+          <h2>Members <span className="muted">{members.length}</span></h2>
+          <div className="card mlist">
+            {groups.map((g) => (
+              <div key={g || 'none'} className="mgroup">
+                <h3>{g || 'Role not set'} <span>{members.filter((m) => m.role === g).length}</span></h3>
                 {members.filter((m) => m.role === g).map((m) => (
-                  <tr key={m.id}>
-                    <td className="m-name">
-                      <input defaultValue={m.name} key={m.name} aria-label="Name" onBlur={(e) => rename(m, e.target.value)} onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()} />
-                    </td>
-                    <td>
-                      <select value={m.role} onChange={(e) => save('members', { ...m, role: e.target.value as Role })} aria-label="Role">
-                        <option value="">Role not set</option>{ROLES.map((r) => <option key={r}>{r}</option>)}
-                      </select>
-                    </td>
-                    <td><input defaultValue={m.email} placeholder="email (links their login)" aria-label="Email" onBlur={(e) => e.target.value.trim() !== m.email && save('members', { ...m, email: e.target.value.trim() })} /></td>
-                    <td>
-                      <button className="ghost" aria-label={`Remove ${m.name}`} onClick={() => confirm(`Remove ${m.name}? Their conferences and papers keep the name.`) && remove('members', m.id)}><Icon name="close" size={14} /></button>
-                    </td>
-                  </tr>
+                  <div key={m.id} className="mrow">
+                    <Avatar name={m.name} dot />
+                    <input className="m-name" defaultValue={m.name} key={m.name} aria-label="Name" onBlur={(e) => rename(m, e.target.value)} onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()} />
+                    <select value={m.role} onChange={(e) => save('members', { ...m, role: e.target.value as Role })} aria-label="Role">
+                      <option value="">Role not set</option>{ROLES.map((r) => <option key={r}>{r}</option>)}
+                    </select>
+                    <button className="ghost" aria-label={`Remove ${m.name}`} title="Remove" onClick={() => confirm(`Remove ${m.name}? Their conferences and papers keep the name.`) && remove('members', m.id)}><Icon name="close" size={14} /></button>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            ))}
+            <div className="mrow new">
+              <Icon name="plus" size={14} />
+              <input className="m-name" placeholder="Add a member: name" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} aria-label="New member name" />
+              <select value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label="Role"><option value="">Role</option>{ROLES.map((r) => <option key={r}>{r}</option>)}</select>
+              <button className="primary" onClick={add} disabled={!name.trim()}>Add</button>
+            </div>
           </div>
         </div>
-      ))}
-      <div className="filters add-member">
-        <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} />
-        <select value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label="Role"><option value="">Role</option>{ROLES.map((r) => <option key={r}>{r}</option>)}</select>
-        <input placeholder="Email (optional)" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <button className="primary" onClick={add}><Icon name="plus" size={14} /> Add member</button>
+
+        <div>
+          <h2>Activity</h2>
+          <div className="card activity">
+            {data.log.length === 0 ? (
+              <p className="empty">Changes to dates, papers, conferences and members are recorded here.</p>
+            ) : (
+              <ul>
+                {[...data.log].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 200).map((e) => (
+                  <li key={e.id}>
+                    <time title={e.at}>{new Date(e.at).toLocaleString('sv-SE').slice(0, 16)}</time>
+                    <span className="who">{data.members.some((m) => m.name === e.by) ? <Avatar name={e.by} size={20} whole /> : e.by}</span>
+                    <span>{e.text}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <h2>Data</h2>
+      <div className="card settings">
+        <Row title={MODE === 'local' ? 'Local mode' : 'Shared database'}>
+          {MODE === 'local'
+            ? 'Everything is stored in this browser only. Connect Supabase (see README) to share it with the lab.'
+            : session ? `You are signed in as ${session}.` : 'This browser joined with the invite link.'}
+        </Row>
+        <Row title="Backup" actions={<>
+          <button onClick={exportJson}>Download</button>
+          <button onClick={() => file.current?.click()}>Restore…</button>
+          <input ref={file} type="file" accept="application/json" hidden onChange={(e) => e.target.files?.[0] && importJson(e.target.files[0])} />
+        </>}>
+          Save everything as one file, or load such a file back in. Restoring overwrites items with the same id.
+        </Row>
+        <Row title="Old deadlines" actions={<button onClick={cleanUp} disabled={obsolete.length === 0}>Clean up ({obsolete.length})</button>}>
+          Deadlines that closed over a year ago and have a newer edition on record. The latest closed edition of each conference is always kept.
+        </Row>
+        <Row title="Spreadsheet data" actions={<button onClick={seed}>{MODE === 'local' ? 'Reset…' : 'Import…'}</button>}>
+          {MODE === 'local'
+            ? 'Erase what this browser holds and start again from the original spreadsheet.'
+            : 'Write the original spreadsheet conferences and deadlines into the database again. Items with the same id are overwritten.'}
+        </Row>
+        <Row title="Sample data" actions={hasDemo ? <button onClick={clearDemo}>Remove</button> : <button onClick={loadDemo}>Load</button>}>
+          Example members, papers and deadlines for trying the site out. Removing them leaves real data alone.
+        </Row>
       </div>
 
       {access === 'admin' && (
         <>
-          <h2>Invite link</h2>
-          <div className="card pad">
-            <p className="muted">Anyone who opens this link sees and edits everything, with no sign-in. Share it with lab members only.</p>
-            <div className="filters">
-              <button className="primary" onClick={() => getInvite(false)}>Copy invite link</button>
-              <button onClick={() => getInvite(true)}>Replace link…</button>
-              {inviteMsg && <span className="muted" role="status">{inviteMsg}</span>}
-            </div>
-            {invite && <input className="invite-url" readOnly value={invite} onFocus={(e) => e.target.select()} aria-label="Invite link" />}
+          <h2>Admin</h2>
+          <div className="card settings admin">
+            <Row title="Invite link" actions={<button className="primary" onClick={() => getInvite(false)}>Copy link</button>}>
+              Anyone who opens this link sees and edits everything, with no sign-in. Share it with lab members only.
+              {inviteMsg && <span className="set-msg" role="status"> {inviteMsg}</span>}
+            </Row>
+            {invite && <div className="set-row"><input className="invite-url" readOnly value={invite} onFocus={(e) => e.target.select()} aria-label="Invite link" /></div>}
+            <Row title="Replace the invite link" actions={<button className="danger-btn" onClick={() => getInvite(true)}>Replace…</button>}>
+              The current link stops working and everyone who joined with it is signed out. Do this if the link got out.
+            </Row>
+            {session && (
+              <Row title="Admin account" actions={<>
+                <button onClick={() => setChangePw(true)}>Change password</button>
+                <button onClick={() => confirm('Sign out?') && supabase!.auth.signOut()}>Sign out</button>
+              </>}>
+                Signed in as {session}.
+              </Row>
+            )}
           </div>
         </>
       )}
-
-      <h2>Activity</h2>
-      <div className="card activity">
-        {data.log.length === 0 ? (
-          <p className="empty">Changes to dates, papers, conferences and members are recorded here.</p>
-        ) : (
-          <ul>
-            {[...data.log].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 200).map((e) => (
-              <li key={e.id}>
-                <time title={e.at}>{new Date(e.at).toLocaleString('sv-SE').slice(0, 16)}</time>
-                <span className="who">{data.members.some((m) => m.name === e.by) ? <Avatar name={e.by} size={20} whole /> : e.by}</span>
-                <span>{e.text}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <h2>Data</h2>
-      <div className="card pad">
-        <p>
-          <b>{MODE === 'local' ? 'Local mode' : 'Shared database (Supabase)'}</b>{' '}
-          <span className="muted">
-            {MODE === 'local'
-              ? '— everything is stored in this browser only. Connect Supabase (see README) to share it with the lab.'
-              : session ? `— signed in as ${session}` : '— joined with the invite link'}
-          </span>
-        </p>
-        <div className="filters">
-          <button onClick={exportJson}>Download backup</button>
-          <button onClick={() => file.current?.click()}>Restore backup</button>
-          <input ref={file} type="file" accept="application/json" hidden onChange={(e) => e.target.files?.[0] && importJson(e.target.files[0])} />
-          <button onClick={seed}>{MODE === 'local' ? 'Reset to spreadsheet data' : 'Import spreadsheet data'}</button>
-          <button onClick={cleanUp} disabled={obsolete.length === 0} title="Deadlines that closed over a year ago and have a newer edition on record. The latest closed edition of each conference is always kept: estimates are based on it.">
-            Clean up old deadlines ({obsolete.length})
-          </button>
-          {hasDemo ? <button onClick={clearDemo}>Remove sample data</button> : <button onClick={loadDemo}>Load sample data</button>}
-          {supabase && session && <button onClick={() => supabase!.auth.signOut()}>Sign out</button>}
-          {supabase && !session && <button onClick={() => (location.hash = 'admin')}>Admin sign in</button>}
-        </div>
-      </div>
+      {supabase && !session && <p className="lab-foot"><button className="link" onClick={() => (location.hash = 'admin')}>Admin sign in</button></p>}
+      {changePw && <PasswordModal onClose={() => setChangePw(false)} />}
     </section>
   )
 }
