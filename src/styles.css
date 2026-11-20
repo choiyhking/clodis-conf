@@ -734,3 +734,15 @@ button.me:hover { background: var(--sunken); border-color: var(--line-strong); }
 button.me svg { flex: none; color: var(--faint); }
 .name-pick button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
 .side .sync { margin: 0; padding: 0 4px; font-size: 12px; line-height: 1.5; }
+
+/* brand is the name alone; paper cards lead with a larger title */
+.brand { padding: 2px 10px 0; font-size: 19px; letter-spacing: -0.02em; }
+.brand b { font-weight: 700; }
+.login .brand { padding: 0; font-size: 24px; }
+.pcard > b { font-size: 15px; line-height: 1.35; letter-spacing: -0.005em; }
+/* removing a member is rare: the × only appears on the row being pointed at */
+@media (hover: hover) {
+  .mrow .ghost { opacity: 0; }
+  .mrow:hover .ghost, .mrow .ghost:focus-visible { opacity: 1; }
+}
+.mrow .ghost:hover { color: var(--hot); background: var(--hot-soft); }

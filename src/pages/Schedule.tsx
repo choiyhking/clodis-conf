@@ -20,7 +20,7 @@ const STATUS_OPTIONS: FilterOption[] = [
 const PAST_DAYS = 365 // "Show past" goes back one year; older rows stay in the data but off the table
 
 export default function Schedule() {
-  const { rows, data, today, guest } = useStore()
+  const { rows, data, today, guest, auto } = useStore()
   const COLS = guest ? 9 : 11
   const [q, setQ] = useState('')
   // Each filter holds any number of values; an empty list means that filter is off.
@@ -86,7 +86,9 @@ export default function Schedule() {
       <header className="page-head">
         <div>
           <h1>Deadlines</h1>
-          <p className="muted">{data.conferences.length} conferences tracked · dates refresh every morning from ccfddl and conference sites</p>
+          <p className="muted">
+            {data.conferences.length} conferences tracked · {auto ? `dates collected ${auto.generatedAt.slice(0, 10)}` : 'dates not collected yet'} from ccfddl and conference sites
+          </p>
         </div>
       </header>
 

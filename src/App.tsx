@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { APP_NAME, LAB_NAME, isStale, newSites, sortMembers } from './logic'
+import { APP_NAME, LAB_NAME, sortMembers } from './logic'
 import Inbox from './pages/Inbox'
 import Lab from './pages/Lab'
 import Papers from './pages/Papers'
@@ -17,15 +17,6 @@ const TABS = [
 ] as const
 type Tab = (typeof TABS)[number]['key']
 const isTab = (h: string): h is Tab => TABS.some((t) => t.key === h)
-
-const Logo = () => (
-  <svg className="logo" viewBox="0 0 32 32" aria-hidden>
-    <rect width="32" height="32" rx="8" />
-    <path d="M10.5 22h11.8a4.2 4.2 0 0 0 .6-8.36A6.3 6.3 0 0 0 10.9 14.6 3.75 3.75 0 0 0 10.5 22Z" fill="none" stroke="#fff" strokeWidth="1.9" strokeLinejoin="round" />
-    <path d="M12.6 18.2h6.8M16 18.2v-3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
-    <circle cx="12.6" cy="18.2" r="1.35" fill="#fff" /><circle cx="19.4" cy="18.2" r="1.35" fill="#fff" /><circle cx="16" cy="15" r="1.35" fill="#fff" />
-  </svg>
-)
 
 /** Lab members come in by invite link; this form is for the admin (and anyone the admin made an account for). */
 function Login({ onBack }: { onBack: () => void }) {
@@ -50,7 +41,7 @@ function Login({ onBack }: { onBack: () => void }) {
   }
   return (
     <form className="login" onSubmit={(e) => { e.preventDefault(); void signIn() }}>
-      <div className="brand"><Logo /> <b>{APP_NAME}</b></div>
+      <div className="brand"><b>{APP_NAME}</b></div>
       <p className="muted">For the lab admin. Lab members do not sign in: open the invite link you were given.</p>
       <input type="email" placeholder="Email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
       <input type="password" placeholder="Password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -79,7 +70,7 @@ function NameModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function App() {
-  const { ready, error, rows, data, today, me, session, guest, joined, auto } = useStore()
+  const { ready, error, rows, data, today, me, session, guest, joined } = useStore()
   const [askedName, setAskedName] = useState(false)
   const [pickName, setPickName] = useState(false)
   // The admin's sign-in is out of the way: the "#admin" address, or the button at the bottom of the Lab page.
@@ -107,15 +98,14 @@ export default function App() {
   const shownTab: Tab = guest ? 'deadlines' : tab
 
   const mineOnly = (owner: string) => !me || owner === me
-  const todo =
-    rows.filter((r) => mineOnly(r.conf.owner) && (r.autoDiff || (r.deadline >= today && (r.status === 'auto' || isStale(r, today))))).length +
-    newSites(data.conferences, data.deadlines, auto).filter((s) => mineOnly(s.conf.owner)).length
+  // The badge counts what waits for a decision: collected dates to confirm, and verified dates that changed.
+  const todo = rows.filter((r) => mineOnly(r.conf.owner) && (r.autoDiff || (r.deadline >= today && r.status === 'auto'))).length
   const meRole = data.members.find((m) => m.name === me)?.role
 
   return (
     <div className="app">
       <aside className="side">
-        <div className="brand" title={LAB_NAME}><Logo /> <b>{APP_NAME}</b></div>
+        <div className="brand" title={LAB_NAME}><b>{APP_NAME}</b></div>
         <nav>
           {tabs.map((t) => (
             <button key={t.key} className={shownTab === t.key ? 'on' : ''} onClick={() => setTab(t.key)} aria-current={shownTab === t.key ? 'page' : undefined}>
@@ -141,10 +131,7 @@ export default function App() {
               <Icon name="down" size={14} />
             </button>
           )}
-          <p className="sync muted">
-            <i className={'dot' + (auto ? ' ok' : '')} /> {auto ? `Dates collected ${auto.generatedAt.slice(0, 10)}` : 'Collector has not run'}
-            {MODE === 'local' && <><br /><i className="dot warn" /> Local mode — not shared</>}
-          </p>
+          {MODE === 'local' && <p className="sync muted"><i className="dot warn" /> Local mode — not shared</p>}
         </div>
       </aside>
       <main>

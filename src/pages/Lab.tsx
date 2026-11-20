@@ -199,7 +199,7 @@ export default function Lab() {
         </Row>
         <Row title="Backup" actions={<>
           <button onClick={exportJson}>Download</button>
-          <button onClick={() => file.current?.click()}>Restore…</button>
+          <button onClick={() => file.current?.click()}>Restore</button>
           <input ref={file} type="file" accept="application/json" hidden onChange={(e) => e.target.files?.[0] && importJson(e.target.files[0])} />
         </>}>
           Save everything as one file, or load such a file back in. Restoring overwrites items with the same id.
@@ -207,7 +207,7 @@ export default function Lab() {
         <Row title="Old deadlines" actions={<button onClick={cleanUp} disabled={obsolete.length === 0}>Clean up ({obsolete.length})</button>}>
           Deadlines that closed over a year ago and have a newer edition on record. The latest closed edition of each conference is always kept.
         </Row>
-        <Row title="Spreadsheet data" actions={<button onClick={seed}>{MODE === 'local' ? 'Reset…' : 'Import…'}</button>}>
+        <Row title="Spreadsheet data" actions={<button onClick={seed}>{MODE === 'local' ? 'Reset' : 'Import'}</button>}>
           {MODE === 'local'
             ? 'Erase what this browser holds and start again from the original spreadsheet.'
             : 'Write the original spreadsheet conferences and deadlines into the database again. Items with the same id are overwritten.'}
@@ -226,7 +226,7 @@ export default function Lab() {
               {inviteMsg && <span className="set-msg" role="status"> {inviteMsg}</span>}
             </Row>
             {invite && <div className="set-row"><input className="invite-url" readOnly value={invite} onFocus={(e) => e.target.select()} aria-label="Invite link" /></div>}
-            <Row title="Replace the invite link" actions={<button className="danger-btn" onClick={() => getInvite(true)}>Replace…</button>}>
+            <Row title="Replace the invite link" actions={<button className="danger-btn" onClick={() => getInvite(true)}>Replace</button>}>
               The current link stops working and everyone who joined with it is signed out. Do this if the link got out.
             </Row>
             {session && (
