@@ -130,8 +130,7 @@ export function Countdown({ deadline, today, at, assumed }: { deadline: string; 
   return <span className={`cd ${tone}`}>{countdown(deadline, today)}</span>
 }
 
-/** `compact` leaves out the ×2 agreement mark; the full badge (drawer, inbox) keeps it. */
-export function StatusBadge({ row, compact }: { row: Row; compact?: boolean }) {
+export function StatusBadge({ row }: { row: Row }) {
   const title =
     row.status === 'verified'
       ? `Verified${row.checkedBy ? ` by ${row.checkedBy}` : ''} on ${fmt(row.checkedAt) || 'unknown date'}`
@@ -144,7 +143,6 @@ export function StatusBadge({ row, compact }: { row: Row; compact?: boolean }) {
     <span className={`status st-${row.status}`} title={title}>
       <i />
       {STATUS_LABEL[row.status]}
-      {!compact && row.status === 'auto' && row.sources?.length === 2 && <b title="The conference site and ccfddl agree">×2</b>}
     </span>
   )
 }

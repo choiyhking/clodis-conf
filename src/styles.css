@@ -128,7 +128,6 @@ main { padding: 26px 24px 80px; min-width: 0; }
 .cd.hot { background: var(--hot-soft); color: var(--hot); } .cd.warm { background: var(--warm-soft); color: var(--warm); } .cd.closed { background: none; color: var(--faint); font-weight: 500; }
 .status { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; white-space: nowrap; margin-right: 6px; font-style: normal; }
 .status i { width: 8px; height: 8px; border-radius: 50%; }
-.status b { font-size: 10.5px; color: var(--muted); font-weight: 600; }
 .st-verified { color: var(--ok); } .st-verified i { background: var(--ok); }
 .st-auto { color: var(--auto); } .st-auto i { background: var(--auto); }
 .st-estimated { color: var(--est); } .st-estimated i { border: 1.5px dashed var(--est); }

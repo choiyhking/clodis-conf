@@ -202,7 +202,7 @@ export default function Schedule() {
                       <span className={'owner-name' + (r.conf.owner ? '' : ' none')} title={r.conf.owner ? undefined : 'No owner assigned'}>{r.conf.owner || '–'}</span>
                     </td>}
                     <td className="st-cell">
-                      <StatusBadge row={r} compact />
+                      <StatusBadge row={r} />
                       {!guest && r.autoDiff && <span className="tag warn" title={`Collected value: ${fmt(r.autoDiff.deadline)}`}>Changed</span>}
                       {!guest && isStale(r, today) && <span className="tag" title={`Last checked ${fmt(r.checkedAt) || 'never'}`}>Re-check</span>}
                     </td>

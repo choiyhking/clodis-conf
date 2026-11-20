@@ -71,7 +71,7 @@ export default function Inbox() {
         </>, <div className="diff">{r.autoDiff!.source === 'site' ? 'Conference site' : 'ccfddl'} says <b>{fmt(r.autoDiff!.deadline)}</b>{r.autoDiff!.abstract && <> · Abstract {fmt(r.autoDiff!.abstract)}</>}</div>))}
       </Section>
 
-      <Section title="New dates to verify" n={autos.length} hint="Collected automatically and already shown on the Deadlines page as Auto. ×2 means the conference site and ccfddl agree.">
+      <Section title="New dates to verify" n={autos.length} hint="Collected automatically and already shown on the Deadlines page as Auto.">
         {autos.map((r) => item(r, <>
           <button className="primary" onClick={() => verify(r)}><Icon name="check" size={14} /> Looks right</button>
           <button onClick={() => setEdit(r)}>Edit</button>
