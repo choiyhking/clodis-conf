@@ -672,7 +672,7 @@ export function TargetModal({ row, onClose }: { row: Row; onClose: () => void })
           ))}
         </div>
       ))}
-      {candidates.length === 0 && <p className="muted">No other papers to choose from. Add ongoing work on the Papers page, or start one here.</p>}
+      {candidates.length === 0 && <p className="muted">No other papers to choose from. Add ongoing work on the Research page, or start one here.</p>}
       <footer>
         <button onClick={() => setFresh(newPaper(me, today, row))}><Icon name="plus" size={14} /> New paper</button>
         <span className="grow" />

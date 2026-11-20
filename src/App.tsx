@@ -136,7 +136,7 @@ export default function App() {
       </aside>
       <main>
         {error && <p className="error">Something went wrong: {error}</p>}
-        {joined === 'bad' && guest && <p className="error">That invite link does not work any more. Ask the lab admin for the current one.</p>}
+        {joined === 'bad' && guest && <p className="error">That invite link no longer works. Ask the lab admin for the current one.</p>}
         {shownTab === 'deadlines' && <Schedule />}
         {shownTab === 'timeline' && <Timeline />}
         {shownTab === 'papers' && <Papers />}
