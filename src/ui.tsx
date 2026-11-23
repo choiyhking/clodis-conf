@@ -74,7 +74,7 @@ export function AreaTag({ area }: { area: string }) {
 
 const ZONES = [
   { label: 'KST', zone: 'Asia/Seoul', hint: 'Korea' },
-  { label: 'AoE', zone: 'Etc/GMT+12', hint: 'Anywhere on Earth (UTC-12), the usual deadline timezone' },
+  { label: 'AoE', zone: 'Etc/GMT+12', hint: 'Anywhere on Earth (UTC-12)' },
   { label: 'UTC', zone: 'UTC', hint: 'Coordinated Universal Time' },
   { label: 'PT', zone: 'America/Los_Angeles', hint: 'US Pacific' },
   { label: 'ET', zone: 'America/New_York', hint: 'US Eastern' },
