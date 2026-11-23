@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { PAPER_STATUS, countdown, fmt, fmtShort, sortMembers } from '../logic'
+import { PAPER_STATUS, countdown, fmt, sortMembers } from '../logic'
 import { useStore } from '../store'
 import type { Paper } from '../types'
 import { Avatar, Avatars, Icon, PaperModal, RESULT_LABEL, newPaper } from '../ui'
@@ -23,7 +23,6 @@ export default function Papers() {
           review: mine.filter((p) => p.status === 'submitted').length,
           acc: hist.filter((h) => h.result === 'accepted').length,
           rej: hist.filter((h) => h.result === 'rejected').length,
-          next: mine.filter((p) => p.target && p.status === 'writing' && p.target.deadline >= today).map((p) => p.target!).sort((a, b) => a.deadline.localeCompare(b.deadline))[0],
         }
       }),
     [data, today],
@@ -84,17 +83,16 @@ export default function Papers() {
           <h2>People</h2>
           <div className="card">
             <table className="plain">
-              <thead><tr><th>Member</th><th>Researching</th><th>Writing</th><th>In review</th><th>Accepted</th><th>Rejected</th><th>Next deadline</th></tr></thead>
+              <thead><tr><th>Member</th><th>Researching</th><th>Writing</th><th>In review</th><th>Accepted</th><th>Rejected</th></tr></thead>
               <tbody>
-                {people.map(({ m, research, writing, review, acc, rej, next }) => (
+                {people.map(({ m, research, writing, review, acc, rej }) => (
                   <tr key={m.id}>
-                    <td><span className="person"><Avatar name={m.name} whole /> {m.role && <span className="tag">{m.role}</span>}</span></td>
+                    <td><span className="person"><Avatar name={m.name} whole /> {m.role && <small className="muted">{m.role}</small>}</span></td>
                     <td>{research || <span className="muted">–</span>}</td>
                     <td>{writing || <span className="muted">–</span>}</td>
                     <td>{review || <span className="muted">–</span>}</td>
                     <td>{acc || <span className="muted">–</span>}</td>
                     <td>{rej || <span className="muted">–</span>}</td>
-                    <td>{next ? <>{next.label} <small className="muted">{fmtShort(next.deadline)}</small></> : <span className="muted">–</span>}</td>
                   </tr>
                 ))}
               </tbody>

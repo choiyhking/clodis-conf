@@ -87,10 +87,6 @@ export default function Schedule() {
         <div>
           <h1>Deadlines</h1>
         </div>
-        <span className="collected" title="Dates are collected automatically every morning">
-          <i className={'dot' + (auto ? ' ok' : '')} />
-          {auto ? <>Dates collected <b>{auto.generatedAt.slice(0, 10)}</b></> : 'Dates not collected yet'}
-        </span>
       </header>
 
       <Clock />
@@ -111,7 +107,10 @@ export default function Schedule() {
 
       {/* what the row colours mean, right above the rows they describe */}
       <div className="table-note">
-        <span className="muted">{shown.length} deadlines · {new Set(shown.map((r) => r.confId)).size} conferences</span>
+        <span className="muted">{new Set(shown.map((r) => r.confId)).size} conferences · {shown.length} deadlines</span>
+        <span className="collected" title="Dates are collected automatically every morning">
+          <Icon name="refresh" size={13} /> {auto ? <>Updated <b>{auto.generatedAt.slice(0, 10)}</b></> : 'Not updated yet'}
+        </span>
         {active.length > 0 && (
           <span className="active-filters">
             <b>{active.length} {active.length === 1 ? 'filter' : 'filters'}</b>
@@ -185,17 +184,11 @@ export default function Schedule() {
                     </td>
                     {!guest && <td onClick={(e) => e.stopPropagation()}>
                       <span className={'targeting' + (tg.length ? '' : ' none')}>
-                        {/* One line only: the first paper, then how many more. The drawer lists them all. */}
-                        {tg.slice(0, 1).map((p) => (
+                        {tg.map((p) => (
                           <button key={p.id} className="paper-chip" onClick={() => setPaper(p)} title={`${p.title} — ${p.members.join(', ')}`}>
-                            <span title={p.members.join(', ')}>{p.title}</span>
+                            <span>{p.title}</span>
                           </button>
                         ))}
-                        {tg.length > 1 && (
-                          <button className="more-chip" onClick={() => setOpen(r)} title={tg.slice(1).map((p) => `${p.title} — ${p.members.join(', ')}`).join(' / ')}>
-                            +{tg.length - 1}
-                          </button>
-                        )}
                         {r.at > now && (
                           <button className="ghost add" title="Target this deadline with one of our papers" onClick={() => setPick(r)}><Icon name="plus" size={14} /></button>
                         )}

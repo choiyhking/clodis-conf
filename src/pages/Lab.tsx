@@ -161,12 +161,12 @@ export default function Lab() {
                 ))}
               </div>
             ))}
-            <div className="mrow new">
-              <Icon name="plus" size={14} />
-              <input className="m-name" placeholder="Add a member: name" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} aria-label="New member name" />
-              <select value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label="Role"><option value="">Role</option>{ROLES.map((r) => <option key={r}>{r}</option>)}</select>
-              <button className="primary" onClick={add} disabled={!name.trim()}>Add</button>
-            </div>
+          </div>
+          <div className="mrow new card">
+            <Icon name="plus" size={14} />
+            <input className="m-name" placeholder="Add a member: name" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} aria-label="New member name" />
+            <select value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label="Role"><option value="">Role</option>{ROLES.map((r) => <option key={r}>{r}</option>)}</select>
+            <button className="primary" onClick={add} disabled={!name.trim()}>Add</button>
           </div>
         </div>
 

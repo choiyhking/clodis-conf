@@ -19,6 +19,7 @@ const ICONS: Record<string, string> = {
   check: 'M20 6 9 17l-5-5',
   edit: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z',
   left: 'M15 18l-6-6 6-6',
+  refresh: 'M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6',
   down: 'M6 9l6 6 6-6',
   right: 'M9 18l6-6-6-6',
 }
@@ -43,7 +44,7 @@ export function Avatar({ name, size = 22, whole = false, dot = false }: { name: 
   const unknown = name === '?'
   const role = data.members.find((x) => x.name === name)?.role
   // Everyone is the same quiet grey; only your own name carries the accent colour, so "mine" stands out.
-  const cls = unknown ? ' none' : name === me ? ' me' : ''
+  const cls = unknown ? ' none' : name === me ? ' self' : ''
   const title = unknown ? 'Not selected' : role ? `${name} · ${role}` : name
   if (dot) return <i className={'who-dot' + cls} title={title} />
   const n = name.trim()
@@ -238,7 +239,7 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
         {date('noti', 'Notification')}
         {date('event', 'Conference starts')}
         <Field label="Edition (year)"><input type="number" value={d.year} onChange={(e) => set('year', Number(e.target.value))} /></Field>
-        <Field label="Round (e.g. 1/2)"><input value={d.round} onChange={(e) => set('round', e.target.value)} /></Field>
+        <Field label="Round (e.g., 1/2)"><input value={d.round} onChange={(e) => set('round', e.target.value)} /></Field>
         <Field label="Location"><input value={d.location} onChange={(e) => set('location', e.target.value)} placeholder="City, Country" /></Field>
         <Field label="URL"><input value={d.url} onChange={(e) => set('url', e.target.value)} /></Field>
         <Field label="Note" span><input value={d.note} onChange={(e) => set('note', e.target.value)} /></Field>
@@ -321,7 +322,7 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
               : <><i className="dot" /> Not linked to the collector — dates for this one are entered by hand.</>}
           </small>
         </div>
-        <Field label="Full name" span><input value={c.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g. ACM SIGMOD International Conference on Management of Data" /></Field>
+        <Field label="Full name" span><input value={c.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g., ACM SIGMOD International Conference on Management of Data" /></Field>
 
         <Field label="Area">
           {newArea || areas.length === 0 ? (
@@ -499,12 +500,6 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
   const sameAttempt = (x: Paper) => x.history.some((h) => h.label === x.target!.label && h.deadline === x.target!.deadline)
   const links = paperLinks(p)
   const setLinks = (v: string[]) => setP((x) => ({ ...x, links: v, link: '' }))
-  // Where could this go next? After the decision if we're still waiting for it, from today if it's already rejected.
-  const after = p.status === 'rejected' ? today : p.target?.noti || p.target?.deadline || today
-  const nextOptions = useMemo(
-    () => upcoming.filter((r) => r.deadline > after && r.confId !== p.target?.confId).slice(0, 5),
-    [upcoming, after, p.target],
-  )
   const submit = async () => {
     if (!p.title.trim()) return alert('Give the paper a working title.')
     let history = p.history
@@ -514,22 +509,13 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
     await save('papers', { ...p, history, links: links.map((l) => l.trim()).filter(Boolean), link: '' })
     onClose()
   }
-  const retarget = (r: Row) =>
-    setP((x) => ({
-      ...x,
-      history: x.target && x.status === 'rejected' && !sameAttempt(x)
-        ? [...x.history, { label: x.target.label, deadline: x.target.deadline, result: 'rejected' as const, date: today }]
-        : x.history,
-      status: 'writing',
-      target: toTarget(r),
-    }))
   return (
     <Modal title={isNew ? 'New paper' : 'Edit paper'} onClose={onClose} wide>
       <div className="grid">
-        <Field label="Working title *" span>
-          <input value={p.title} onChange={(e) => set('title', e.target.value)} autoFocus={isNew} placeholder="e.g. LLM-seccomp" />
+        <Field label="Working title (required)" span>
+          <input value={p.title} onChange={(e) => set('title', e.target.value)} autoFocus={isNew} placeholder="e.g., LLM-seccomp" />
         </Field>
-        <Field label="Research topic">
+        <Field label="Research topic" span>
           {newTopic || topics.length === 0 ? (
             <span className="combo">
               <input value={p.group} onChange={(e) => set('group', e.target.value)} placeholder="Name the new topic" autoFocus={newTopic} />
@@ -550,6 +536,7 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
             {PAPER_STATUS.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
         </Field>
+        <Field label="Started on"><input type="date" value={p.start} onChange={(e) => set('start', e.target.value)} /></Field>
         <Field label="People" span>
           <div className="chips">
             {sortMembers(data.members).map((m) => (
@@ -563,16 +550,15 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
         </Field>
         {/* Not a <label>: a label would forward stray clicks inside the open list to the toggle button and close it. */}
         <div className="field span">
-          <span>Target</span>
+          <span>Target deadline</span>
           <TargetPicker value={p.target} rows={upcoming} today={today} onPick={(r) => set('target', r ? toTarget(r) : null)} />
         </div>
-        <Field label="Started"><input type="date" value={p.start} onChange={(e) => set('start', e.target.value)} /></Field>
-        <Field label="Notes"><textarea rows={1} value={p.note} onChange={(e) => set('note', e.target.value)} /></Field>
-        <Field label="Links (Overleaf, repo, slides…)" span>
+        <Field label="Notes" span><textarea className="notes" rows={3} value={p.note} onChange={(e) => set('note', e.target.value)} placeholder="e.g., what is still missing before submission" /></Field>
+        <Field label="Links" span>
           <div className="links">
             {links.map((l, i) => (
               <span className="combo" key={i}>
-                <input value={l} placeholder="https://…" onChange={(e) => setLinks(links.map((x, j) => (j === i ? e.target.value : x)))} />
+                <input value={l} placeholder="e.g., the Overleaf project, code repository or slides (https://…)" onChange={(e) => setLinks(links.map((x, j) => (j === i ? e.target.value : x)))} />
                 {/^https?:\/\//.test(l) && <a className="btn" href={l} target="_blank" rel="noreferrer" title="Open"><Icon name="link" size={14} /></a>}
                 <button className="ghost" onClick={() => setLinks(links.filter((_, j) => j !== i))} aria-label="Remove link"><Icon name="close" size={14} /></button>
               </span>
@@ -581,28 +567,6 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
           </div>
         </Field>
       </div>
-      {p.target && p.status !== 'accepted' && nextOptions.length > 0 && (
-        <div className="next fallback">
-          <span className="fb-title">{p.status === 'rejected' ? <>Rejected at <b>{p.target.label}</b> — where next?</> : <>Backup plan if <b>{p.target.label}</b> rejects it</>}</span>
-          <span>
-            {p.status === 'rejected'
-              ? 'The nearest deadlines still open:'
-              : p.target.noti
-                ? <>Decision on <b className="when-date">{fmt(p.target.noti)}</b>. The first deadlines after that:</>
-                : 'No decision date yet, so these are simply the next deadlines after this one:'}
-          </span>
-          <ul>
-            {nextOptions.map((r) => (
-              <li key={r.id}>
-                <b className="venue">{rowLabel(r)}</b>
-                <span className="tp-date">{fmt(r.deadline)}</span>
-                <span className="muted">{diffDays(r.deadline, after)} days {p.status === 'rejected' ? 'from now' : p.target?.noti ? 'after the decision' : 'after this deadline'}</span>
-                <button onClick={() => retarget(r)}>Make this the target</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
       {p.history.length > 0 && (
         <div className="next">
           <span className="muted">Submission history</span>
