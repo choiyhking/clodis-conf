@@ -1,10 +1,10 @@
 import { useState, type ReactNode } from 'react'
-import { fmt, isStale, rowLabel } from '../logic'
+import { fmt, rowLabel } from '../logic'
 import { useStore } from '../store'
 import type { Row } from '../types'
 import { ConfDrawer, Countdown, DeadlineModal, Icon, useVerify } from '../ui'
 
-/** What waits for a person: collected dates to confirm, verified dates that changed, and checks that have gone stale. */
+/** What waits for a person: collected dates to confirm, and verified dates that changed. */
 export default function Inbox() {
   const { rows, today, me } = useStore()
   const verify = useVerify()
@@ -16,7 +16,6 @@ export default function Inbox() {
 
   const changed = rows.filter((r) => r.autoDiff && ok(r.conf.owner))
   const autos = future.filter((r) => r.status === 'auto')
-  const stale = future.filter((r) => isStale(r, today) && !r.autoDiff)
 
   // Each line: what it is on the left, the one or two things you can do on the right. The section it sits in
   // already says its status, and the owner is only named when the list is not narrowed to your own.
@@ -74,13 +73,6 @@ export default function Inbox() {
           <button className="primary" onClick={() => verify(r)}><Icon name="check" size={14} /> Looks right</button>
           <button onClick={() => setEdit(r)}>Edit</button>
         </>))}
-      </Section>
-
-      <Section title="Due for a re-check" n={stale.length} hint="Verified more than 45 days ago and the deadline is still ahead.">
-        {stale.map((r) => item(r, <>
-          <button className="primary" onClick={() => verify(r)}>Still correct</button>
-          <button onClick={() => setEdit(r)}>Edit</button>
-        </>, <small className="muted">Last checked {fmt(r.checkedAt) || 'never'}{r.checkedBy ? ` by ${r.checkedBy}` : ''}</small>))}
       </Section>
 
       {edit && <DeadlineModal row={edit} onClose={() => setEdit(null)} />}

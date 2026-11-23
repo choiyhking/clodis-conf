@@ -3,7 +3,6 @@ import { diffDays, fmt, rowRound, rowTrack, sortMembers, venueOf } from '../logi
 import { useStore } from '../store'
 import type { Paper, Row } from '../types'
 import { AreaTag, Clock, ConfDrawer, ConfModal, Countdown, Icon, MultiFilter, PaperModal, Place, Rank, StatusBadge, TargetModal, type FilterOption } from '../ui'
-import { isStale } from '../logic'
 
 const RANK_OPTIONS: FilterOption[] = [
   { group: 'KIISE', value: 'k:S', label: 'KIISE S' },
@@ -226,7 +225,6 @@ export default function Schedule() {
                     <td className="st-cell">
                       <StatusBadge row={r} />
                       {!guest && r.autoDiff && <span className="tag warn" title={`Collected value: ${fmt(r.autoDiff.deadline)}`}>Changed</span>}
-                      {!guest && isStale(r, today) && <span className="tag" title={`Last checked ${fmt(r.checkedAt) || 'never'}`}>Re-check</span>}
                     </td>
                   </tr>
                 </Fragment>

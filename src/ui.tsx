@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
-  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, initials, isDate, isStale, paperLinks, rowLabel,
+  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, initials, isDate, paperLinks, rowLabel,
   settleStatus, sortMembers, timeLeft, toKST, uid,
 } from './logic'
 import { useStore } from './store'
@@ -736,7 +736,6 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
         <section className="trust">
           <div className="trust-head">
             <StatusBadge row={live} />
-            {!guest && isStale(live, today) && <span className="tag warn">Re-check</span>}
             {!guest && live.autoDiff && <span className="tag warn">Changed</span>}
           </div>
           <p className="muted">

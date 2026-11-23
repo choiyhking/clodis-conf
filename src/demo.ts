@@ -13,7 +13,7 @@ export interface DemoData {
 /**
  * Sample data that exercises every feature: extra members in different roles, papers in every status
  * (with links, notes and rejection history), and deadlines in every trust state (freshly verified,
- * due for a re-check, and disagreeing with the collector).
+ * verified long ago, and disagreeing with the collector).
  *
  * Everything is built from the real deadlines so the dates line up across pages, and every id starts
  * with "demo-" so it can all be removed again without touching real data.
@@ -116,7 +116,7 @@ export function demoData(rows: Row[], members: Member[], today: string): DemoDat
   })
   const deadlines: Deadline[] = [
     ...candidates.slice(0, 3).map((r, i) => asDoc(r, { checkedAt: addDays(today, -1 - i) })), // freshly verified
-    ...candidates.slice(3, 6).map((r, i) => asDoc(r, { checkedAt: addDays(today, -60 - i * 9) })), // verified long ago → Re-check
+    ...candidates.slice(3, 6).map((r, i) => asDoc(r, { checkedAt: addDays(today, -60 - i * 9) })), // verified long ago
     // verified with the old date, then the collector found a later one → Changed (a deadline extension)
     ...candidates.slice(6, 8).map((r) => asDoc(r, { deadline: addDays(r.deadline, -7), abstract: r.abstract ? addDays(r.abstract, -7) : '', checkedAt: addDays(today, -12) })),
   ]

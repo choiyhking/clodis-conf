@@ -253,7 +253,6 @@ export function flagOf(location: string): string {
 // ---------- merging collected data into rows ----------
 export const autoSig = (a: Round) => [a.abstract, a.deadline, a.noti].join('|')
 const MATCH_WINDOW = 21 // days: a collected round and a stored row this close are the same round
-const STALE_DAYS = 45
 const MAX_SITE_ROUNDS = 2 // a page yielding more "rounds" than this was almost certainly misread
 
 interface Collected {
@@ -463,5 +462,3 @@ export function obsoleteDeadlines(deadlines: Deadline[], today: string): Deadlin
   return deadlines.filter((d) => d.deadline < cutoff && deadlines.some((o) => o.confId === d.confId && diffDays(o.deadline, d.deadline) > 300))
 }
 
-export const isStale = (r: Row, today: string) =>
-  r.status === 'verified' && r.deadline >= today && (!r.checkedAt || diffDays(today, r.checkedAt) > STALE_DAYS)
