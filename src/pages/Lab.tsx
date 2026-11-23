@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { demoData, isDemo, withSampleRoles } from '../demo'
-import { obsoleteDeadlines, roleRank, sortMembers, uid } from '../logic'
+import { fmt, obsoleteDeadlines, roleRank, sortMembers, uid } from '../logic'
 import { MODE, inviteUrl, loadSeed, supabase, useStore } from '../store'
 import { ROLES, type Data, type Member, type Role } from '../types'
 import { Avatar, Field, Icon, Modal } from '../ui'
@@ -61,6 +61,7 @@ export default function Lab() {
   }
   const [name, setName] = useState('')
   const [changePw, setChangePw] = useState(false)
+  const [showOld, setShowOld] = useState(false)
   const [role, setRole] = useState<Role>('')
   const file = useRef<HTMLInputElement>(null)
 
@@ -204,14 +205,28 @@ export default function Lab() {
         </>}>
           Save everything as one file, or load such a file back in. Restoring overwrites items with the same id.
         </Row>
-        <Row title="Old deadlines" actions={<button onClick={cleanUp} disabled={obsolete.length === 0}>Clean up ({obsolete.length})</button>}>
+        <Row title="Old deadlines" actions={<>
+          {obsolete.length > 0 && <button onClick={() => setShowOld(!showOld)} aria-expanded={showOld}>{showOld ? 'Hide list' : 'Show list'}</button>}
+          <button onClick={cleanUp} disabled={obsolete.length === 0}>Clean up ({obsolete.length})</button>
+        </>}>
           Deadlines that closed over a year ago and have a newer edition on record. The latest closed edition of each conference is always kept.
         </Row>
-        <Row title="Spreadsheet data" actions={<button onClick={seed}>{MODE === 'local' ? 'Reset' : 'Import'}</button>}>
-          {MODE === 'local'
-            ? 'Erase what this browser holds and start again from the original spreadsheet.'
-            : 'Write the original spreadsheet conferences and deadlines into the database again. Items with the same id are overwritten.'}
-        </Row>
+        {showOld && obsolete.length > 0 && (
+          <ul className="set-list">
+            {[...obsolete].sort((x, y) => x.deadline.localeCompare(y.deadline)).map((d) => (
+              <li key={d.id}>
+                <b>{data.conferences.find((c) => c.id === d.confId)?.acronym ?? d.confId}{d.round ? ` R${d.round}` : ''}</b>
+                <span className="muted">{d.year}</span>
+                <span>closed {fmt(d.deadline)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {MODE === 'local' && (
+          <Row title="Spreadsheet data" actions={<button onClick={seed}>Reset</button>}>
+            Erase what this browser holds and start again from the original spreadsheet.
+          </Row>
+        )}
         <Row title="Sample data" actions={hasDemo ? <button onClick={clearDemo}>Remove</button> : <button onClick={loadDemo}>Load</button>}>
           Example members, papers and deadlines for trying the site out. Removing them leaves real data alone.
         </Row>
