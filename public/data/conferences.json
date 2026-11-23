@@ -296,7 +296,7 @@
  {
   "id": "fse",
   "acronym": "FSE",
-  "name": "ACM SIGSOFT Symposium on the Foundations of Software Engineering",
+  "name": "ACM International Conference on the Foundations of Software Engineering",
   "area": "SE",
   "kiise": "S",
   "bk": 4,
@@ -469,7 +469,7 @@
  {
   "id": "ifip-sec",
   "acronym": "IFIP-SEC",
-  "name": "IFIP International Information Security and Privacy Conference",
+  "name": "IFIP International Conference on ICT Systems Security and Privacy Protection",
   "area": "Security",
   "kiise": "",
   "bk": 1,
@@ -993,7 +993,7 @@
  {
   "id": "www",
   "acronym": "WWW",
-  "name": "International World Wide Web Conference",
+  "name": "The ACM Web Conference",
   "area": "Web",
   "kiise": "S",
   "bk": 4,
