@@ -80,11 +80,11 @@ export default function Timeline() {
   /** What the row used to print under the title; now a tooltip, since the bar already shows it. */
   const tip = (p: Paper) => {
     const t = p.target
-    if (!t) return `${p.title} — no target yet`
-    if (p.status === 'submitted') return `${p.title} — under review at ${t.label}, result ${t.noti ? fmt(t.noti) : 'TBD'}`
-    if (p.status === 'accepted') return `${p.title} — accepted at ${t.label}`
-    if (p.status === 'rejected') return `${p.title} — rejected at ${t.label}`
-    return `${p.title} — ${t.label}, due ${fmt(t.deadline)} (${countdown(t.deadline, today)})`
+    if (!t) return `${p.title}: no target yet`
+    if (p.status === 'submitted') return `${p.title}: under review at ${t.label}, result ${t.noti ? fmt(t.noti) : 'TBD'}`
+    if (p.status === 'accepted') return `${p.title}: accepted at ${t.label}`
+    if (p.status === 'rejected') return `${p.title}: rejected at ${t.label}`
+    return `${p.title}: ${t.label}, due ${fmt(t.deadline)} (${countdown(t.deadline, today)})`
   }
 
   const bar = (p: Paper) => {

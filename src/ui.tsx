@@ -74,7 +74,7 @@ export function AreaTag({ area }: { area: string }) {
 
 const ZONES = [
   { label: 'KST', zone: 'Asia/Seoul', hint: 'Korea' },
-  { label: 'AoE', zone: 'Etc/GMT+12', hint: 'Anywhere on Earth (UTC-12) — the usual deadline timezone' },
+  { label: 'AoE', zone: 'Etc/GMT+12', hint: 'Anywhere on Earth (UTC-12), the usual deadline timezone' },
   { label: 'UTC', zone: 'UTC', hint: 'Coordinated Universal Time' },
   { label: 'PT', zone: 'America/Los_Angeles', hint: 'US Pacific' },
   { label: 'ET', zone: 'America/New_York', hint: 'US Eastern' },
@@ -133,7 +133,7 @@ export function StatusBadge({ row }: { row: Row }) {
     row.status === 'verified'
       ? `Verified${row.checkedBy ? ` by ${row.checkedBy}` : ''} on ${fmt(row.checkedAt) || 'unknown date'}`
       : row.status === 'auto'
-        ? `Collected automatically from ${(row.sources ?? [row.source]).join(' + ')} — not yet verified by the owner`
+        ? `Collected automatically from ${(row.sources ?? [row.source]).join(' + ')}. Not yet verified by the owner`
         : row.derivedFrom
           ? `Not announced yet. Projected from last year's deadline (${fmt(row.derivedFrom)})`
           : 'Not announced yet. Expected date'
@@ -173,6 +173,29 @@ export function Field({ label, children, span }: { label: string; children: Reac
   )
 }
 
+/**
+ * A date typed as YYYY-MM-DD, with a button that opens the browser's calendar. A plain date input would show
+ * its placeholder in the browser's own language, which is not English for everyone.
+ */
+export function DateInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [text, setText] = useState(value)
+  const pick = useRef<HTMLInputElement>(null)
+  useEffect(() => setText(value), [value])
+  const tidy = (s: string) => {
+    const m = s.trim().match(/^(\d{4})[-./ ]?(\d{1,2})[-./ ]?(\d{1,2})$/)
+    return m ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : ''
+  }
+  return (
+    <span className="date-in">
+      <input type="text" inputMode="numeric" placeholder="YYYY-MM-DD" value={text}
+        onChange={(e) => { const s = e.target.value; setText(s); if (!s.trim()) onChange(''); else if (isDate(s.trim())) onChange(s.trim()) }}
+        onBlur={() => { if (!text.trim()) return; const t = tidy(text); if (t) { onChange(t); setText(t) } else setText(value) }} />
+      <button type="button" aria-label="Open calendar" title="Open calendar" onClick={() => pick.current?.showPicker?.()}><Icon name="calendar" size={14} /></button>
+      <input ref={pick} className="date-pick" type="date" tabIndex={-1} aria-hidden value={value} onChange={(e) => onChange(e.target.value)} />
+    </span>
+  )
+}
+
 export function toDeadline(r: Row): Deadline {
   const { conf: _c, virtual: _v, derivedFrom: _d, autoDiff: _a, sources: _s, evidence: _e, time: _t, tz: _z, at: _at, exact: _x, ...d } = r
   return d
@@ -200,7 +223,7 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
   const set = (k: keyof Deadline, v: string | number) => setD((p) => ({ ...p, [k]: v }))
   const date = (k: 'abstract' | 'deadline' | 'noti' | 'event', label: string) => (
     <Field label={label}>
-      <input type="date" value={d[k]} onChange={(e) => set(k, e.target.value)} />
+      <DateInput value={d[k]} onChange={(v) => set(k, v)} />
     </Field>
   )
   const applyAuto = () =>
@@ -220,7 +243,7 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
     onClose()
   }
   return (
-    <Modal title={`${rowLabel(row)} — dates`} onClose={onClose}>
+    <Modal title={`Dates for ${rowLabel(row)}`} onClose={onClose}>
       <p className="muted">
         Saving marks these dates as <b>Verified</b>{me ? ` by ${me}` : ''}. Check them against the conference site first.
       </p>
@@ -289,6 +312,7 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
   const q = c.acronym.trim().toLowerCase()
   const linked = catalog.find((x) => x.key === c.ccfddl)
   const matches = !conf && q.length >= 2 && !linked ? catalog.filter((x) => x.title.toLowerCase().includes(q)).slice(0, 6) : []
+  const dup = !conf && !!q && data.conferences.some((x) => x.id === slug(c.acronym))
   const link = (x: { key: string; title: string }) => {
     const g = grades[slug(x.title)]
     setC((p) => ({ ...p, acronym: x.title, ccfddl: x.key, kiise: g?.kiise ?? p.kiise, bk: g?.bk ?? p.bk }))
@@ -307,7 +331,7 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
       <div className="grid conf-form">
         <div className="field span">
           <span>Acronym *</span>
-          <input value={c.acronym} onChange={(e) => setC((p) => ({ ...p, acronym: e.target.value, ccfddl: conf ? p.ccfddl : '' }))} autoFocus={!conf} placeholder="e.g. SIGMOD" />
+          <input value={c.acronym} onChange={(e) => setC((p) => ({ ...p, acronym: e.target.value, ccfddl: conf ? p.ccfddl : '' }))} autoFocus={!conf} placeholder="e.g., SIGMOD" />
           {matches.length > 0 && (
             <ul className="suggest">
               {matches.map((x) => (
@@ -318,9 +342,11 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
             </ul>
           )}
           <small className={'collect ' + (linked ? 'on' : '')}>
-            {linked
+            {dup
+              ? <><i className="dot warn" /> {c.acronym.trim()} is already tracked. Open it from the Deadlines table to edit it.</>
+              : linked
               ? <><i className="dot ok" /> Dates are collected automatically ({linked.key}). <button type="button" className="link" onClick={() => set('ccfddl', '')}>Unlink</button></>
-              : <><i className="dot" /> Not linked to the collector — dates for this one are entered by hand.</>}
+              : <><i className="dot" /> Not linked to the collector. Dates for this one are entered by hand.</>}
           </small>
         </div>
         <Field label="Full name" span><input value={c.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g., ACM SIGMOD International Conference on Management of Data" /></Field>
@@ -537,7 +563,7 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
             {PAPER_STATUS.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
         </Field>
-        <Field label="Started on"><input type="date" value={p.start} onChange={(e) => set('start', e.target.value)} /></Field>
+        <Field label="Started on"><DateInput value={p.start} onChange={(v) => set('start', v)} /></Field>
         <Field label="People" span>
           <div className="chips">
             {sortMembers(data.members).map((m) => (
@@ -614,7 +640,7 @@ export function TargetModal({ row, onClose }: { row: Row; onClose: () => void })
   if (fresh) return <PaperModal paper={fresh} isNew onClose={onClose} />
   const groups = [
     { title: 'No target yet', hint: 'Free to take this deadline', tone: 'free', papers: candidates.filter((p) => !p.target && p.status !== 'rejected') },
-    { title: 'Rejected — needs a new venue', hint: '', tone: 'free', papers: candidates.filter((p) => p.status === 'rejected') },
+    { title: 'Rejected', hint: 'Needs a new venue', tone: 'free', papers: candidates.filter((p) => p.status === 'rejected') },
     { title: 'Aimed at another deadline', hint: 'Choosing one moves it here', tone: 'busy', papers: candidates.filter((p) => !!p.target && p.status !== 'rejected') },
   ].filter((g) => g.papers.length)
   return (
@@ -632,7 +658,7 @@ export function TargetModal({ row, onClose }: { row: Row; onClose: () => void })
           {g.papers.map((p) => (
             <button key={p.id} className="mini" onClick={() => assign(p)}>
               <b title={p.members.join(', ')}>{p.title}</b>
-              {p.target && <span className="muted">{p.status === 'rejected' ? `was ${p.target.label}` : <>now <b>{p.target.label}</b> · {fmt(p.target.deadline)}</>}</span>}
+              {p.target && <span className="muted">{p.status === 'rejected' ? <>was <b>{p.target.label}</b></> : <>now <b>{p.target.label}</b> · {fmt(p.target.deadline)}</>}</span>}
             </button>
           ))}
         </div>
@@ -698,7 +724,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
               <span>{s.label}</span>
               <b className={live.status === 'estimated' || s.soft ? 'est' : ''}>{fmt(s.date) || 'TBD'}</b>
               {s.main && <Countdown deadline={live.deadline} today={today} at={live.at} assumed={!live.exact} />}
-              {s.main && !live.exact && live.at > Date.now() && <small className="muted when">Closing time not stated — assuming 23:59 AoE. Check the site.</small>}
+              {s.main && !live.exact && live.at > Date.now() && <small className="muted when">Closing time not stated, so 23:59 AoE is assumed. Check the site.</small>}
               {s.main && live.time && live.tz && (
                 <small className="muted when">{live.time} {/^UTC-12$/i.test(live.tz) ? 'AoE' : live.tz}{toKST(live.deadline, live.time, live.tz) && <> = <b>{toKST(live.deadline, live.time, live.tz)} KST</b></>}</small>
               )}

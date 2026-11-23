@@ -117,7 +117,7 @@ export default function App() {
         <div className="side-foot">
           {guest && (
             <div className="guest-box">
-              <p className="muted">Public view — conference deadlines only.</p>
+              <p className="muted">Public view: conference deadlines only.</p>
               {MODE === 'supabase' && <p className="muted">Lab members: open your invite link.</p>}
             </div>
           )}
@@ -131,7 +131,7 @@ export default function App() {
               <Icon name="down" size={14} />
             </button>
           )}
-          {MODE === 'local' && <p className="sync muted"><i className="dot warn" /> Local mode — not shared</p>}
+          {MODE === 'local' && <p className="sync muted"><i className="dot warn" /> Local mode, not shared</p>}
         </div>
       </aside>
       <main>

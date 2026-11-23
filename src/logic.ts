@@ -300,7 +300,11 @@ export function collected(conf: Conf, auto: AutoData): Collected[] {
 /** Round label for the i-th collected entry: side tracks keep their own name and don't count as rounds. */
 function roundOf(rounds: Round[], i: number): string {
   const comment = (rounds[i].comment ?? '').trim()
-  if (SIDE_TRACK.test(comment)) return comment.length > 22 ? comment.slice(0, 21).trimEnd() + '…' : comment
+  // A side track is named by the first clause of its comment: "AAAI fast track; eligible …" reads "AAAI fast track".
+  if (SIDE_TRACK.test(comment)) {
+    const short = comment.split(/[;:(]/)[0].trim() || comment
+    return short.length > 22 ? short.slice(0, 21).trimEnd() + '…' : short
+  }
   const main = rounds.filter((r) => !SIDE_TRACK.test(r.comment ?? ''))
   return main.length > 1 ? `${main.indexOf(rounds[i]) + 1}/${main.length}` : ''
 }

@@ -101,6 +101,7 @@ export default function Schedule() {
       <header className="page-head">
         <div>
           <h1>Deadlines</h1>
+          <p className="muted">Submission deadlines of the conferences we track, soonest first</p>
         </div>
       </header>
 
@@ -201,7 +202,7 @@ export default function Schedule() {
                       <span className={'targeting' + (tg.length ? '' : ' none')}>
                         {/* One line only: the first paper, then a "+2" chip that opens the list of all of them. */}
                         {tg.slice(0, 1).map((p) => (
-                          <button key={p.id} className="paper-chip" onClick={() => setPaper(p)} title={`${p.title} — ${p.members.join(', ')}`}>
+                          <button key={p.id} className="paper-chip" onClick={() => setPaper(p)} title={`${p.title} (${p.members.join(', ')})`}>
                             <span>{p.title}</span>
                           </button>
                         ))}

@@ -6,7 +6,7 @@ import { ConfDrawer, Countdown, DeadlineModal, Icon, useVerify } from '../ui'
 
 /** What waits for a person: collected dates to confirm, verified dates that changed, and checks that have gone stale. */
 export default function Inbox() {
-  const { rows, auto, today, me } = useStore()
+  const { rows, today, me } = useStore()
   const verify = useVerify()
   const [mine, setMine] = useState(!!me)
   const [edit, setEdit] = useState<Row | null>(null)
@@ -52,8 +52,7 @@ export default function Inbox() {
         <div>
           <h1>Inbox</h1>
           <p className="muted">
-            Dates the collector found — a person confirms them here.
-            {auto ? ` Last collected ${auto.generatedAt.replace('T', ' ').slice(0, 16)} UTC.` : ' The collector has not run yet.'}
+            Dates collected automatically. Confirm each one after checking the conference site.
           </p>
         </div>
         <button className={'toggle' + (mine ? ' on' : '')} onClick={() => setMine(!mine)} disabled={!me} aria-pressed={mine}
@@ -67,7 +66,7 @@ export default function Inbox() {
           <button className="primary" onClick={() => verify(r, { deadline: r.autoDiff!.deadline, abstract: r.autoDiff!.abstract || r.abstract, noti: r.autoDiff!.noti || r.noti })}>Accept new</button>
           <button onClick={() => verify(r)}>Keep mine</button>
           <button onClick={() => setEdit(r)}>Edit</button>
-        </>, <div className="diff">{r.autoDiff!.source === 'site' ? 'Conference site' : 'ccfddl'} says <b>{fmt(r.autoDiff!.deadline)}</b>{r.autoDiff!.abstract && <> · Abstract {fmt(r.autoDiff!.abstract)}</>}</div>))}
+        </>, <div className="diff">{r.autoDiff!.source === 'site' ? 'The conference site' : 'ccfddl'} now shows: Deadline <b>{fmt(r.autoDiff!.deadline)}</b>{r.autoDiff!.abstract && <> · Abstract {fmt(r.autoDiff!.abstract)}</>}</div>))}
       </Section>
 
       <Section title="New dates to verify" n={autos.length} hint="Collected automatically and already shown on the Deadlines page as Auto.">
@@ -81,7 +80,7 @@ export default function Inbox() {
         {stale.map((r) => item(r, <>
           <button className="primary" onClick={() => verify(r)}>Still correct</button>
           <button onClick={() => setEdit(r)}>Edit</button>
-        </>, <small className="muted">Last checked {fmt(r.checkedAt) || 'never'} by {r.checkedBy || '—'}</small>))}
+        </>, <small className="muted">Last checked {fmt(r.checkedAt) || 'never'}{r.checkedBy ? ` by ${r.checkedBy}` : ''}</small>))}
       </Section>
 
       {edit && <DeadlineModal row={edit} onClose={() => setEdit(null)} />}

@@ -166,7 +166,7 @@ export default function Lab() {
           <div className="mrow new card">
             <Icon name="plus" size={14} />
             <input className="m-name" placeholder="Add a member: name" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} aria-label="New member name" />
-            <select value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label="Role"><option value="">Role</option>{ROLES.map((r) => <option key={r}>{r}</option>)}</select>
+            <select value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label="Role"><option value="" hidden>Role</option>{ROLES.map((r) => <option key={r}>{r}</option>)}</select>
             <button className="primary" onClick={add} disabled={!name.trim()}>Add</button>
           </div>
         </div>
@@ -193,11 +193,11 @@ export default function Lab() {
 
       <h2>Data</h2>
       <div className="card settings">
-        <Row title={MODE === 'local' ? 'Local mode' : 'Shared database'}>
-          {MODE === 'local'
-            ? 'Everything is stored in this browser only. Connect Supabase (see README) to share it with the lab.'
-            : session ? `You are signed in as ${session}.` : 'This browser joined with the invite link.'}
-        </Row>
+        {MODE === 'local' && (
+          <Row title="Local mode">
+            Everything is stored in this browser only. Connect Supabase (see README) to share it with the lab.
+          </Row>
+        )}
         <Row title="Backup" actions={<>
           <button onClick={exportJson}>Download</button>
           <button onClick={() => file.current?.click()}>Restore</button>

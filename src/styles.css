@@ -823,3 +823,10 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
   .lab-cols > div { display: flex; flex-direction: column; }
   .lab .activity { flex: 1 1 0; min-height: 0; max-height: none; contain: size; }
 }
+
+/* dates are typed as YYYY-MM-DD; the calendar button opens the browser's own picker */
+.date-in { position: relative; display: block; }
+.date-in input[type='text'] { width: 100%; padding-right: 34px; font-variant-numeric: tabular-nums; }
+.date-in button { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: none; padding: 5px; color: var(--muted); display: inline-flex; }
+.date-in button:hover { color: var(--text); background: var(--sunken); }
+.date-in .date-pick { position: absolute; left: 0; bottom: 0; width: 0; height: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
