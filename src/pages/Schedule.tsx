@@ -199,7 +199,7 @@ export default function Schedule() {
                     </td>
                     {!guest && <td onClick={(e) => e.stopPropagation()}>
                       <span className={'targeting' + (tg.length ? '' : ' none')}>
-                        {/* One chip, one line. A single paper opens directly; several open a list of all of them. */}
+                        {/* One chip, one line. A single paper shows its title; several show how many, and open the list of all of them. */}
                         {tg.length === 1 && (
                           <button className="paper-chip" onClick={() => setPaper(tg[0])} title={`${tg[0].title} — ${tg[0].members.join(', ')}`}>
                             <span>{tg[0].title}</span>
@@ -211,8 +211,8 @@ export default function Schedule() {
                               const box = e.currentTarget.getBoundingClientRect()
                               setMore({ papers: tg, x: Math.max(8, Math.min(box.left, window.innerWidth - 296)), y: box.bottom + 4 })
                             }}>
-                            <span>{tg[0].title}</span>
-                            <em>+{tg.length - 1}</em>
+                            <span>{tg.length} papers</span>
+                            <Icon name="down" size={13} />
                           </button>
                         )}
                         {r.at > now && (
