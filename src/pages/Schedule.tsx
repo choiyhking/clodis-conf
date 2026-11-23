@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { diffDays, fmt, rowRound, rowTrack, sortMembers, venueOf } from '../logic'
 import { useStore } from '../store'
 import type { Paper, Row } from '../types'
@@ -34,6 +34,21 @@ export default function Schedule() {
   const [addConf, setAddConf] = useState(false)
   const [paper, setPaper] = useState<Paper | null>(null)
   const [pick, setPick] = useState<Row | null>(null)
+  // The list behind a "+2" chip. It floats over the page (table cells clip their contents), anchored under the chip.
+  const [more, setMore] = useState<{ papers: Paper[]; x: number; y: number } | null>(null)
+  useEffect(() => {
+    if (!more) return
+    const close = () => setMore(null)
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    window.addEventListener('scroll', close, true)
+    window.addEventListener('resize', close)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('scroll', close, true)
+      window.removeEventListener('resize', close)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [more])
 
   // Papers being written for, or under review at, each deadline.
   const targets = useMemo(() => {
@@ -184,11 +199,21 @@ export default function Schedule() {
                     </td>
                     {!guest && <td onClick={(e) => e.stopPropagation()}>
                       <span className={'targeting' + (tg.length ? '' : ' none')}>
-                        {tg.map((p) => (
+                        {/* One line only: the first paper, then a chip that opens the full list. */}
+                        {tg.slice(0, 1).map((p) => (
                           <button key={p.id} className="paper-chip" onClick={() => setPaper(p)} title={`${p.title} — ${p.members.join(', ')}`}>
                             <span>{p.title}</span>
                           </button>
                         ))}
+                        {tg.length > 1 && (
+                          <button className="more-chip" aria-haspopup="menu" title={`Show all ${tg.length} papers`}
+                            onClick={(e) => {
+                              const box = e.currentTarget.getBoundingClientRect()
+                              setMore({ papers: tg, x: Math.max(8, Math.min(box.left, window.innerWidth - 296)), y: box.bottom + 4 })
+                            }}>
+                            +{tg.length - 1}
+                          </button>
+                        )}
                         {r.at > now && (
                           <button className="ghost add" title="Target this deadline with one of our papers" onClick={() => setPick(r)}><Icon name="plus" size={14} /></button>
                         )}
@@ -214,6 +239,18 @@ export default function Schedule() {
       {open && <ConfDrawer row={open} onClose={() => setOpen(null)} />}
       {addConf && <ConfModal conf={null} onClose={() => setAddConf(false)} />}
       {pick && <TargetModal row={pick} onClose={() => setPick(null)} />}
+      {more && (
+        <div className="more-back" onClick={() => setMore(null)}>
+          <div className="more-pop" role="menu" style={{ left: more.x, top: more.y }} onClick={(e) => e.stopPropagation()}>
+            {more.papers.map((p) => (
+              <button key={p.id} role="menuitem" onClick={() => { setMore(null); setPaper(p) }}>
+                <b>{p.title}</b>
+                <small className="muted">{p.members.join(', ') || 'Nobody yet'}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       {paper && <PaperModal paper={paper} isNew={!data.papers.some((p) => p.id === paper.id)} onClose={() => setPaper(null)} />}
     </section>
   )

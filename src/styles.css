@@ -757,8 +757,6 @@ button.me svg { flex: none; color: var(--faint); }
 /* deadlines: counts and the last update share the line above the table */
 .table-note .collected { display: inline-flex; align-items: center; gap: 5px; margin-left: 14px; padding-left: 14px; border-left: 1px solid var(--line-strong); color: var(--muted); }
 .table-note .collected b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
-/* deadlines: several papers on one deadline are listed one under another */
-.sched .targeting { flex-wrap: wrap; row-gap: 3px; }
 /* lab: the add-member row is its own strip under the list */
 .mrow.new.card { margin-top: 10px; border-top: 1px solid var(--line); }
 /* timeline: a pointed-at paper row is tinted, so it never looks like a person's heading row */
@@ -769,3 +767,17 @@ button.me svg { flex: none; color: var(--faint); }
 .person small { font-size: 12.5px; }
 /* paper editor: notes get room for a few lines */
 .field textarea.notes { height: auto; min-height: 76px; padding: 8px 10px; line-height: 1.45; }
+
+/* deadlines: the "+2" chip opens the list of every paper aimed at that deadline */
+.more-chip { cursor: pointer; }
+.more-chip:hover { background: var(--accent); color: #fff; }
+.more-back { position: fixed; inset: 0; z-index: 40; }
+.more-pop { position: fixed; width: 288px; max-height: 320px; overflow: auto; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16); }
+.more-pop button { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; height: auto; padding: 7px 9px; border: none; background: none; text-align: left; white-space: normal; }
+.more-pop button:hover { background: var(--sunken); }
+.more-pop b { font-weight: 600; }
+/* table headings are written as words, not capitals, on every page */
+th { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
+/* dialogs sit in the middle of the window; one taller than the window starts at the top and scrolls */
+.overlay { display: flex; padding: 5vh 12px; }
+.overlay > .modal { margin: auto; }
