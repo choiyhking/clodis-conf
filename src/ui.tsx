@@ -19,7 +19,6 @@ const ICONS: Record<string, string> = {
   check: 'M20 6 9 17l-5-5',
   edit: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z',
   left: 'M15 18l-6-6 6-6',
-  refresh: 'M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6',
   down: 'M6 9l6 6 6-6',
   right: 'M9 18l6-6-6-6',
 }

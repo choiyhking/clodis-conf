@@ -754,9 +754,6 @@ button.me svg { flex: none; color: var(--faint); }
 .tl-ghead .tl-left b { font-size: 15px; }
 .tl-paper .tl-left small { font-size: 13px; color: color-mix(in srgb, var(--muted) 55%, var(--text)); }
 
-/* deadlines: counts and the last update share the line above the table */
-.table-note .collected { display: inline-flex; align-items: center; gap: 5px; margin-left: 14px; padding-left: 14px; border-left: 1px solid var(--line-strong); color: var(--muted); }
-.table-note .collected b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
 /* lab: the add-member row is its own strip under the list */
 .mrow.new.card { margin-top: 10px; border-top: 1px solid var(--line); }
 /* timeline: a pointed-at paper row is tinted, so it never looks like a person's heading row */
@@ -781,3 +778,9 @@ th { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 /* dialogs sit in the middle of the window; one taller than the window starts at the top and scrolls */
 .overlay { display: flex; padding: 5vh 12px; }
 .overlay > .modal { margin: auto; }
+
+/* deadlines: conferences, deadlines and the last update, evenly divided by thin rules */
+.note-stats { display: inline-flex; align-items: center; color: var(--muted); }
+.note-stats > span { display: inline-flex; align-items: center; gap: 5px; padding: 0 12px; border-left: 1px solid var(--line-strong); line-height: 1; }
+.note-stats > span:first-child { padding-left: 0; border-left: none; }
+.note-stats b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }

@@ -20,7 +20,7 @@ const STATUS_OPTIONS: FilterOption[] = [
 const PAST_DAYS = 365 // "Show past" goes back one year; older rows stay in the data but off the table
 
 export default function Schedule() {
-  const { rows, data, today, guest, auto } = useStore()
+  const { rows, data, today, guest } = useStore()
   const COLS = guest ? 9 : 11
   const [q, setQ] = useState('')
   // Each filter holds any number of values; an empty list means that filter is off.
@@ -122,9 +122,9 @@ export default function Schedule() {
 
       {/* what the row colours mean, right above the rows they describe */}
       <div className="table-note">
-        <span className="muted">{new Set(shown.map((r) => r.confId)).size} conferences · {shown.length} deadlines</span>
-        <span className="collected" title="Dates are collected automatically every morning">
-          <Icon name="refresh" size={13} /> {auto ? <>Updated <b>{auto.generatedAt.slice(0, 10)}</b></> : 'Not updated yet'}
+        <span className="note-stats">
+          <span><b>{new Set(shown.map((r) => r.confId)).size}</b> conferences</span>
+          <span><b>{shown.length}</b> deadlines</span>
         </span>
         {active.length > 0 && (
           <span className="active-filters">
