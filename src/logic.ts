@@ -345,6 +345,8 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
             const numbered = (x: string) => /^\d+\/\d+$/.test(x)
             if (round && (!best.round || (numbered(best.round) && !numbered(round)))) best.round = round
             if (best.deadline === a.deadline) Object.assign(best, { time: a.time, tz: a.tz })
+            // A notification date saved as a guess stops being one once a source announces that same date.
+            if (best.notiEstimated && a.noti && a.noti === best.noti) best.notiEstimated = false
           } else if (best) {
             // An estimate from the sheet, and the real dates are now out: show the collected values.
             Object.assign(best, {
