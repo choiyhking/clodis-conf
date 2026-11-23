@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { fmt, isStale, rowLabel } from '../logic'
 import { useStore } from '../store'
 import type { Row } from '../types'
-import { Avatar, ConfDrawer, Countdown, DeadlineModal, Icon, StatusBadge, useVerify } from '../ui'
+import { ConfDrawer, Countdown, DeadlineModal, Icon, useVerify } from '../ui'
 
 /** What waits for a person: collected dates to confirm, verified dates that changed, and checks that have gone stale. */
 export default function Inbox() {
@@ -18,10 +18,16 @@ export default function Inbox() {
   const autos = future.filter((r) => r.status === 'auto')
   const stale = future.filter((r) => isStale(r, today) && !r.autoDiff)
 
+  // Each line: what it is on the left, the one or two things you can do on the right. The section it sits in
+  // already says its status, and the owner is only named when the list is not narrowed to your own.
   const item = (r: Row, actions: ReactNode, extra?: ReactNode) => (
     <li key={r.id}>
       <div className="it-main">
-        <button className="link it-title" onClick={() => setOpen(r)}>{rowLabel(r)} <small className="muted">{r.year}</small></button>
+        <div className="it-head">
+          <button className="link it-title" onClick={() => setOpen(r)}>{rowLabel(r)} <small className="muted">{r.year}</small></button>
+          {r.url && <a className="it-site" href={r.url} target="_blank" rel="noreferrer" title="Open conference site" aria-label="Open conference site"><Icon name="link" size={13} /></a>}
+          {!(mine && me) && r.conf.owner && <small className="muted it-owner">{r.conf.owner}</small>}
+        </div>
         <div className="it-dates">
           <span className="kv"><i>Deadline</i> <b className={r.status === 'estimated' ? 'est' : ''}>{fmt(r.deadline)}</b></span> <Countdown deadline={r.deadline} today={today} />
           {r.abstract && <span className="kv"><i>Abstract</i> {fmt(r.abstract)}</span>}
@@ -29,12 +35,7 @@ export default function Inbox() {
         </div>
         {extra}
       </div>
-      <StatusBadge row={r} />
-      <Avatar name={r.conf.owner} />
-      <div className="acts">
-        {r.url && <a className="btn" href={r.url} target="_blank" rel="noreferrer" title="Open conference site"><Icon name="link" size={14} /></a>}
-        {actions}
-      </div>
+      <div className="acts">{actions}</div>
     </li>
   )
   const Section = ({ title, hint, n, children }: { title: string; hint: string; n: number; children: ReactNode }) => (

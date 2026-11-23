@@ -787,3 +787,12 @@ th { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 
 /* one rule for every heading and label on the site: written as a sentence, never forced into capitals */
 h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
+
+/* inbox: a quiet right-hand side; one filled button per line, everything else is plain text */
+.it-head { display: flex; align-items: center; gap: 8px; }
+.it-site { display: inline-flex; color: var(--muted); }
+.it-site:hover { color: var(--accent-ink); }
+.it-owner { font-size: 12.5px; }
+.ilist .acts { display: flex; align-items: center; gap: 4px; flex: none; }
+.ilist .acts button:not(.primary) { border-color: transparent; background: none; color: var(--muted); font-weight: 500; }
+.ilist .acts button:not(.primary):hover { background: var(--sunken); color: var(--text); }
