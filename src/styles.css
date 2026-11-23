@@ -801,3 +801,6 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 .notice > span { min-width: 0; }
 .notice b { font-variant-numeric: tabular-nums; }
 .notice button { flex: none; height: 28px; }
+/* the notice's label-and-date pairs never break in the middle; they sit side by side with a gap */
+.notice > span { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; }
+.notice .pair { white-space: nowrap; }

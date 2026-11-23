@@ -227,8 +227,8 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
       {row.autoDiff && (
         <div className="notice">
           <span>
-            The collector now reads deadline <b>{fmt(row.autoDiff.deadline)}</b>
-            {row.autoDiff.abstract && <>, abstract <b>{fmt(row.autoDiff.abstract)}</b></>}
+            Collected: <span className="pair">deadline <b>{fmt(row.autoDiff.deadline)}</b></span>
+            {row.autoDiff.abstract && <span className="pair">abstract <b>{fmt(row.autoDiff.abstract)}</b></span>}
           </span>
           <button onClick={applyAuto}>Use these</button>
         </div>
