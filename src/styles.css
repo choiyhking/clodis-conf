@@ -788,3 +788,5 @@ th { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 /* deadlines: several papers on one deadline are a single chip, "first title +2", that opens the list */
 .paper-chip.multi > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .paper-chip.multi em { flex: none; margin-right: -4px; padding: 3px 6px; border-radius: 9px; font-style: normal; font-size: 11.5px; font-weight: 700; color: var(--accent-ink); background: var(--accent-soft); }
+/* one rule for every heading and label on the site: written as a sentence, never forced into capitals */
+h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
