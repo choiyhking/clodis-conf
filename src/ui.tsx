@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
-  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, flagOf, fmt, fmtShort, initials, isDate, paperLinks, rowLabel,
+  PAPER_STATUS, STATUS_LABEL, autoSig, countdown, diffDays, diffParts, flagOf, fmt, fmtShort, initials, isDate, paperLinks, rowLabel,
   settleStatus, sortMembers, timeLeft, toKST, uid,
 } from './logic'
 import { useStore } from './store'
@@ -136,7 +136,7 @@ export function StatusBadge({ row }: { row: Row }) {
   const { guest } = useStore()
   const changed = !guest && !!row.autoDiff
   const title = changed
-    ? `You verified ${fmt(row.deadline)}, but ${row.autoDiff!.source === 'site' ? 'the conference site' : 'ccfddl'} now shows ${fmt(row.autoDiff!.deadline)}. Settle it in the Inbox`
+    ? `${row.autoDiff!.source === 'site' ? 'The conference site' : 'ccfddl'} now shows ${diffParts(row).map((p) => `${p.label.toLowerCase()} ${fmt(p.value)}`).join(', ')}. Settle it in the Inbox`
     : row.status === 'verified'
       ? `Verified${row.checkedBy ? ` by ${row.checkedBy}` : ''} on ${fmt(row.checkedAt) || 'unknown date'}`
       : row.status === 'auto'
@@ -257,8 +257,7 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
       {row.autoDiff && (
         <div className="notice">
           <span>
-            Collected: <span className="pair">deadline <b>{fmt(row.autoDiff.deadline)}</b></span>
-            {row.autoDiff.abstract && <span className="pair">abstract <b>{fmt(row.autoDiff.abstract)}</b></span>}
+            Collected: {diffParts(row).map((p) => <span key={p.label} className="pair">{p.label.toLowerCase()} <b>{fmt(p.value)}</b></span>)}
           </span>
           <button onClick={applyAuto}>Use these</button>
         </div>
@@ -751,8 +750,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
           </p>
           {!guest && live.autoDiff && (
             <p className="diff">
-              {live.autoDiff.source === 'site' ? 'The conference site' : 'ccfddl'} now says deadline <b>{fmt(live.autoDiff.deadline)}</b>
-              {live.autoDiff.abstract && <> (abstract {fmt(live.autoDiff.abstract)})</>}.
+              {live.autoDiff.source === 'site' ? 'The conference site' : 'ccfddl'} now shows {diffParts(live).map((p, i) => <span key={p.label}>{i > 0 && ', '}{p.label.toLowerCase()} <b>{fmt(p.value)}</b></span>)}.
             </p>
           )}
           {!!live.evidence?.length && (

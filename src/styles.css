@@ -837,3 +837,10 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 .sched col.c-target { width: 244px; }
 @media (min-width: 1500px) { .sched col.c-target { width: 300px; } }
 @media (min-width: 1800px) { .sched col.c-target { width: 340px; } }
+
+/* wide screens: Location is only as wide as a place name needs; Conference and Targeting share what is left */
+@media (min-width: 1500px) {
+  .sched col.c-loc { width: 210px; }
+  .sched col.c-conf { width: 54%; }
+  .sched col.c-target { width: 46%; }
+}

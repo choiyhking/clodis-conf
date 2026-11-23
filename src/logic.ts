@@ -252,6 +252,11 @@ export function flagOf(location: string): string {
 
 // ---------- merging collected data into rows ----------
 export const autoSig = (a: Round) => [a.abstract, a.deadline, a.noti].join('|')
+/** Which of a row's three dates the collector now reads differently, with the collected values. */
+export const diffParts = (r: Row) =>
+  !r.autoDiff ? [] : ([['Deadline', r.deadline, r.autoDiff.deadline], ['Abstract', r.abstract, r.autoDiff.abstract], ['Notification', r.noti, r.autoDiff.noti]] as const)
+    .filter(([, mine, theirs]) => theirs && theirs !== mine)
+    .map(([label, , value]) => ({ label, value: value as string }))
 const MATCH_WINDOW = 21 // days: a collected round and a stored row this close are the same round
 const MAX_SITE_ROUNDS = 2 // a page yielding more "rounds" than this was almost certainly misread
 
@@ -331,10 +336,12 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
             if (gap <= MATCH_WINDOW && (!best || gap < Math.abs(diffDays(best.deadline, a.deadline)))) best = r
           }
           if (best && best.status === 'verified') {
-            // Past deadlines aren't worth an alert. Notification dates aren't compared: sources differ on
-            // whether they mean the first-round or the final decision.
-            const upcoming = best.deadline >= today || a.deadline >= today
-            const differs = best.deadline !== a.deadline || (!!a.abstract && best.abstract !== a.abstract)
+            // A notification date that is missing or was saved as a guess gives way to the one a source announces.
+            if ((best.notiEstimated || !best.noti) && a.noti) Object.assign(best, { noti: a.noti, notiEstimated: false })
+            // All three dates are compared every day. Nothing is worth an alert once both the deadline and
+            // the notification are behind us.
+            const upcoming = best.deadline >= today || a.deadline >= today || a.noti >= today
+            const differs = best.deadline !== a.deadline || (!!a.abstract && best.abstract !== a.abstract) || (!!a.noti && best.noti !== a.noti)
             if (upcoming && differs && best.autoSig !== autoSig(a)) best.autoDiff = { ...a, link: ed.link, source }
             best.sources = a.sources
             best.evidence = a.evidence
@@ -344,8 +351,6 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
             const numbered = (x: string) => /^\d+\/\d+$/.test(x)
             if (round && (!best.round || (numbered(best.round) && !numbered(round)))) best.round = round
             if (best.deadline === a.deadline) Object.assign(best, { time: a.time, tz: a.tz })
-            // A notification date saved as a guess gives way to the one a source announces.
-            if (best.notiEstimated && a.noti) Object.assign(best, { noti: a.noti, notiEstimated: false })
           } else if (best) {
             // An estimate from the sheet, and the real dates are now out: show the collected values.
             Object.assign(best, {

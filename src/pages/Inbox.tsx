@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { fmt, rowLabel } from '../logic'
+import { diffParts, fmt, rowLabel } from '../logic'
 import { useStore } from '../store'
 import type { Row } from '../types'
 import { ConfDrawer, Countdown, DeadlineModal, Icon, useVerify } from '../ui'
@@ -60,12 +60,12 @@ export default function Inbox() {
         </button>
       </header>
 
-      <Section title="Changed" n={changed.length} hint="A date you verified no longer matches what the collector reads. Often a deadline extension.">
+      <Section title="Changed" n={changed.length} hint="A verified abstract, deadline or notification date no longer matches what the collector reads. Often an extension.">
         {changed.map((r) => item(r, <>
           <button className="primary" onClick={() => verify(r, { deadline: r.autoDiff!.deadline, abstract: r.autoDiff!.abstract || r.abstract, noti: r.autoDiff!.noti || r.noti })}>Accept new</button>
           <button onClick={() => verify(r)}>Keep mine</button>
           <button onClick={() => setEdit(r)}>Edit</button>
-        </>, <div className="diff">{r.autoDiff!.source === 'site' ? 'The conference site' : 'ccfddl'} now shows: Deadline <b>{fmt(r.autoDiff!.deadline)}</b>{r.autoDiff!.abstract && <> · Abstract {fmt(r.autoDiff!.abstract)}</>}</div>))}
+        </>, <div className="diff">{r.autoDiff!.source === 'site' ? 'The conference site' : 'ccfddl'} now shows: {diffParts(r).map((p, i) => <span key={p.label}>{i > 0 && ' · '}{p.label} <b>{fmt(p.value)}</b></span>)}</div>))}
       </Section>
 
       <Section title="New dates to verify" n={autos.length} hint="Collected automatically and already shown on the Deadlines page as Auto.">
