@@ -206,22 +206,11 @@ export default function Lab() {
           Save everything as one file, or load such a file back in. Restoring overwrites items with the same id.
         </Row>
         <Row title="Old deadlines" actions={<>
-          {obsolete.length > 0 && <button onClick={() => setShowOld(!showOld)} aria-expanded={showOld}>{showOld ? 'Hide list' : 'Show list'}</button>}
-          <button onClick={cleanUp} disabled={obsolete.length === 0}>Clean up ({obsolete.length})</button>
+          <button onClick={() => setShowOld(true)} disabled={obsolete.length === 0}>View ({obsolete.length})</button>
+          <button onClick={cleanUp} disabled={obsolete.length === 0}>Clean up</button>
         </>}>
           Deadlines that closed over a year ago and have a newer edition on record. The latest closed edition of each conference is always kept.
         </Row>
-        {showOld && obsolete.length > 0 && (
-          <ul className="set-list">
-            {[...obsolete].sort((x, y) => x.deadline.localeCompare(y.deadline)).map((d) => (
-              <li key={d.id}>
-                <b>{data.conferences.find((c) => c.id === d.confId)?.acronym ?? d.confId}{d.round ? ` R${d.round}` : ''}</b>
-                <span className="muted">{d.year}</span>
-                <span>closed {fmt(d.deadline)}</span>
-              </li>
-            ))}
-          </ul>
-        )}
         {MODE === 'local' && (
           <Row title="Spreadsheet data" actions={<button onClick={seed}>Reset</button>}>
             Erase what this browser holds and start again from the original spreadsheet.
@@ -256,6 +245,25 @@ export default function Lab() {
         </>
       )}
       {supabase && !session && <p className="lab-foot"><button className="link" onClick={() => (location.hash = 'admin')}>Admin sign in</button></p>}
+      {showOld && obsolete.length > 0 && (
+        <Modal title={`Old deadlines (${obsolete.length})`} onClose={() => setShowOld(false)}>
+          <p className="muted old-hint">Clean up deletes these. Each has a newer edition of the same conference on record.</p>
+          <ul className="set-list">
+            {[...obsolete].sort((x, y) => x.deadline.localeCompare(y.deadline)).map((d) => (
+              <li key={d.id}>
+                <b>{data.conferences.find((c) => c.id === d.confId)?.acronym ?? d.confId}{d.round ? ` R${d.round}` : ''}</b>
+                <span className="muted">{d.year}</span>
+                <span className="grow" />
+                <span>closed {fmt(d.deadline)}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="old-foot">
+            <button onClick={() => setShowOld(false)}>Close</button>
+            <button className="danger-btn" onClick={cleanUp}>Clean up</button>
+          </div>
+        </Modal>
+      )}
       {changePw && <PasswordModal onClose={() => setChangePw(false)} />}
     </section>
   )

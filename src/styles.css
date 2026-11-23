@@ -809,3 +809,17 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 .set-list { list-style: none; margin: 0; padding: 4px 16px 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 2px 24px; font-size: 13px; font-variant-numeric: tabular-nums; }
 .set-list li { display: flex; align-items: baseline; gap: 8px; padding: 3px 0; }
 .set-list b { font-weight: 600; }
+
+/* lab: old deadlines open in a dialog; the list scrolls inside it */
+.modal .set-list { display: block; padding: 0; margin: 0 0 14px; max-height: min(52vh, 420px); overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+.modal .set-list li { padding: 7px 12px; border-top: 1px solid var(--line); }
+.modal .set-list li:first-child { border-top: none; }
+.old-hint { margin: 0 0 12px; font-size: 13px; }
+.old-foot { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* lab: the activity log is exactly as tall as the members column beside it, and scrolls inside */
+@media (min-width: 1101px) {
+  .lab-cols { align-items: stretch; }
+  .lab-cols > div { display: flex; flex-direction: column; }
+  .lab .activity { flex: 1 1 0; min-height: 0; max-height: none; contain: size; }
+}
