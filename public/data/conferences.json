@@ -35,7 +35,7 @@
  {
   "id": "acsac",
   "acronym": "ACSAC",
-  "name": "ACM Annual Computer Security Applications Conference",
+  "name": "Annual Computer Security Applications Conference",
   "area": "Security",
   "kiise": "A",
   "bk": 2,
@@ -46,7 +46,7 @@
  {
   "id": "aistats",
   "acronym": "AISTATS",
-  "name": "Artificial Intelligence and Statistics",
+  "name": "International Conference on Artificial Intelligence and Statistics",
   "area": "AI",
   "kiise": "",
   "bk": 1,
@@ -68,7 +68,7 @@
  {
   "id": "asiaccs",
   "acronym": "AsiaCCS",
-  "name": "ACM ASIA Conference on Computer and Communications Security",
+  "name": "ACM Asia Conference on Computer and Communications Security",
   "area": "Security",
   "kiise": "A",
   "bk": 1,
@@ -79,7 +79,7 @@
  {
   "id": "asplos",
   "acronym": "ASPLOS",
-  "name": "Architectural Support for Programming Languages and Operating Systems",
+  "name": "International Conference on Architectural Support for Programming Languages and Operating Systems",
   "area": "Arch",
   "kiise": "S",
   "bk": 4,
@@ -155,7 +155,7 @@
  {
   "id": "conext",
   "acronym": "CoNEXT",
-  "name": "ACM International Conference on Emerging Networking Experiments and Technologie",
+  "name": "ACM International Conference on Emerging Networking Experiments and Technologies",
   "area": "Network",
   "kiise": "S",
   "bk": 3,
@@ -166,7 +166,7 @@
  {
   "id": "csf",
   "acronym": "CSF",
-  "name": "IEEE Computer Security Foundation Symposium",
+  "name": "IEEE Computer Security Foundations Symposium",
   "area": "Security",
   "kiise": "",
   "bk": 1,
@@ -231,7 +231,7 @@
  {
   "id": "emnlp",
   "acronym": "EMNLP",
-  "name": "Empirical Methods in Natural Language Processing",
+  "name": "Conference on Empirical Methods in Natural Language Processing",
   "area": "NLP",
   "kiise": "S",
   "bk": 3,
@@ -275,7 +275,7 @@
  {
   "id": "fase",
   "acronym": "FASE",
-  "name": "International Conf. on Fundamental Approaches to Software Engineering",
+  "name": "International Conference on Fundamental Approaches to Software Engineering",
   "area": "SE",
   "kiise": "",
   "bk": 1,
@@ -339,7 +339,7 @@
  {
   "id": "hpdc",
   "acronym": "HPDC",
-  "name": "IEEE International Symposium on High Performance Distributed Computing",
+  "name": "ACM International Symposium on High-Performance Parallel and Distributed Computing",
   "area": "System",
   "kiise": "S",
   "bk": 2,
@@ -447,7 +447,7 @@
  {
   "id": "icsoc",
   "acronym": "ICSOC",
-  "name": "International Conf. on Service-Oriented Computing",
+  "name": "International Conference on Service-Oriented Computing",
   "area": "System",
   "kiise": "",
   "bk": 1,
@@ -523,8 +523,8 @@
  },
  {
   "id": "infovis",
-  "acronym": "InfoVis",
-  "name": "IEEE Conference on Information Visualization",
+  "acronym": "IEEE VIS",
+  "name": "IEEE Visualization and Visual Analytics",
   "area": "Data",
   "kiise": "",
   "bk": 1,
@@ -589,7 +589,7 @@
  {
   "id": "mascots",
   "acronym": "MASCOTS",
-  "name": "IEEE Symposium Model Analysis and Simulation of Computer and Telecommunicatio",
+  "name": "International Symposium on Modeling, Analysis, and Simulation of Computer and Telecommunication Systems",
   "area": "Measurement",
   "kiise": "A",
   "bk": 2,
@@ -676,7 +676,7 @@
  {
   "id": "oopsla",
   "acronym": "OOPSLA",
-  "name": "Conference on Object-Oriented Programming, System, Languages, and Applications",
+  "name": "Conference on Object-Oriented Programming, Systems, Languages, and Applications",
   "area": "PL",
   "kiise": "S",
   "bk": 4,
@@ -708,8 +708,8 @@
  },
  {
   "id": "performance",
-  "acronym": "PERFORMANCE",
-  "name": "IFIP WG 7.3 International Symposium on Computer Performance, Modeling, Measure",
+  "acronym": "Performance",
+  "name": "IFIP WG 7.3 International Symposium on Computer Performance, Modeling, Measurements and Evaluation",
   "area": "Measurement",
   "kiise": "S",
   "bk": 2,
@@ -731,7 +731,7 @@
  {
   "id": "pods",
   "acronym": "PODS",
-  "name": "The Principles of Database Systems (PODS) symposium",
+  "name": "ACM Symposium on Principles of Database Systems",
   "area": "Data",
   "kiise": "S",
   "bk": 4,
@@ -829,7 +829,7 @@
  {
   "id": "sc",
   "acronym": "SC",
-  "name": "ACM/IEEE International Conference for High Performance Computing, Networking, S",
+  "name": "ACM/IEEE International Conference for High Performance Computing, Networking, Storage and Analysis",
   "area": "HPC",
   "kiise": "S",
   "bk": 3,
@@ -894,7 +894,7 @@
  {
   "id": "sigmetrics",
   "acronym": "SIGMETRICS",
-  "name": "ACM SIGMETRICS International Conference on Measurement and Modeling of Com",
+  "name": "ACM SIGMETRICS International Conference on Measurement and Modeling of Computer Systems",
   "area": "Measurement",
   "kiise": "S",
   "bk": 3,
@@ -905,7 +905,7 @@
  {
   "id": "sigmod",
   "acronym": "SIGMOD",
-  "name": "ACM SIGMOD/PODC International conference on management of data",
+  "name": "ACM SIGMOD International Conference on Management of Data",
   "area": "Data",
   "kiise": "S",
   "bk": 4,
@@ -971,7 +971,7 @@
  {
   "id": "vldb",
   "acronym": "VLDB",
-  "name": "International Conference on Very Large Databases",
+  "name": "International Conference on Very Large Data Bases",
   "area": "Data",
   "kiise": "S",
   "bk": 4,
