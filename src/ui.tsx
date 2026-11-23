@@ -128,9 +128,16 @@ export function Countdown({ deadline, today, at, assumed }: { deadline: string; 
   return <span className={`cd ${tone}`}>{countdown(deadline, today)}</span>
 }
 
+/**
+ * How far a row's dates can be trusted. A verified date that no longer matches what the collector reads is
+ * shown as Changed instead of Verified, so there is always exactly one badge. Guests never see Changed.
+ */
 export function StatusBadge({ row }: { row: Row }) {
-  const title =
-    row.status === 'verified'
+  const { guest } = useStore()
+  const changed = !guest && !!row.autoDiff
+  const title = changed
+    ? `You verified ${fmt(row.deadline)}, but ${row.autoDiff!.source === 'site' ? 'the conference site' : 'ccfddl'} now shows ${fmt(row.autoDiff!.deadline)}. Settle it in the Inbox`
+    : row.status === 'verified'
       ? `Verified${row.checkedBy ? ` by ${row.checkedBy}` : ''} on ${fmt(row.checkedAt) || 'unknown date'}`
       : row.status === 'auto'
         ? `Collected automatically from ${(row.sources ?? [row.source]).join(' + ')}. Not yet verified by the owner`
@@ -138,9 +145,9 @@ export function StatusBadge({ row }: { row: Row }) {
           ? `Not announced yet. Projected from last year's deadline (${fmt(row.derivedFrom)})`
           : 'Not announced yet. Expected date'
   return (
-    <span className={`status st-${row.status}`} title={title}>
+    <span className={`status st-${changed ? 'changed' : row.status}`} title={title}>
       <i />
-      {STATUS_LABEL[row.status]}
+      {changed ? 'Changed' : STATUS_LABEL[row.status]}
     </span>
   )
 }
@@ -736,7 +743,6 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
         <section className="trust">
           <div className="trust-head">
             <StatusBadge row={live} />
-            {!guest && live.autoDiff && <span className="tag warn">Changed</span>}
           </div>
           <p className="muted">
             {live.status === 'verified' && <>Verified{live.checkedBy ? ` by ${live.checkedBy}` : ''} on {fmt(live.checkedAt) || 'an unknown date'}.</>}

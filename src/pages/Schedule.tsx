@@ -15,6 +15,7 @@ const STATUS_OPTIONS: FilterOption[] = [
   { value: 'verified', label: 'Verified' },
   { value: 'auto', label: 'Auto' },
   { value: 'estimated', label: 'Estimated' },
+  { value: 'changed', label: 'Changed' },
 ]
 const PAST_DAYS = 365 // "Show past" goes back one year; older rows stay in the data but off the table
 
@@ -76,7 +77,7 @@ export default function Schedule() {
     if (kiise.length && !kiise.includes(`k:${c.kiise}`)) return false
     if (bk.length && !bk.includes(`b:${c.bk ?? ''}`)) return false
     if (owner.length && !owner.includes(c.owner)) return false
-    if (status.length && !status.includes(r.status)) return false
+    if (status.length && !status.includes(!guest && r.autoDiff ? 'changed' : r.status)) return false
     if (onlyTarget && !tg) return false
     if (q && !`${c.acronym} ${c.name}`.toLowerCase().includes(q.toLowerCase())) return false
     return true
@@ -111,7 +112,7 @@ export default function Schedule() {
         <MultiFilter label="All areas" noun="Area" value={area} onChange={setArea} options={areas.map((a) => ({ value: a, label: a }))} />
         <MultiFilter label="Any rank" noun="Rank" value={rank} onChange={setRank} options={RANK_OPTIONS} />
         {!guest && <MultiFilter label="Any owner" noun="Owner" value={owner} onChange={setOwner} options={[...sortMembers(data.members).map((m) => ({ value: m.name, label: m.name })), { value: '', label: 'Unassigned' }]} />}
-        <MultiFilter label="Any status" noun="Status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
+        <MultiFilter label="Any status" noun="Status" value={status} onChange={setStatus} options={guest ? STATUS_OPTIONS.filter((o) => o.value !== 'changed') : STATUS_OPTIONS} />
         <button className={'toggle' + (past ? ' on' : '')} onClick={() => setPast(!past)} aria-pressed={past} title="Also show deadlines that closed in the last 12 months">Show past year</button>
         <span className="grow" />
         {!guest && <button className={'only-ours' + (onlyTarget ? ' on' : '')} onClick={() => setOnlyTarget(!onlyTarget)} aria-pressed={onlyTarget} title="Show only the deadlines our papers are aimed at or under review for">
@@ -224,7 +225,6 @@ export default function Schedule() {
                     </td>}
                     <td className="st-cell">
                       <StatusBadge row={r} />
-                      {!guest && r.autoDiff && <span className="tag warn" title={`Collected value: ${fmt(r.autoDiff.deadline)}`}>Changed</span>}
                     </td>
                   </tr>
                 </Fragment>

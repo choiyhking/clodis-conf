@@ -830,3 +830,10 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 .date-in button { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: none; padding: 5px; color: var(--muted); display: inline-flex; }
 .date-in button:hover { color: var(--text); background: var(--sunken); }
 .date-in .date-pick { position: absolute; left: 0; bottom: 0; width: 0; height: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
+
+/* status is always one badge (Changed replaces Verified), so the column is narrow and the room goes to Targeting */
+.st-changed { color: var(--hot); } .st-changed i { background: var(--hot); }
+.sched col.c-status { width: 112px; }
+.sched col.c-target { width: 244px; }
+@media (min-width: 1500px) { .sched col.c-target { width: 300px; } }
+@media (min-width: 1800px) { .sched col.c-target { width: 340px; } }
