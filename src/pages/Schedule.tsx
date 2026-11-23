@@ -199,20 +199,19 @@ export default function Schedule() {
                     </td>
                     {!guest && <td onClick={(e) => e.stopPropagation()}>
                       <span className={'targeting' + (tg.length ? '' : ' none')}>
-                        {/* One chip, one line. A single paper shows its title; several show how many, and open the list of all of them. */}
-                        {tg.length === 1 && (
-                          <button className="paper-chip" onClick={() => setPaper(tg[0])} title={`${tg[0].title} — ${tg[0].members.join(', ')}`}>
-                            <span>{tg[0].title}</span>
+                        {/* One line only: the first paper, then a "+2" chip that opens the list of all of them. */}
+                        {tg.slice(0, 1).map((p) => (
+                          <button key={p.id} className="paper-chip" onClick={() => setPaper(p)} title={`${p.title} — ${p.members.join(', ')}`}>
+                            <span>{p.title}</span>
                           </button>
-                        )}
+                        ))}
                         {tg.length > 1 && (
-                          <button className="paper-chip multi" aria-haspopup="menu" title={`${tg.length} papers — click to list them`}
+                          <button className="more-chip" aria-haspopup="menu" title={`Show all ${tg.length} papers`}
                             onClick={(e) => {
                               const box = e.currentTarget.getBoundingClientRect()
                               setMore({ papers: tg, x: Math.max(8, Math.min(box.left, window.innerWidth - 296)), y: box.bottom + 4 })
                             }}>
-                            <span>{tg.length} papers</span>
-                            <Icon name="down" size={13} />
+                            +{tg.length - 1}
                           </button>
                         )}
                         {r.at > now && (
