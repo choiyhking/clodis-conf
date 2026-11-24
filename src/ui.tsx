@@ -724,7 +724,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
               <span>{s.label}</span>
               <b className={live.status === 'estimated' || s.soft ? 'est' : ''}>{fmt(s.date) || (s.label === 'Abstract' ? '–' : 'TBD')}</b>
               {s.main && <Countdown deadline={live.deadline} today={today} at={live.at} assumed={!live.exact} />}
-              {s.main && !live.exact && live.at > Date.now() && <small className="muted when">Closing time not stated, so 23:59 AoE is assumed. Check the site.</small>}
+              {s.main && !live.exact && live.at > Date.now() && <small className="muted when">Closing time not stated. 23:59 AoE assumed.</small>}
               {s.main && live.time && live.tz && (
                 <small className="muted when">{live.time} {/^UTC-12$/i.test(live.tz) ? 'AoE' : live.tz}{toKST(live.deadline, live.time, live.tz) && <> = <b>{toKST(live.deadline, live.time, live.tz)} KST</b></>}</small>
               )}
@@ -744,7 +744,8 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
           </p>
           {!guest && live.autoDiff && (
             <p className="diff">
-              {live.autoDiff.source === 'site' ? 'The conference site' : 'ccfddl'} now shows {diffParts(live).map((p, i) => <span key={p.label}>{i > 0 && ', '}{p.label.toLowerCase()} <b>{fmt(p.value)}</b></span>)}.
+              {live.autoDiff.source === 'site' ? 'The conference site' : 'ccfddl'} now shows{' '}
+              {diffParts(live).map((p, i, all) => <span key={p.label} className="nw">{p.label.toLowerCase()} <b>{fmt(p.value)}</b>{i < all.length - 1 ? ', ' : '.'}</span>)}
             </p>
           )}
           <div className="acts">

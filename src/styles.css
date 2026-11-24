@@ -870,3 +870,9 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 .tm-when .muted b { font-size: 13px; font-weight: 600; color: var(--text); }
 .tm-when .cd { height: 22px; padding: 0 9px; font-size: 12.5px; }
 .tm-when .cd:not(.hot):not(.warm):not(.urgent) { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+/* detail panel: a label and its date never split across lines */
+.nw { white-space: nowrap; }
+.nw + .nw::before { content: ' '; white-space: normal; }
+.steps .when { text-wrap: balance; }
+.diff { text-wrap: balance; }
