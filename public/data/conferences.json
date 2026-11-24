@@ -566,16 +566,6 @@
   "ccfddl": "SE/issta"
  },
  {
-  "id": "issta-demo",
-  "acronym": "ISSTA (Demo)",
-  "name": "ACM International Symposium on Software Testing and Analysis",
-  "area": "SE",
-  "kiise": "S",
-  "bk": 2,
-  "blind": "Double",
-  "owner": ""
- },
- {
   "id": "kdd",
   "acronym": "KDD",
   "name": "ACM SIGKDD Conference on Knowledge Discovery and Data Mining",

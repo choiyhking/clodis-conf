@@ -1098,24 +1098,6 @@
   "id": "snp-2026-06-11"
  },
  {
-  "confId": "issta-demo",
-  "year": 2026,
-  "round": "",
-  "abstract": "",
-  "deadline": "2026-06-26",
-  "noti": "2026-07-24",
-  "event": "2026-10-03",
-  "location": "Oakland, CA, USA",
-  "url": "https://conf.researchr.org/home/issta-2026",
-  "status": "verified",
-  "notiEstimated": false,
-  "checkedAt": "2026-07-20",
-  "checkedBy": "",
-  "source": "sheet",
-  "note": "",
-  "id": "issta-demo-2026-06-26"
- },
- {
   "confId": "icse",
   "year": 2027,
   "round": "",
