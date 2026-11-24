@@ -181,7 +181,7 @@ export default function Lab() {
                 {[...data.log].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 200).map((e) => (
                   <li key={e.id}>
                     <time title={e.at}>{new Date(e.at).toLocaleString('sv-SE').slice(0, 16)}</time>
-                    <span className="who">{data.members.some((m) => m.name === e.by) ? <Avatar name={e.by} size={20} whole /> : e.by === 'unknown' ? 'No name' : e.by}</span>
+                    <span className="who">{data.members.some((m) => m.name === e.by) ? <Avatar name={e.by} size={20} whole /> : e.by === 'No name' ? 'unknown' : e.by}</span>
                     <span>{e.text}</span>
                   </li>
                 ))}

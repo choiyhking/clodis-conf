@@ -552,7 +552,7 @@ export function PaperModal({ paper, isNew, onClose }: { paper: Paper; isNew?: bo
   return (
     <Modal title={isNew ? 'New paper' : 'Edit paper'} onClose={onClose} wide>
       <div className="grid">
-        <Field label="Working title (required)" span>
+        <Field label="Working title *" span>
           <input value={p.title} onChange={(e) => set('title', e.target.value)} autoFocus={isNew} placeholder="e.g., LLM-seccomp" />
         </Field>
         <Field label="Research topic" span>
@@ -662,7 +662,7 @@ export function TargetModal({ row, onClose }: { row: Row; onClose: () => void })
         <span>Deadline</span>
         <b className={row.status === 'estimated' ? 'est' : ''}>{fmt(row.deadline)}</b>
         <Countdown deadline={row.deadline} today={today} at={row.at} />
-        {row.noti && <span className="muted">result {fmt(row.noti)}</span>}
+        {row.noti && <span className="muted">Notification <b>{fmt(row.noti)}</b></span>}
       </div>
       <p className="muted">Which paper is going here?</p>
       {groups.map((g) => (

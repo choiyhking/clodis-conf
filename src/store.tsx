@@ -175,7 +175,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const logEntry = (coll: Coll, prev: unknown, next: unknown): LogEntry | null => {
     if (coll === 'log') return null
     const text = describeChange(coll, prev, next, data)
-    return text ? { id: uid(), at: new Date().toISOString(), by: me || session || 'No name', text } : null
+    return text ? { id: uid(), at: new Date().toISOString(), by: me || session || 'unknown', text } : null
   }
 
   const guest = supabase ? !access : PREVIEW_GUEST

@@ -862,3 +862,11 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 
 /* date editor: dates that are out of order */
 .form-warn { margin: 10px 0 0; color: var(--auto); font-size: 12.5px; }
+
+/* target dialog: the deadline line reads at one size, with the countdown as large as in the table */
+.tm-when { gap: 12px; padding: 12px 14px; }
+.tm-when > span:first-child, .tm-when .muted { font-size: 13px; }
+.tm-when b { font-size: 15px; }
+.tm-when .muted b { font-size: 13px; font-weight: 600; color: var(--text); }
+.tm-when .cd { height: 22px; padding: 0 9px; font-size: 12.5px; }
+.tm-when .cd:not(.hot):not(.warm):not(.urgent) { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-strong); }
