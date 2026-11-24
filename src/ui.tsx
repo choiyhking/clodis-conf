@@ -355,7 +355,7 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
       <div className="grid conf-form">
         <div className="field span">
           <span>Acronym *</span>
-          <input value={c.acronym} onChange={(e) => setC((p) => ({ ...p, acronym: e.target.value, ccfddl: conf ? p.ccfddl : '' }))} autoFocus={!conf} placeholder="e.g., SIGMOD" />
+          <input value={c.acronym} onChange={(e) => setC((p) => ({ ...p, acronym: e.target.value, ccfddl: conf ? p.ccfddl : '' }))} autoFocus={!conf} placeholder="e.g., SIGMOD, or SIGMOD (short) for a side track" />
           {matches.length > 0 && (
             <ul className="suggest">
               {matches.map((x) => (
