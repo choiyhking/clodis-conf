@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { buildRows, describeChange, todayStr, uid } from './logic'
+import { buildRows, describeChange, syncTargets, todayStr, uid } from './logic'
 import type { AutoData, Coll, Conf, Data, Deadline, LogEntry, Member, Row } from './types'
 
 /**
@@ -175,7 +175,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const logEntry = (coll: Coll, prev: unknown, next: unknown): LogEntry | null => {
     if (coll === 'log') return null
     const text = describeChange(coll, prev, next, data)
-    return text ? { id: uid(), at: new Date().toISOString(), by: me || session || 'unknown', text } : null
+    return text ? { id: uid(), at: new Date().toISOString(), by: me || session || 'No name', text } : null
   }
 
   const guest = supabase ? !access : PREVIEW_GUEST
@@ -242,8 +242,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const rows = useMemo(() => buildRows(data.conferences, data.deadlines, auto, today), [data, auto, today])
 
+  // What the pages see: papers whose target date has moved follow it.
+  const view = useMemo(() => {
+    const papers = syncTargets(data.papers, rows)
+    return papers === data.papers ? data : { ...data, papers }
+  }, [data, rows])
+
   return (
-    <StoreCtx.Provider value={{ data, rows, auto, today, ready, error, me, setMe, session, access, guest, joined, save, remove, replaceAll, reload }}>
+    <StoreCtx.Provider value={{ data: view, rows, auto, today, ready, error, me, setMe, session, access, guest, joined, save, remove, replaceAll, reload }}>
       {children}
     </StoreCtx.Provider>
   )

@@ -20,7 +20,13 @@ export function todayStr() {
   const p = (x: number) => String(x).padStart(2, '0')
   return `${n.getFullYear()}-${p(n.getMonth() + 1)}-${p(n.getDate())}`
 }
-export const isDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s)
+/** A real calendar day written as YYYY-MM-DD. 2026-02-31 is not one. */
+export const isDate = (s: string) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
+  if (!m) return false
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]))
+  return d.getUTCMonth() === +m[2] - 1 && d.getUTCDate() === +m[3]
+}
 export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 /** Every date in the UI is shown as ISO 2026-11-17; this only blanks out missing values. */
@@ -257,6 +263,31 @@ export const diffParts = (r: Row) =>
   !r.autoDiff ? [] : ([['Deadline', r.deadline, r.autoDiff.deadline], ['Abstract', r.abstract, r.autoDiff.abstract], ['Notification', r.noti, r.autoDiff.noti]] as const)
     .filter(([, mine, theirs]) => theirs && theirs !== mine)
     .map(([label, , value]) => ({ label, value: value as string }))
+const TARGET_WINDOW = 45 // days: how far a deadline may move and still be the one a paper was aimed at
+/**
+ * A paper remembers its target as a conference plus a deadline date. When that date moves (an extension, a
+ * corrected date, an estimate replaced by the real one) the paper follows it instead of losing its target.
+ */
+export function syncTargets(papers: Paper[], rows: Row[]): Paper[] {
+  let touched = false
+  const out = papers.map((p) => {
+    const t = p.target
+    if (!t || (p.status !== 'writing' && p.status !== 'submitted')) return p
+    const mine = rows.filter((r) => r.confId === t.confId)
+    let r = mine.find((x) => x.deadline === t.deadline)
+    if (!r) {
+      const named = mine.filter((x) => rowLabel(x) === t.label)
+      r = (named.length ? named : mine)
+        .map((x) => [Math.abs(diffDays(x.deadline, t.deadline)), x] as const)
+        .filter(([gap]) => gap <= TARGET_WINDOW)
+        .sort((a, b) => a[0] - b[0])[0]?.[1]
+    }
+    if (!r || (r.deadline === t.deadline && r.noti === t.noti)) return p
+    touched = true
+    return { ...p, target: { ...t, label: rowLabel(r), deadline: r.deadline, noti: r.noti } }
+  })
+  return touched ? out : papers
+}
 const MATCH_WINDOW = 21 // days: a collected round and a stored row this close are the same round
 const MAX_SITE_ROUNDS = 2 // a page yielding more "rounds" than this was almost certainly misread
 
@@ -338,11 +369,13 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
           if (best && best.status === 'verified') {
             // A notification date that is missing or was saved as a guess gives way to the one a source announces.
             if ((best.notiEstimated || !best.noti) && a.noti) Object.assign(best, { noti: a.noti, notiEstimated: false })
-            // All three dates are compared every day. Nothing is worth an alert once both the deadline and
-            // the notification are behind us.
-            const upcoming = best.deadline >= today || a.deadline >= today || a.noti >= today
-            const differs = best.deadline !== a.deadline || (!!a.abstract && best.abstract !== a.abstract) || (!!a.noti && best.noti !== a.noti)
-            if (upcoming && differs && best.autoSig !== autoSig(a)) best.autoDiff = { ...a, link: ed.link, source }
+            // All three dates are compared every day, but a date is only worth an alert while it is still ahead:
+            // a deadline that has closed on both sides is left alone, and so is a notification that has passed.
+            const dueOpen = best.deadline >= today || a.deadline >= today
+            const notiOpen = best.noti >= today || a.noti >= today
+            const shown = { ...a, deadline: dueOpen ? a.deadline : best.deadline, abstract: dueOpen ? a.abstract : best.abstract, noti: notiOpen ? a.noti : best.noti }
+            const differs = best.deadline !== shown.deadline || (!!shown.abstract && best.abstract !== shown.abstract) || (!!shown.noti && best.noti !== shown.noti)
+            if (differs && best.autoSig !== autoSig(a)) best.autoDiff = { ...shown, sig: autoSig(a), link: ed.link, source }
             best.sources = a.sources
             best.evidence = a.evidence
             // A row saved without a round (e.g. imported from the sheet) takes the collected round's label,

@@ -196,7 +196,7 @@ export function DateInput({ value, onChange }: { value: string; onChange: (v: st
     <span className="date-in">
       <input type="text" inputMode="numeric" placeholder="YYYY-MM-DD" value={text}
         onChange={(e) => { const s = e.target.value; setText(s); if (!s.trim()) onChange(''); else if (isDate(s.trim())) onChange(s.trim()) }}
-        onBlur={() => { if (!text.trim()) return; const t = tidy(text); if (t) { onChange(t); setText(t) } else setText(value) }} />
+        onBlur={() => { if (!text.trim()) return; const t = tidy(text); if (t && isDate(t)) { onChange(t); setText(t) } else setText(value) }} />
       <button type="button" aria-label="Open calendar" title="Open calendar" onClick={() => pick.current?.showPicker?.()}><Icon name="calendar" size={14} /></button>
       <input ref={pick} className="date-pick" type="date" tabIndex={-1} aria-hidden value={value} onChange={(e) => onChange(e.target.value)} />
     </span>
@@ -219,7 +219,7 @@ export function useVerify() {
       notiEstimated: false,
       checkedAt: today,
       checkedBy: me || r.checkedBy,
-      autoSig: r.autoDiff ? autoSig(r.autoDiff) : r.autoSig,
+      autoSig: r.autoDiff ? r.autoDiff.sig : r.autoSig,
     })
 }
 
@@ -236,6 +236,12 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
   const applyAuto = () =>
     row.autoDiff &&
     setD((p) => ({ ...p, abstract: row.autoDiff!.abstract || p.abstract, deadline: row.autoDiff!.deadline, noti: row.autoDiff!.noti || p.noti }))
+  // Dates that are out of order are almost always a typo, but saving is still allowed.
+  const odd = [
+    d.abstract && d.deadline && d.abstract > d.deadline && 'The abstract date is after the submission deadline.',
+    d.noti && d.deadline && d.noti < d.deadline && 'The notification date is before the submission deadline.',
+    d.event && d.event < (d.noti || d.deadline) && `The conference starts before the ${d.noti ? 'notification date' : 'submission deadline'}.`,
+  ].filter(Boolean) as string[]
   const submit = async () => {
     if (!isDate(d.deadline)) return alert('A submission deadline is required.')
     await save('deadlines', {
@@ -245,7 +251,7 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
       checkedAt: today,
       checkedBy: me || d.checkedBy,
       source: row.status === 'verified' ? d.source : 'manual',
-      autoSig: row.autoDiff ? autoSig(row.autoDiff) : d.autoSig,
+      autoSig: row.autoDiff ? row.autoDiff.sig : d.autoSig,
     })
     onClose()
   }
@@ -274,6 +280,7 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
         <Field label="URL"><input value={d.url} onChange={(e) => set('url', e.target.value)} /></Field>
         <Field label="Note" span><input value={d.note} onChange={(e) => set('note', e.target.value)} /></Field>
       </div>
+      {odd.length > 0 && <p className="form-warn">{odd.join(' ')} Check the dates.</p>}
       <footer>
         {!row.virtual && (
           <button className="danger" onClick={async () => { if (confirm('Delete this deadline?')) { await remove('deadlines', row.id); onClose() } }}>Delete</button>
@@ -728,7 +735,7 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
           {steps.map((s) => (
             <li key={s.label} className={s === nextStep ? 'upnext' : s.date && s.date < today ? 'done' : ''} title={s === nextStep ? 'Next date coming up' : s.date && s.date < today ? 'Passed' : ''}>
               <span>{s.label}</span>
-              <b className={live.status === 'estimated' || s.soft ? 'est' : ''}>{fmt(s.date) || 'TBD'}</b>
+              <b className={live.status === 'estimated' || s.soft ? 'est' : ''}>{fmt(s.date) || (s.label === 'Abstract' ? '–' : 'TBD')}</b>
               {s.main && <Countdown deadline={live.deadline} today={today} at={live.at} assumed={!live.exact} />}
               {s.main && !live.exact && live.at > Date.now() && <small className="muted when">Closing time not stated, so 23:59 AoE is assumed. Check the site.</small>}
               {s.main && live.time && live.tz && (

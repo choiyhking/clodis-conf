@@ -851,3 +851,14 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 /* research cards: the venue name opens the conference site */
 .pc-target .pc-site { align-self: flex-start; cursor: pointer; }
 .pc-target .pc-site:hover, .pc-target .pc-site:focus-visible { text-decoration: underline; }
+
+/* phones: the menu sits on top. Restated here because a later width rule for .app had overridden it */
+@media (max-width: 900px) { .app { grid-template-columns: 1fr; } }
+
+/* deadlines: the three flexible columns share the room by screen width, so Conference is never squeezed */
+.sched col.c-conf { width: 40%; } .sched col.c-loc { width: 27%; } .sched col.c-target { width: 33%; }
+@media (min-width: 1500px) { .sched col.c-conf { width: 36%; } .sched col.c-loc { width: 32%; } .sched col.c-target { width: 32%; } }
+@media (min-width: 1740px) { .sched col.c-loc { width: 320px; } .sched col.c-conf { width: 54%; } .sched col.c-target { width: 46%; } }
+
+/* date editor: dates that are out of order */
+.form-warn { margin: 10px 0 0; color: var(--auto); font-size: 12.5px; }

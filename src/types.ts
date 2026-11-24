@@ -45,7 +45,7 @@ export interface Row extends Deadline {
   conf: Conf
   virtual: boolean // not stored yet (collected or estimated)
   derivedFrom?: string // for estimates: last year's deadline this was projected from
-  autoDiff?: Round & { link?: string; source: string } // collected value disagrees with the confirmed one
+  autoDiff?: Round & { link?: string; source: string; sig: string } // collected value disagrees with the confirmed one
   sources?: string[] // which collectors reported this deadline: 'ccfddl' | 'site'
   evidence?: string[] // lines of the conference page the dates were read from
   time?: string // deadline time of day, e.g. "23:59"
