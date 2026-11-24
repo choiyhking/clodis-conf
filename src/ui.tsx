@@ -771,12 +771,6 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
               {live.autoDiff.source === 'site' ? 'The conference site' : 'ccfddl'} now shows {diffParts(live).map((p, i) => <span key={p.label}>{i > 0 && ', '}{p.label.toLowerCase()} <b>{fmt(p.value)}</b></span>)}.
             </p>
           )}
-          {!!live.evidence?.length && (
-            <details>
-              <summary>Text read from the conference site</summary>
-              <ul className="evidence">{live.evidence.map((l, i) => <li key={i}>{l}</li>)}</ul>
-            </details>
-          )}
           <div className="acts">
             {live.url && <a className="btn" href={live.url} target="_blank" rel="noreferrer">Open site <Icon name="link" size={13} /></a>}
             {!guest && live.status !== 'verified' && live.status !== 'estimated' && <button className="primary" onClick={() => verify(live)}><Icon name="check" size={14} /> Looks right</button>}
