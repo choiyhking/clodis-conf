@@ -48,43 +48,92 @@ export function htmlToLines(html) {
     .filter((l) => l.length >= 8 && l.length <= 260)
 }
 
-const SKIP = /camera|artifact|workshop|tutorial|poster|demo\b|doctoral|student research|early.?bird|hotel|visa|rebuttal|author response|response period|revis|\bfinal\b|shepherd|proposal|panel|industry|journal.first|video|supplement|early reject|desk reject|conference dates?|main conference|registration (deadline|opens)|bidding|nomination|\bopens?\b|reviews? (due|released)|presentation|will be held|accepted (for|to|papers)|rolled over|feedback|review deadline|notification of (paper )?registration/i
+// Lines that carry a date but are not a paper deadline or a result: other tracks, logistics, and sentences
+// that merely mention a date ("the site will start accepting submissions on…", "Update September 30: …").
+const SKIP_BASE = 'camera|artifact|workshop|tutorial|poster|demo|doctoral|consortium|competition|student research|early.?bird|hotel|visa|rebuttal|author response|response period|revis|shepherd\\w* (deadline|due|ends?)|proposal|panel|industry|industrial|journal.first|video|supplement|desk reject|conference dates?|main conference|registration (deadline|opens)|bidding|nomination|\\bopens?\\b|start(s|ed|ing)? accepting|^update\\b|\\bnotice\\b|^\\[|track cfps?|author registration|travel|\\baward|application|reviews? (due|released)|presentation|will be held|accepted (for|to|papers)|rolled over|feedback|review deadline|notification of (paper )?registration'
+const SKIP = new RegExp(SKIP_BASE + '|\\bfinal\\b', 'i')
+const SKIP_BUT_FINAL = new RegExp(SKIP_BASE, 'i')
+// "Final notification", "Final decisions", "Notification of final decisions": the result that counts.
+const FINAL_NOTI = /final\s+(author\s+|paper\s+)?(notification|decision|acceptance|accept)|(notification|decision)s?\s+of\s+final/i
+// A first answer that is not the result: early rejects, the first of two rounds of decisions.
+const EARLY_NOTI = /early|initial|first[- ]round|phase (1|one)\b|preliminary|interim/i
 
-/** 'abstract' | 'deadline' | 'noti' | null */
+/** 'abstract' | 'deadline' | 'noti' (the result) | 'noti1' (an earlier, partial answer) | null */
 export function classify(line) {
   const l = line.toLowerCase()
-  if (/abstract|paper registration/.test(l) && !/camera|workshop|poster|tutorial/.test(l)) return 'abstract'
+  // "Submission of regular papers and SRC research abstracts" is the paper deadline, not an abstract deadline.
+  const papersToo = /(regular|full|research) papers? and/.test(l)
+  if (/abstract|paper registration/.test(l) && !papersToo && !/camera|workshop|poster|tutorial/.test(l)) return 'abstract'
+  if (FINAL_NOTI.test(l) && !SKIP_BUT_FINAL.test(l)) return 'noti'
   if (SKIP.test(l)) return null
-  if (/notif|decision|acceptance/.test(l)) return 'noti'
+  if (/notif|decision|acceptance/.test(l)) return EARLY_NOTI.test(l) ? 'noti1' : 'noti'
   if (/submission|submit|deadline|\bdue\b/.test(l)) return 'deadline'
   return null
 }
+
+// A short line without a date is read as a heading. Dates under a heading for another track are not ours.
+const SIDE_HEADING = /workshop|tutorial|poster|demo|doctoral|consortium|industr|panel|competition|challenge|student|journal|proposal|artifact|\btools?\b|education|visions?\b|short papers?|fast track|late.breaking|blue sky/i
+const MAIN_HEADING = /call for papers|important dates|research|main|technical|\bfull\b|regular|^papers?\b|\bpapers? (and|&|\/)/i
+// Pages that list every track in one table ("Fri 2 Oct 2026 | Research Papers | Full paper submission").
+const MAIN_ROW = /research (track|papers?)|technical (track|papers?)|main track/i
 
 const days = (a, b) => (Date.parse(a) - Date.parse(b)) / 86400000
 
 /**
  * @param {string} html
  * @param {number} year conference edition year; used to throw away dates from other editions
+ * @param {{ acronym?: string, url?: string }} [about] which conference this is, as we list it ("ISSTA (Demo)")
  * @returns {{ rounds: {abstract:string, deadline:string, noti:string}[], evidence: string[] }}
  */
-export function extractRounds(html, year) {
+export function extractRounds(html, year, about = {}) {
+  const name = (about.acronym ?? '').split(/[ (]/)[0]
+  // We list a few side tracks as conferences of their own ("CCS Poster"). For those the side track is the one to read.
+  const trackWord = /poster/i.test(about.acronym ?? '') ? 'poster' : /demo/i.test(about.acronym ?? '') ? 'demo' : /short/i.test(about.acronym ?? '') ? 'short' : ''
+  const track = trackWord ? new RegExp(trackWord + '[a-z]*', 'gi') : null
+  const isTrack = (t) => !!track && new RegExp(trackWord, 'i').test(t)
+  // A page shared by several conferences: "Submission deadline for ESOP round 1" is not ours.
+  const othersRound = (line) => {
+    const m = line.match(/\b([A-Z][A-Za-z]*[A-Z][A-Za-z]*)[- ]round\b/)
+    return !!m && !!name && m[1].toLowerCase() !== name.toLowerCase() && !line.toLowerCase().includes(name.toLowerCase())
+  }
   const lo = `${year - 2}-06-01`, hi = `${year}-12-31`
-  const got = { abstract: [], deadline: [], noti: [] }
-  const evidence = []
+  let found = []
+  let side = false
   for (const line of htmlToLines(html)) {
-    const dates = findDates(line).filter((d) => d >= lo && d <= hi)
-    if (!dates.length) continue
-    const kind = classify(line)
+    const all = findDates(line)
+    if (!all.length && line.length <= 60) {
+      side = SIDE_HEADING.test(line) && !MAIN_HEADING.test(line) && !isTrack(line)
+      continue
+    }
+    const dates = all.filter((d) => d >= lo && d <= hi)
+    if (!dates.length || side || othersRound(line)) continue
+    const kind = classify(track ? line.replace(track, ' ') : line)
     if (!kind) continue
     // "Oct 1 (extended to Oct 8)" → the later date is the real one
-    const date = /extend/i.test(line) ? dates[dates.length - 1] : dates[0]
-    if (!got[kind].includes(date)) got[kind].push(date)
-    if (evidence.length < 12 && !evidence.includes(line)) evidence.push(line)
+    found.push({ kind, line, date: /extend/i.test(line) ? dates[dates.length - 1] : dates[0] })
+  }
+  // When rows name their track, only the main track's rows count.
+  if (track) {
+    // Rows that name the track win. A page about another track altogether tells us nothing.
+    if (found.some((f) => isTrack(f.line))) found = found.filter((f) => isTrack(f.line))
+    else if (!isTrack(about.url ?? '')) found = []
+  } else if (found.some((f) => f.kind === 'deadline' && MAIN_ROW.test(f.line))) found = found.filter((f) => MAIN_ROW.test(f.line))
+
+  const got = { abstract: [], deadline: [], noti: [], noti1: [] }
+  const evidence = []
+  for (const f of found) {
+    if (!got[f.kind].includes(f.date)) got[f.kind].push(f.date)
+    if (evidence.length < 12 && !evidence.includes(f.line)) evidence.push(f.line)
   }
   const deadlines = [...got.deadline].sort()
-  const rounds = deadlines.slice(0, 12).map((deadline) => {
+  // The result is the final notification. An early one is used only when the page gives nothing else.
+  const notis = (got.noti.length ? got.noti : got.noti1).slice().sort()
+  // One notification per round, each after its own deadline: they pair up in order. (With rolling rounds
+  // the result of round 1 can come after the deadline of round 2, so "the first one after" is not enough.)
+  const inOrder = notis.length === deadlines.length && deadlines.every((d, i) => notis[i] > d && days(notis[i], d) <= 330)
+  const rounds = deadlines.slice(0, 12).map((deadline, i) => {
     const abs = got.abstract.filter((a) => a <= deadline && days(deadline, a) <= 30).sort().pop() ?? ''
-    const noti = got.noti.filter((n) => n > deadline && days(n, deadline) <= 220).sort()[0] ?? ''
+    const noti = inOrder ? notis[i] : notis.filter((n) => n > deadline && days(n, deadline) <= 220)[0] ?? ''
     return { abstract: abs === deadline ? '' : abs, deadline, noti }
   })
   // A lone abstract date with no paper deadline is still worth showing as evidence, but not as a round.

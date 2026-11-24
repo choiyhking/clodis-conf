@@ -59,14 +59,17 @@ async function get(url) {
       headers: { 'user-agent': 'Mozilla/5.0 (compatible; conference-deadline-checker)', accept: 'text/html,*/*' },
     })
     if (!res.ok) return null
-    return { url: res.url, html: await res.text() }
+    const html = await res.text()
+    // A bot check served instead of the page is a failed read, not a page without dates.
+    if (html.length < 40000 && /captcha|just a moment|verify you are human/i.test(html.slice(0, 4000))) return null
+    return { url: res.url, html }
   } catch {
     return null
   }
 }
 
 /** Read one edition's dates from its site; follows one "Call for Papers / Important Dates" link if needed. */
-async function crawlEdition(url, year, { mustMentionYear }) {
+async function crawlEdition(url, year, { mustMentionYear, acronym }) {
   const page = await get(url)
   if (!page) return null
   // Bounced to a login / access-denied page, or redirected to another host: the site isn't really there.
@@ -75,12 +78,20 @@ async function crawlEdition(url, year, { mustMentionYear }) {
   const y = String(year)
   if (mustMentionYear && !(page.html.includes(y) && (page.url.includes(y) || page.url.includes(y.slice(2))))) return null
 
-  let best = { url: page.url, ...extractRounds(page.html, year) }
+  let best = { url: page.url, ...extractRounds(page.html, year, { acronym, url: page.url }) }
+  // researchr.org sites keep every date on a /dates/ page; the home page only has news items.
+  const rr = page.url.match(/^https?:\/\/conf\.researchr\.org\/home\/([^/?#]+)/)
+  if (rr) {
+    const sub = await get(`https://conf.researchr.org/dates/${rr[1]}`)
+    const r = sub && extractRounds(sub.html, year, { acronym, url: page.url })
+    if (r?.rounds.length) best = { url: sub.url, ...r }
+    else if (r) best = { ...best, rounds: [] }
+  }
   if (!best.rounds.length) {
     for (const link of findCfpLinks(page.html, page.url)) {
       const sub = await get(link)
       if (!sub) continue
-      const r = extractRounds(sub.html, year)
+      const r = extractRounds(sub.html, year, { acronym, url: sub.url })
       if (r.rounds.length) {
         best = { url: sub.url, ...r }
         break
@@ -100,16 +111,20 @@ async function crawlAll(prev) {
     if (!mine.length) return
     const latest = mine.reduce((a, b) => (b.year > a.year ? b : a))
     const editions = []
-    const cur = await crawlEdition(latest.url, latest.year, { mustMentionYear: false })
+    const cur = await crawlEdition(latest.url, latest.year, { mustMentionYear: false, acronym: c.acronym })
+    // A site that could not be read today keeps what was read from it last time, with its old fetch date.
+    const kept = (year) => prev[c.id]?.find((e) => e.year === year && e.rounds.length)
     if (cur) editions.push(cur)
+    else if (kept(latest.year)) editions.push(kept(latest.year))
     for (const cand of nextYearCandidates(latest.url, latest.year)) {
-      const next = await crawlEdition(cand, latest.year + 1, { mustMentionYear: true })
+      const next = await crawlEdition(cand, latest.year + 1, { mustMentionYear: true, acronym: c.acronym })
       if (next) {
         const seen = prev[c.id]?.find((e) => e.year === next.year)
         editions.push({ ...next, firstSeen: seen?.firstSeen ?? today })
         break
       }
     }
+    if (!editions.some((e) => e.year === latest.year + 1) && kept(latest.year + 1)) editions.push(kept(latest.year + 1))
     if (editions.length) out[c.id] = editions
   })
   let i = 0
