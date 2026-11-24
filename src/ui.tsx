@@ -275,7 +275,7 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
         {date('noti', 'Notification')}
         {date('event', 'Conference starts')}
         <Field label="Edition (year)"><input type="number" value={d.year} onChange={(e) => set('year', Number(e.target.value))} /></Field>
-        <Field label="Round (e.g., 1/2)"><input value={d.round} onChange={(e) => set('round', e.target.value)} /></Field>
+        <Field label="Round or track (e.g., 1/2, Short Paper)"><input value={d.round} onChange={(e) => set('round', e.target.value)} /></Field>
         <Field label="Location"><input value={d.location} onChange={(e) => set('location', e.target.value)} placeholder="City, Country" /></Field>
         <Field label="URL"><input value={d.url} onChange={(e) => set('url', e.target.value)} /></Field>
         <Field label="Note" span><input value={d.note} onChange={(e) => set('note', e.target.value)} /></Field>
