@@ -1,15 +1,22 @@
 import { useMemo, useState } from 'react'
-import { PAPER_STATUS, countdown, fmt, sortMembers } from '../logic'
+import { PAPER_STATUS, countdown, diffDays, fmt, sortMembers } from '../logic'
 import { useStore } from '../store'
 import type { Paper } from '../types'
 import { Avatar, Avatars, Icon, PaperModal, RESULT_LABEL, newPaper } from '../ui'
 
 export default function Papers() {
-  const { data, today, me } = useStore()
+  const { data, rows, today, me } = useStore()
   const [paper, setPaper] = useState<Paper | null>(null)
   const [who, setWho] = useState('')
   const papers = data.papers.filter((p) => !who || p.members.includes(who))
-  const cols = PAPER_STATUS
+  // Accepted is the last column: the board reads left to right towards it.
+  const cols = [...PAPER_STATUS.filter((s) => s.key !== 'accepted'), ...PAPER_STATUS.filter((s) => s.key === 'accepted')]
+  /** The site of the round a paper is aimed at, or failing that the conference's nearest round that has one. */
+  const siteOf = (t: NonNullable<Paper['target']>) => {
+    const mine = rows.filter((r) => r.confId === t.confId && r.url)
+    return (mine.find((r) => r.deadline === t.deadline) ?? mine.sort((a, b) => Math.abs(diffDays(a.deadline, t.deadline)) - Math.abs(diffDays(b.deadline, t.deadline)))[0])?.url ?? ''
+  }
+  const open = (e: { stopPropagation: () => void }, url: string) => { e.stopPropagation(); window.open(url, '_blank', 'noopener') }
 
   const people = useMemo(
     () =>
@@ -59,7 +66,11 @@ export default function Papers() {
                   {p.group && <span className="tag">{p.group}</span>}
                   {p.target && (
                     <span className="pc-target">
-                      <b>{p.target.label}</b>
+                      {siteOf(p.target)
+                        ? <b className="pc-site" role="link" tabIndex={0} title="Open conference site"
+                            onClick={(e) => open(e, siteOf(p.target!))}
+                            onKeyDown={(e) => { if (e.key === 'Enter') open(e, siteOf(p.target!)) }}>{p.target.label}</b>
+                        : <b>{p.target.label}</b>}
                       {/* the one date that matters at this stage, always with its label */}
                       {s.key === 'writing' && <small><i>Deadline</i> {fmt(p.target.deadline)} ({countdown(p.target.deadline, today)})</small>}
                       {s.key === 'submitted' && (
@@ -83,7 +94,7 @@ export default function Papers() {
           <h2>People</h2>
           <div className="card">
             <table className="plain">
-              <thead><tr><th>Member</th><th>Researching</th><th>Writing</th><th>In review</th><th>Accepted</th><th>Rejected</th></tr></thead>
+              <thead><tr><th>Member</th><th>Researching</th><th>Writing</th><th>In review</th><th>Rejected</th><th>Accepted</th></tr></thead>
               <tbody>
                 {people.map(({ m, research, writing, review, acc, rej }) => (
                   <tr key={m.id}>
@@ -91,8 +102,8 @@ export default function Papers() {
                     <td>{research || <span className="muted">–</span>}</td>
                     <td>{writing || <span className="muted">–</span>}</td>
                     <td>{review || <span className="muted">–</span>}</td>
-                    <td>{acc || <span className="muted">–</span>}</td>
                     <td>{rej || <span className="muted">–</span>}</td>
+                    <td>{acc || <span className="muted">–</span>}</td>
                   </tr>
                 ))}
               </tbody>

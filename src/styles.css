@@ -847,3 +847,7 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 
 /* inbox: the dates of one line sit on a shared text baseline, whatever their size or weight */
 .it-dates { align-items: baseline; }
+
+/* research cards: the venue name opens the conference site */
+.pc-target .pc-site { align-self: flex-start; cursor: pointer; }
+.pc-target .pc-site:hover, .pc-target .pc-site:focus-visible { text-decoration: underline; }
