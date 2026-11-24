@@ -722,13 +722,14 @@ export function ConfDrawer({ row, onClose }: { row: Row; onClose: () => void }) 
           {steps.map((s) => (
             <li key={s.label} className={s === nextStep ? 'upnext' : s.date && s.date < today ? 'done' : ''} title={s === nextStep ? 'Next date coming up' : s.date && s.date < today ? 'Passed' : ''}>
               <span>{s.label}</span>
-              <b className={live.status === 'estimated' || s.soft ? 'est' : ''}>{fmt(s.date) || (s.label === 'Abstract' ? '–' : 'TBD')}</b>
+              <b className={live.status === 'estimated' || s.soft ? 'est' : ''} title={s.date && (live.status === 'estimated' || s.soft) ? 'Estimated: not announced yet, projected from the previous edition' : undefined}>{fmt(s.date) || (s.label === 'Abstract' ? '–' : 'TBD')}</b>
               {s.main && <Countdown deadline={live.deadline} today={today} at={live.at} assumed={!live.exact} />}
               {s.main && !live.exact && live.at > Date.now() && <small className="muted when">Closing time not stated. 23:59 AoE assumed.</small>}
               {s.main && live.time && live.tz && (
                 <small className="muted when">{live.time} {/^UTC-12$/i.test(live.tz) ? 'AoE' : live.tz}{toKST(live.deadline, live.time, live.tz) && <> = <b>{toKST(live.deadline, live.time, live.tz)} KST</b></>}</small>
               )}
               {s.label === 'Notification' && live.noti && <small className="muted">{diffDays(live.noti, live.deadline)} days of review</small>}
+              {s.soft && s.date && live.status !== 'estimated' && <small className="muted when">Not announced yet. Estimated from last year.</small>}
             </li>
           ))}
         </ol>
