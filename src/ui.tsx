@@ -308,7 +308,8 @@ function Choice<T extends string | number>({ value, options, onChange }: { value
 }
 
 export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () => void }) {
-  const { save, remove, data, auto } = useStore()
+  const { save, remove, data, auto, today } = useStore()
+  const [first, setFirst] = useState<Row | null>(null)
   const [c, setC] = useState<Conf>(() => conf ?? { id: '', acronym: '', name: '', area: '', kiise: '', bk: null, blind: 'Double', owner: '', ccfddl: '' })
   const [grades, setGrades] = useState<Record<string, { kiise?: string; bk?: number }>>({})
   useEffect(() => {
@@ -335,9 +336,19 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
     if (!c.acronym.trim()) return alert('An acronym is required.')
     const id = conf?.id ?? slug(c.acronym)
     if (!conf && data.conferences.some((x) => x.id === id)) return alert('This conference is already tracked.')
-    await save('conferences', { ...c, acronym: c.acronym.trim(), id })
+    const saved = { ...c, acronym: c.acronym.trim(), id }
+    await save('conferences', saved)
+    // A conference the collector does not know has no dates, and without one it would not show in the table.
+    // So its first deadline is asked for right away.
+    if (!conf && !saved.ccfddl) {
+      return setFirst({
+        id: uid(), confId: id, conf: saved, year: Number(today.slice(0, 4)) + 1, round: '', abstract: '', deadline: '', noti: '', event: '', location: '', url: '',
+        status: 'estimated', checkedAt: '', checkedBy: '', source: 'manual', note: '', virtual: true, at: 0, exact: false,
+      })
+    }
     onClose()
   }
+  if (first) return <DeadlineModal row={first} onClose={onClose} />
 
   return (
     <Modal title={conf ? `Edit ${conf.acronym}` : 'Track a conference'} onClose={onClose}>
@@ -359,7 +370,7 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
               ? <><i className="dot warn" /> {c.acronym.trim()} is already tracked. Open it from the Deadlines table to edit it.</>
               : linked
               ? <><i className="dot ok" /> Dates are collected automatically ({linked.key}). <button type="button" className="link" onClick={() => set('ccfddl', '')}>Unlink</button></>
-              : <><i className="dot" /> Not linked to the collector. Dates for this one are entered by hand.</>}
+              : <><i className="dot" /> Not linked to the collector. {conf ? 'Dates for this one are entered by hand.' : 'You will enter its dates in the next step.'}</>}
           </small>
         </div>
         <Field label="Full name" span><input value={c.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g., ACM SIGMOD International Conference on Management of Data" /></Field>
@@ -411,7 +422,7 @@ export function ConfModal({ conf, onClose }: { conf: Conf | null; onClose: () =>
         )}
         <span className="grow" />
         <button onClick={onClose}>Cancel</button>
-        <button className="primary" onClick={submit}>{conf ? 'Save' : 'Track'}</button>
+        <button className="primary" onClick={submit}>{conf ? 'Save' : linked ? 'Track' : 'Next: dates'}</button>
       </footer>
     </Modal>
   )
