@@ -558,24 +558,6 @@
   "id": "raid-2026-04-16"
  },
  {
-  "confId": "icdcs-poster",
-  "year": 2026,
-  "round": "",
-  "abstract": "",
-  "deadline": "2026-04-17",
-  "noti": "2026-04-26",
-  "event": "2026-06-22",
-  "location": "Seoul, South Korea",
-  "url": "https://icdcs2026.icdcs.org/",
-  "status": "verified",
-  "notiEstimated": false,
-  "checkedAt": "2026-10-06",
-  "checkedBy": "",
-  "source": "sheet",
-  "note": "",
-  "id": "icdcs-poster-2026-04-17"
- },
- {
   "confId": "sdm",
   "year": 2026,
   "round": "",
@@ -1204,24 +1186,6 @@
   "source": "sheet",
   "note": "",
   "id": "icsoc-2026-07-19"
- },
- {
-  "confId": "ccs-poster",
-  "year": 2026,
-  "round": "",
-  "abstract": "",
-  "deadline": "2026-07-23",
-  "noti": "2026-08-27",
-  "event": "2026-11-15",
-  "location": "The Hague, Netherlands",
-  "url": "https://www.sigsac.org/ccs/CCS2026/call-for/call-for-posters.html",
-  "status": "verified",
-  "notiEstimated": false,
-  "checkedAt": "2026-10-06",
-  "checkedBy": "",
-  "source": "sheet",
-  "note": "",
-  "id": "ccs-poster-2026-07-23"
  },
  {
   "confId": "kdd",
@@ -2194,24 +2158,6 @@
   "source": "sheet",
   "note": "",
   "id": "kdd-2027-02-08"
- },
- {
-  "confId": "sigir-short",
-  "year": 2027,
-  "round": "",
-  "abstract": "",
-  "deadline": "2027-02-12",
-  "noti": "",
-  "event": "2027-07-18",
-  "location": "San Jose, CA, USA",
-  "url": "https://sigir2027.org/pages/submit-short.html",
-  "status": "estimated",
-  "notiEstimated": false,
-  "checkedAt": "2026-10-02",
-  "checkedBy": "",
-  "source": "sheet",
-  "note": "",
-  "id": "sigir-short-2027-02-12"
  },
  {
   "confId": "sacmat",

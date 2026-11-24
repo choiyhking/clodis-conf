@@ -99,16 +99,6 @@
   "ccfddl": "SC/ccs"
  },
  {
-  "id": "ccs-poster",
-  "acronym": "CCS Poster",
-  "name": "ACM Conference on Computer and Communications Security",
-  "area": "Security",
-  "kiise": "S",
-  "bk": 4,
-  "blind": "Single",
-  "owner": ""
- },
- {
   "id": "cikm",
   "acronym": "CIKM",
   "name": "ACM Conference on Information and Knowledge Management",
@@ -367,16 +357,6 @@
   "blind": "Double",
   "owner": "",
   "ccfddl": "DS/icdcs"
- },
- {
-  "id": "icdcs-poster",
-  "acronym": "ICDCS Poster",
-  "name": "IEEE International Conference on Distributed Computing Systems",
-  "area": "System",
-  "kiise": "A",
-  "bk": 3,
-  "blind": "Double",
-  "owner": ""
  },
  {
   "id": "icde",
@@ -870,16 +850,6 @@
   "blind": "Double",
   "owner": "",
   "ccfddl": "DB/sigir"
- },
- {
-  "id": "sigir-short",
-  "acronym": "SIGIR (short)",
-  "name": "ACM SIGIR Conference on Information Retrieval",
-  "area": "Data",
-  "kiise": "S",
-  "bk": 3,
-  "blind": "Double",
-  "owner": ""
  },
  {
   "id": "sigmetrics",

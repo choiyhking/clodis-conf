@@ -136,6 +136,11 @@ const SIDE_TRACK = /short|poster|workshop|demo|industr|tutorial|doctoral|journal
  * to papers that already went through ARR review. They are left out entirely.
  */
 const NOT_A_SUBMISSION = /commitment|reviewed papers only/i
+/**
+ * Only the main track is tracked. Side tracks a source lists next to it (short papers, posters, fast tracks…)
+ * are left out; one we do submit to is added by hand as its own entry, e.g. "WSDM (short)".
+ */
+const OTHER_TRACK = /short|poster|workshop|demo|industr|tutorial|doctoral|journal|tools?|artifact|fast track|resubmission/i
 export const STATUS_LABEL: Record<Row['status'], string> = { verified: 'Verified', auto: 'Auto', estimated: 'Estimated' }
 export const PAPER_STATUS: { key: PaperStatus; label: string }[] = [
   { key: 'research', label: 'Researching' },
@@ -312,7 +317,7 @@ export function collected(conf: Conf, auto: AutoData): Collected[] {
   for (const year of years) {
     const c = ccf.find((e) => e.year === year)
     const s = crawl.find((e) => e.year === year)
-    const cRounds = (c?.rounds ?? []).filter((r) => isDate(r.deadline) && !NOT_A_SUBMISSION.test(r.comment ?? ''))
+    const cRounds = (c?.rounds ?? []).filter((r) => isDate(r.deadline) && !NOT_A_SUBMISSION.test(r.comment ?? '') && !OTHER_TRACK.test(r.comment ?? ''))
     const sRounds = (s?.rounds ?? []).filter((r) => isDate(r.deadline))
     if (cRounds.length) {
       out.push({

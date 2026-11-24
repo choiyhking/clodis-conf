@@ -166,32 +166,6 @@
     "firstSeen": "2026-11-21"
    }
   ],
-  "ccs-poster": [
-   {
-    "year": 2026,
-    "url": "https://www.sigsac.org/ccs/CCS2026/call-for/call-for-posters.html",
-    "rounds": [
-     {
-      "abstract": "",
-      "deadline": "2026-07-23",
-      "noti": "2026-08-27"
-     }
-    ],
-    "evidence": [
-     "Submission deadline: July 23, 2026, 23:59:59 (AoE, or UTC -12)",
-     "Author notification: August 27, 2026, 23:59:59 (AoE, or UTC -12)"
-    ],
-    "fetchedAt": "2026-11-24"
-   },
-   {
-    "year": 2027,
-    "url": "https://www.sigsac.org/ccs/CCS2027/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-24",
-    "firstSeen": "2026-11-24"
-   }
-  ],
   "dasfaa": [
    {
     "year": 2027,
@@ -645,23 +619,6 @@
     ],
     "fetchedAt": "2026-11-24",
     "firstSeen": "2026-11-10"
-   }
-  ],
-  "icdcs-poster": [
-   {
-    "year": 2026,
-    "url": "https://icdcs2026.icdcs.org/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-24"
-   },
-   {
-    "year": 2027,
-    "url": "https://icdcs2027.icdcs.org/",
-    "rounds": [],
-    "evidence": [],
-    "fetchedAt": "2026-11-24",
-    "firstSeen": "2026-11-24"
    }
   ],
   "icws": [
@@ -1425,15 +1382,6 @@
      "Full paper submission: January 21, 2027",
      "Full paper notification: April 5, 2027"
     ],
-    "fetchedAt": "2026-11-24"
-   }
-  ],
-  "sigir-short": [
-   {
-    "year": 2027,
-    "url": "https://sigir2027.org/pages/submit-short.html",
-    "rounds": [],
-    "evidence": [],
     "fetchedAt": "2026-11-24"
    }
   ],
