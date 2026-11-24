@@ -139,7 +139,6 @@ export default function Lab() {
       <header className="page-head">
         <div>
           <h1>Lab</h1>
-          <p className="muted">Members, activity and data</p>
         </div>
       </header>
 

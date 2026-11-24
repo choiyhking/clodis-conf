@@ -167,7 +167,6 @@ export default function Timeline() {
       <header className="page-head">
         <div>
           <h1>Timeline</h1>
-          <p className="muted">Where every paper stands against its deadline, month by month</p>
         </div>
       </header>
 

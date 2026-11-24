@@ -2,7 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from 'react'
 import { diffDays, fmt, rowRound, rowTrack, sortMembers, venueOf } from '../logic'
 import { useStore } from '../store'
 import type { Paper, Row } from '../types'
-import { AreaTag, Clock, ConfDrawer, ConfModal, Countdown, Icon, MultiFilter, PaperModal, Place, Rank, StatusBadge, TargetModal, type FilterOption } from '../ui'
+import { AreaTag, ConfDrawer, ConfModal, Countdown, Icon, MultiFilter, PaperModal, Place, Rank, StatusBadge, TargetModal, type FilterOption } from '../ui'
 
 const RANK_OPTIONS: FilterOption[] = [
   { group: 'KIISE', value: 'k:S', label: 'KIISE S' },
@@ -101,11 +101,9 @@ export default function Schedule() {
       <header className="page-head">
         <div>
           <h1>Deadlines</h1>
-          <p className="muted">Submission deadlines of the conferences we track, soonest first</p>
         </div>
       </header>
 
-      <Clock />
 
       <div className="filters">
         <input type="search" placeholder="Search conferences" value={q} onChange={(e) => setQ(e.target.value)} />

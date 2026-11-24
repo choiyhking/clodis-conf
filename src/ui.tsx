@@ -72,30 +72,6 @@ export function AreaTag({ area }: { area: string }) {
   return area ? <span className="area">{area}</span> : null
 }
 
-const ZONES = [
-  { label: 'KST', zone: 'Asia/Seoul', hint: 'Korea' },
-  { label: 'AoE', zone: 'Etc/GMT+12', hint: 'Anywhere on Earth (UTC-12)' },
-  { label: 'UTC', zone: 'UTC', hint: 'Coordinated Universal Time' },
-  { label: 'PT', zone: 'America/Los_Angeles', hint: 'US Pacific' },
-  { label: 'ET', zone: 'America/New_York', hint: 'US Eastern' },
-]
-/** Live clock in the timezones deadlines are usually stated in. */
-export function Clock() {
-  const [now, setNow] = useState(() => new Date())
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 15000)
-    return () => clearInterval(t)
-  }, [])
-  const at = (zone: string) => new Intl.DateTimeFormat('en-GB', { timeZone: zone, weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).format(now)
-  return (
-    <div className="clock">
-      {ZONES.map((z) => (
-        <span key={z.label} title={z.hint}><i>{z.label}</i> {at(z.zone)}</span>
-      ))}
-    </div>
-  )
-}
-
 export function Place({ location }: { location: string }) {
   if (!location) return <span className="muted">TBD</span>
   const flag = flagOf(location)
@@ -114,11 +90,11 @@ export function Place({ location }: { location: string }) {
 export function Countdown({ deadline, today, at, assumed }: { deadline: string; today: string; at?: number; assumed?: boolean }) {
   if (at) {
     const t = timeLeft(at, Date.now())
-    const local = new Date(at).toLocaleString('sv-SE').slice(0, 16)
+    const kst = new Date(at).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 16)
     const open = t.tone !== 'closed'
     return (
       <span className={'cd-wrap' + (assumed && open ? ' assumed' : '')}
-        title={assumed ? `No closing time was given, so 23:59 AoE is assumed (${local} your time). Check the conference site.` : `Closes ${local} your time`}>
+        title={assumed ? `No closing time was given, so 23:59 AoE is assumed (${kst} KST). Check the conference site.` : `Closes ${kst} KST`}>
         <span className={`cd ${t.tone}`}>{t.text}</span>
       </span>
     )

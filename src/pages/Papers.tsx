@@ -43,7 +43,6 @@ export default function Papers() {
       <header className="page-head">
         <div>
           <h1>Research</h1>
-          <p className="muted">Ongoing research, where each paper is headed, and how past submissions went</p>
         </div>
         <button className="primary" onClick={() => setPaper(newPaper(me, today))}><Icon name="plus" size={14} /> New paper</button>
       </header>

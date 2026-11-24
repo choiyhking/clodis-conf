@@ -50,9 +50,6 @@ export default function Inbox() {
       <header className="page-head">
         <div>
           <h1>Inbox</h1>
-          <p className="muted">
-            Dates collected automatically. Confirm each one after checking the conference site.
-          </p>
         </div>
         <button className={'toggle' + (mine ? ' on' : '')} onClick={() => setMine(!mine)} disabled={!me} aria-pressed={mine}
           title={me ? '' : 'Pick who you are in the sidebar first'}>
