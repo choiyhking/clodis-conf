@@ -880,3 +880,6 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 /* the "soon" countdown is a clear orange, so it stands apart from the pale yellow of a targeted row */
 .cd.warm { background: #ffd3a1; color: #8a4700; }
 @media (prefers-color-scheme: dark) { .cd.warm { background: #5a3a0c; color: #ffc878; } }
+/* the red chip is as strong as the orange one */
+.cd.hot { background: #ffc7bf; color: #ad2114; }
+@media (prefers-color-scheme: dark) { .cd.hot { background: #5e231d; color: #ffa095; } }
