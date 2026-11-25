@@ -883,3 +883,5 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 /* the red chip is as strong as the orange one */
 .cd.hot { background: #ffc7bf; color: #ad2114; }
 @media (prefers-color-scheme: dark) { .cd.hot { background: #5e231d; color: #ffa095; } }
+/* the grey chip, one step stronger to sit with the orange and red */
+.sched .cd:not(.hot):not(.warm):not(.urgent):not(.closed) { background: var(--line-strong); color: color-mix(in srgb, var(--muted) 30%, var(--text)); }
