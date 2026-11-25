@@ -876,3 +876,7 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 .nw + .nw::before { content: ' '; white-space: normal; }
 .steps .when { text-wrap: balance; }
 .diff { text-wrap: balance; }
+
+/* the "soon" countdown is a clear orange, so it stands apart from the pale yellow of a targeted row */
+.cd.warm { background: #ffd3a1; color: #8a4700; }
+@media (prefers-color-scheme: dark) { .cd.warm { background: #5a3a0c; color: #ffc878; } }
