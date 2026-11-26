@@ -888,3 +888,6 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 
 /* Edit dates: closing time and its zone share one cell */
 .time-tz { display: grid; grid-template-columns: 1fr 96px; gap: 8px; }
+
+/* every countdown chip in the table is as wide as the longest one ("23h 59m") */
+.sched .cd { min-width: 68px; }
