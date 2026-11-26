@@ -188,7 +188,7 @@ export function DateInput({ value, onChange }: { value: string; onChange: (v: st
 }
 
 export function toDeadline(r: Row): Deadline {
-  const { conf: _c, virtual: _v, derivedFrom: _d, autoDiff: _a, sources: _s, evidence: _e, time: _t, tz: _z, at: _at, exact: _x, ...d } = r
+  const { conf: _c, virtual: _v, derivedFrom: _d, autoDiff: _a, sources: _s, evidence: _e, at: _at, exact: _x, ...d } = r
   return d
 }
 
@@ -236,6 +236,8 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
       checkedBy: me || d.checkedBy,
       source: row.status === 'verified' ? d.source : 'manual',
       autoSig: row.autoDiff ? row.autoDiff.sig : d.autoSig,
+      time: d.time || '',
+      tz: d.time ? d.tz || 'AoE' : '',
     })
     onClose()
   }
@@ -256,6 +258,15 @@ export function DeadlineModal({ row, onClose }: { row: Row; onClose: () => void 
       <div className="grid">
         {date('abstract', 'Abstract')}
         {date('deadline', 'Submission *')}
+        <Field label="Closing time (empty: 23:59 AoE)">
+          <div className="time-tz">
+            <input type="time" value={d.time ?? ''} onChange={(e) => set('time', e.target.value)} />
+            <select value={d.time ? d.tz || 'AoE' : ''} disabled={!d.time} onChange={(e) => set('tz', e.target.value)}>
+              {!d.time && <option value="">AoE</option>}
+              {[...new Set(['AoE', 'UTC', 'PT', 'ET', 'CET', 'KST', ...(d.tz ? [d.tz] : [])])].map((z) => <option key={z}>{z}</option>)}
+            </select>
+          </div>
+        </Field>
         {date('noti', 'Notification')}
         {date('event', 'Conference starts')}
         <Field label="Edition (year)"><input type="number" value={d.year} onChange={(e) => set('year', Number(e.target.value))} /></Field>

@@ -393,7 +393,7 @@ export function buildRows(confs: Conf[], deadlines: Deadline[], auto: AutoData |
             // Likewise a saved "2/2" gives way when the collector now knows this entry is a named side track.
             const numbered = (x: string) => /^\d+\/\d+$/.test(x)
             if (round && (!best.round || (numbered(best.round) && !numbered(round)))) best.round = round
-            if (best.deadline === a.deadline) Object.assign(best, { time: a.time, tz: a.tz })
+            if (best.deadline === a.deadline && !best.time) Object.assign(best, { time: a.time, tz: a.tz })
           } else if (best) {
             // An estimate from the sheet, and the real dates are now out: show the collected values.
             Object.assign(best, {

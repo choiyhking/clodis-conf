@@ -29,6 +29,8 @@ export interface Deadline {
   checkedBy: string
   source: string
   note: string
+  time?: string // closing time of day a person entered, e.g. "23:59". Empty: the collected one, else 23:59 AoE
+  tz?: string // the zone that time is in, e.g. "AoE", "UTC", "PT"
   autoSig?: string // the collected value at the time a person confirmed; a later change raises "Changed"
 }
 
