@@ -891,3 +891,8 @@ h3 { text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 
 /* every countdown chip in the table is as wide as the longest one ("23h 59m") */
 .sched .cd { min-width: 68px; }
+/* the Left column holds the widest chip and its mark; the room comes out of the target column, Conference keeps its width */
+.sched col.c-left { width: 98px; }
+.sched col.c-conf { width: 42%; } .sched col.c-loc { width: 28%; } .sched col.c-target { width: 30%; }
+@media (min-width: 1500px) { .sched col.c-conf { width: 37%; } .sched col.c-loc { width: 33%; } .sched col.c-target { width: 30%; } }
+@media (min-width: 1740px) { .sched col.c-loc { width: 320px; } .sched col.c-conf { width: 56%; } .sched col.c-target { width: 44%; } }
