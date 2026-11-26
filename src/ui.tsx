@@ -88,6 +88,14 @@ export function Place({ location }: { location: string }) {
  * `assumed` adds a small ? when the closing time wasn't stated and 23:59 AoE was assumed.
  */
 export function Countdown({ deadline, today, at, assumed }: { deadline: string; today: string; at?: number; assumed?: boolean }) {
+  // Under a day the chip shows minutes, so it redraws every half minute.
+  const [, tick] = useState(0)
+  const near = !!at && at - Date.now() < 25 * 3600000 && at > Date.now()
+  useEffect(() => {
+    if (!near) return
+    const id = setInterval(() => tick((n) => n + 1), 30000)
+    return () => clearInterval(id)
+  }, [near])
   if (at) {
     const t = timeLeft(at, Date.now())
     const kst = new Date(at).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 16)

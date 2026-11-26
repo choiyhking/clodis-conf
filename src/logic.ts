@@ -84,12 +84,17 @@ export function closesAt(date: string, time?: string, tz?: string): { at: number
     ? { at: Date.parse(`${date}T23:59:00Z`) + 12 * HOUR, exact: false }
     : { at: Date.parse(`${date}T${time}:00Z`) - off * HOUR, exact: true }
 }
-/** "Closed", hours once less than a day is left ("18h"), otherwise whole days ("12d"). */
+/** "Closed", hours and minutes once less than a day is left ("18h 05m"), otherwise whole days ("12d"). */
 export function timeLeft(at: number, now: number): { text: string; tone: 'closed' | 'urgent' | 'hot' | 'warm' | 'calm' } {
   const ms = at - now
   if (ms <= 0) return { text: 'Closed', tone: 'closed' }
   const hours = ms / HOUR
-  if (hours < 24) return { text: `${Math.max(1, Math.floor(hours))}h`, tone: 'urgent' }
+  // Hours always come with minutes ("7h 05m"), so "7h" is never misread as "7d".
+  if (hours < 24) {
+    const mins = Math.max(1, Math.floor(ms / 60000))
+    const h = Math.floor(mins / 60), m = mins % 60
+    return { text: h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`, tone: 'urgent' }
+  }
   const days = Math.floor(hours / 24)
   return { text: `${days}d`, tone: days <= 7 ? 'hot' : days <= 30 ? 'warm' : 'calm' }
 }
